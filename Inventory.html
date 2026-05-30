@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTV Inventory Hub | Inventory Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #053d1a;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            text-align: center;
+        }
+
+        .sidebar-logo,
+        .logo {
+            height: 80px;
+            width: 80px;
+            object-fit: contain;
+            background: white;
+            padding: 10px;
+            border-radius: 18px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: var(--transition);
+            gap: 0.75rem;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .header-title h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .header-title p {
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Stat Card */
+        .stat-card .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .stat-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .stat-value.small {
+            font-size: 2rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--secondary);
+            font-weight: 500;
+        }
+        
+        .stat-sublabel {
+            font-size: 0.85rem;
+            color: var(--success);
+            font-weight: 500;
+            margin-top: -0.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #0da271;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #cc3333;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--secondary);
+        }
+
+        .btn-outline:hover {
+            background: var(--light);
+        }
+
+        /* Table Styles */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .inventory-table thead th {
+            text-align: left;
+            padding: 1.25rem;
+            background: var(--light);
+            color: var(--secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .inventory-table thead th input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .inventory-table tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background-color 0.2s ease;
+        }
+        
+        .inventory-table tbody tr.selected {
+            background-color: #fee2e2;
+        }
+
+        .inventory-table tbody tr:last-child {
+            border-bottom: none;
+        }
+        
+        .inventory-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .inventory-table td {
+            padding: 1rem 1.25rem;
+            vertical-align: middle;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+        
+        .inventory-table tbody td input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 600;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.375rem;
+        }
+        
+        .status-available { color: #065f46; background-color: #d1fae5; }
+        .status-in-use { color: #1e40af; background-color: #dbeafe; }
+        .status-maintenance { color: #92400e; background-color: #fef3c7; }
+        .status-retired { color: #991b1b; background-color: #fee2e2; }
+        /* --- MODIFICATION START: Added style for pending approval --- */
+        .status-pending-approval { color: #9a3412; background-color: #ffedd5; }
+        /* --- MODIFICATION END --- */
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-buttons .btn {
+            font-size: 0.8rem;
+            padding: 0.5rem 0.8rem;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+        
+        .modal-content h3 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .modal-footer {
+            margin-top: 1.5rem;
+            text-align: right;
+        }
+        
+        #search-box {
+            width: 300px;
+        }
+
+        #qr-code-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+            font-size: 0.9rem;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        #upload-preview {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+
+        #upload-preview table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        #upload-preview th, #upload-preview td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Security Check: This script runs first to protect the page.
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (!loggedInUser) {
+            // If no user is logged in, redirect to the login page.
+            window.location.href = 'login.html';
+        } else if (loggedInUser.role !== 'admin') {
+            // If a user is logged in but is NOT an admin, redirect them to their default page.
+            window.location.href = 'supervisor.html';
+        }
+    </script>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="rtv logo.svg" alt="RTV Inventory Hub Logo" class="sidebar-logo">
+                <h2>RTV Inventory Hub</h2>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="index.html" class="menu-item">
+                    <i class="fas fa-home"></i>
+                    <span class="menu-text">Dashboard</span>
+                </a>
+                <a href="Inventory.html" class="menu-item active">
+                    <i class="fas fa-list"></i>
+                    <span class="menu-text">Inventory</span>
+                </a>
+                <a href="supervisor.html" class="menu-item">
+                    <i class="fas fa-user-shield"></i>
+                    <span class="menu-text">Supervisor</span>
+                </a>
+                <a href="transfers.html" class="menu-item">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span class="menu-text">Transfers</span>
+                </a>
+                <a href="reports.html" class="menu-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="menu-text">Reports</span>
+                </a>
+                <a href="settings.html" class="menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span class="menu-text">Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-title">
+                    <h1>Inventory Management</h1>
+                    <p>Manage and track all inventory items</p>
+                </div>
+                <div class="header-actions">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-primary" id="new-item-btn"><i class="fas fa-plus"></i> New Item</button>
+                        <button class="btn btn-outline" id="bulk-upload-btn"><i class="fas fa-upload"></i> Bulk Upload</button>
+                    </div>
+                     <button class="btn btn-danger" id="bulk-delete-btn" style="display: none;"><i class="fas fa-trash-alt"></i> Bulk Delete</button>
+                    <input type="text" id="search-box" class="form-control" placeholder="Search by ID, name, or type...">
+                    <button class="btn btn-outline" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+            </header>
+            
+            <div class="dashboard-grid">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-value" id="total-items">0</div>
+                        <div class="stat-label">Total Items</div>
+                    </div>
+                </div>
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-value" id="available-items">0</div>
+                        <div class="stat-label">Available</div>
+                    </div>
+                </div>
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-value" id="in-use-items">0</div>
+                        <div class="stat-label">In Use</div>
+                    </div>
+                </div>
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-value" id="maintenance-items">0</div>
+                        <div class="stat-label">Maintenance</div>
+                    </div>
+                </div>
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-value" id="retired-items">0</div>
+                        <div class="stat-label">Retired</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <i class="fas fa-tablet-alt stat-icon"></i>
+                        <div class="stat-value small" id="tablet-total">0</div>
+                        <div class="stat-label">Tablets</div>
+                        <div class="stat-sublabel"><span id="tablet-available">0</span> Available</div>
+                    </div>
+                </div>
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <i class="fas fa-mobile-alt stat-icon"></i>
+                        <div class="stat-value small" id="phone-total">0</div>
+                        <div class="stat-label">Phones</div>
+                        <div class="stat-sublabel"><span id="phone-available">0</span> Available</div>
+                    </div>
+                </div>
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <i class="fas fa-charging-station stat-icon"></i>
+                        <div class="stat-value small" id="charger-total">0</div>
+                        <div class="stat-label">Chargers</div>
+                        <div class="stat-sublabel"><span id="charger-available">0</span> Available</div>
+                    </div>
+                </div>
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <i class="fas fa-briefcase stat-icon"></i>
+                        <div class="stat-value small" id="bag-total">0</div>
+                        <div class="stat-label">Bags</div>
+                        <div class="stat-sublabel"><span id="bag-available">0</span> Available</div>
+                    </div>
+                </div>
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <i class="fas fa-car-battery stat-icon"></i>
+                        <div class="stat-value small" id="power-bank-total">0</div>
+                        <div class="stat-label">Power Banks</div>
+                        <div class="stat-sublabel"><span id="power-bank-available">0</span> Available</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="inventory-table">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="select-all-checkbox"></th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Assigned To</th>
+                            <th>District</th>
+                            <th>Last Update</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-table-body">
+                        </tbody>
+                </table>
+            </div>
+            
+        </main>
+    </div>
+
+    <div id="item-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3 id="modal-title">Add New Item</h3>
+            <form id="item-form">
+                <input type="hidden" id="item-id-hidden">
+                <div class="form-group">
+                    <label for="item-id">Item ID</label>
+                    <input type="text" class="form-control" id="item-id" placeholder="Auto-generated or enter ID">
+                </div>
+                <div class="form-group">
+                    <label for="item-name">Item Name</label>
+                    <input type="text" class="form-control" id="item-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="item-type">Item Type</label>
+                    <select class="form-control" id="item-type" required>
+                        <option value="">Select a type</option>
+                        <option value="tablet">Tablet</option>
+                        <option value="phone">Phone</option>
+                        <option value="charger">Charger</option>
+                        <option value="bag">Bag</option>
+                        <option value="power-bank">Power Bank</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="item-assigned">Assigned To (Supervisor)</label>
+                    <select class="form-control" id="item-assigned">
+                        <option value="">Unassigned</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="item-district">District</label>
+                     <select class="form-control" id="item-district">
+                        <option value="">Unassigned</option>
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="item-status">Status</label>
+                    <select class="form-control" id="item-status" required>
+                        <option value="available">Available</option>
+                        <option value="in-use">In Use</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="retired">Retired</option>
+                        <option value="pending-approval">Pending Approval</option>
+                        </select>
+                </div>
+                <div class="form-group">
+                    <label for="item-notes">Notes</label>
+                    <textarea class="form-control" id="item-notes" rows="3" placeholder="Add any relevant notes"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline modal-close">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="save-item-btn">Save Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="bulk-upload-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Bulk Upload</h3>
+            <p>Upload a CSV or XLSX file to add multiple items. Required columns are 'name' and 'type'.</p>
+            <div class="form-group">
+                <label for="file-upload">Choose File</label>
+                <input type="file" class="form-control" id="file-upload" accept=".csv, .xlsx, .xls">
+            </div>
+            <div id="upload-preview" style="display: none;">
+                </div>
+            <div class="modal-footer">
+                <a href="data:text/csv;charset=utf-8,id,name,type,status,assigned,district,notes%0ATBL-DEMO-1,Sample Tablet,tablet,available,,mbarara,This is a sample row" download="inventory_template.csv" class="btn btn-outline" id="download-template-btn">
+                    <i class="fas fa-download"></i> Download Template
+                </a>
+                <button type="button" class="btn btn-success" id="confirm-upload" disabled>
+                    <i class="fas fa-check"></i> Process Upload
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="qr-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>QR Code for <span id="qr-item-name"></span></h3>
+            <div id="qr-code-display">
+                <canvas id="qr-canvas"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification-toast" class="notification"></div>
+
+    <script>
+        let inventory = [];
+        let movementLogs = [];
+        let selectedItems = new Set();
+
+        const inventoryTableBody = document.getElementById('inventory-table-body');
+        const searchBox = document.getElementById('search-box');
+        
+        // Modals
+        const itemModal = document.getElementById('item-modal');
+        const bulkUploadModal = document.getElementById('bulk-upload-modal');
+        const qrModal = document.getElementById('qr-modal');
+        
+        // Forms and Inputs
+        const itemForm = document.getElementById('item-form');
+        const itemIdHidden = document.getElementById('item-id-hidden');
+        const itemIdInput = document.getElementById('item-id');
+        const itemNameInput = document.getElementById('item-name');
+        const itemTypeSelect = document.getElementById('item-type');
+        const itemStatusSelect = document.getElementById('item-status');
+        const itemAssignedSelect = document.getElementById('item-assigned');
+        const itemDistrictSelect = document.getElementById('item-district');
+        const itemNotesInput = document.getElementById('item-notes');
+
+        // Other elements
+        const selectAllCheckbox = document.getElementById('select-all-checkbox');
+
+        // --- DATA INITIALIZATION ---
+        function initializeData() {
+            // This function ensures that essential data exists in localStorage, preventing errors.
+            if (!localStorage.getItem('districts')) {
+                const defaultDistricts = ["Kagadi", "Kibaale", "Kyenjojo", "Kyegegwa", "Mbarara"];
+                localStorage.setItem('districts', JSON.stringify(defaultDistricts));
+            }
+            if (!localStorage.getItem('supervisors')) {
+                const sampleSupervisors = [{
+                    id: 1,
+                    name: 'John Smith',
+                    district: 'Kagadi',
+                    status: 'active',
+                    password: 'password123'
+                }];
+                localStorage.setItem('supervisors', JSON.stringify(sampleSupervisors));
+            }
+        }
+
+        // --- Core Data Functions ---
+        // --- MODIFICATION START: Updated business rule to allow 'pending-approval' in Mbarara ---
+        function applyBusinessRules(item) {
+            // Rule: If an item's district is 'Mbarara', it cannot be 'in-use'. If it is, move it to 'available'.
+            // This allows for 'pending-approval', 'maintenance', etc. statuses in Mbarara.
+            if (item.district && item.district.toLowerCase() === 'mbarara' && item.status === 'in-use') {
+                logMovement(item.id, 'status_update', `Status auto-updated from 'in-use' to 'available' as it is in the Mbarara central store.`);
+                item.status = 'available';
+                item.assigned = ''; // Available items in central store should not be assigned
+                item.lastUpdate = new Date().toLocaleDateString();
+            }
+            return item;
+        }
+        // --- MODIFICATION END ---
+
+        function loadData() {
+            try {
+                inventory = JSON.parse(localStorage.getItem('inventoryData')) || getSampleData();
+                movementLogs = JSON.parse(localStorage.getItem('movementLogs')) || [];
+
+                let wasModified = false;
+                inventory.forEach((item, index) => {
+                    const originalStatus = item.status;
+                    const updatedItem = applyBusinessRules(item);
+                    if (updatedItem.status !== originalStatus) {
+                        wasModified = true;
+                    }
+                    inventory[index] = updatedItem;
+                });
+
+                if (wasModified) {
+                    saveData();
+                }
+
+            } catch (e) {
+                console.error("Failed to parse data from localStorage. Using sample data.", e);
+                inventory = getSampleData();
+                movementLogs = [];
+            }
+        }
+        
+        function saveData() {
+            localStorage.setItem('inventoryData', JSON.stringify(inventory));
+            localStorage.setItem('movementLogs', JSON.stringify(movementLogs));
+            window.dispatchEvent(new Event('storage'));
+        }
+
+        // --- MODIFICATION START: Added sample data for 'pending-approval' ---
+        function getSampleData() {
+            const today = new Date().toLocaleDateString();
+            return [
+                { id: 'TBL-0421', name: 'iPad Pro 12.9"', type: 'tablet', status: 'available', assigned: '', district: 'mbarara', lastUpdate: today, notes: '' },
+                { id: 'PHN-1872', name: 'Samsung Galaxy S21', type: 'phone', status: 'in-use', assigned: 'John Smith', district: 'Kagadi', lastUpdate: today, notes: '' },
+                { id: 'CHG-9901', name: 'Anker PowerCore', type: 'charger', status: 'pending-approval', assigned: '', district: 'mbarara', lastUpdate: today, notes: 'Returned from Kyenjojo' }
+            ];
+        }
+        // --- MODIFICATION END ---
+
+        function generateId(type) {
+            let prefix = (type || 'GEN').substring(0, 3).toUpperCase();
+            const random = Math.floor(1000 + Math.random() * 9000);
+            return `${prefix}-${random}`;
+        }
+        
+        function logMovement(itemId, action, details) {
+            movementLogs.unshift({
+                itemId,
+                action,
+                details,
+                timestamp: new Date().toISOString()
+            });
+            saveData();
+        }
+
+        function showNotification(message) {
+            const notificationToast = document.getElementById('notification-toast');
+            notificationToast.textContent = message;
+            notificationToast.classList.add('show');
+            setTimeout(() => {
+                notificationToast.classList.remove('show');
+            }, 3000);
+        }
+
+        function openModal(modalId, isEdit = false, item = null) {
+            document.querySelectorAll('.modal').forEach(modal => modal.style.display = 'none');
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'flex';
+            
+            if (modalId === 'item-modal') {
+                document.getElementById('modal-title').textContent = isEdit ? 'Edit Item' : 'Add New Item';
+                itemIdInput.readOnly = isEdit;
+                if (isEdit) {
+                    itemIdHidden.value = item.id;
+                    itemIdInput.value = item.id;
+                    itemNameInput.value = item.name;
+                    itemTypeSelect.value = item.type;
+                    itemStatusSelect.value = item.status;
+                    itemAssignedSelect.value = item.assigned || "";
+                    itemDistrictSelect.value = item.district || "";
+                    itemNotesInput.value = item.notes;
+                } else {
+                    itemForm.reset();
+                    itemIdHidden.value = '';
+                    itemIdInput.value = generateId(itemTypeSelect.value);
+                }
+            } else if (modalId === 'qr-modal' && item) {
+                document.getElementById('qr-item-name').textContent = item.name;
+                generateQrCode(item.id);
+            }
+        }
+        
+        function closeModal(modal) {
+            modal.style.display = 'none';
+        }
+
+        // --- UI Update Functions ---
+        function renderInventory(items) {
+            inventoryTableBody.innerHTML = '';
+            if (items.length === 0) {
+                inventoryTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--secondary); padding: 2rem;">No items found.</td></tr>';
+                return;
+            }
+            items.forEach(item => {
+                const row = document.createElement('tr');
+                if (selectedItems.has(item.id)) row.classList.add('selected');
+
+                let statusClass = `status-${item.status.replace('_', '-')}`;
+
+                row.innerHTML = `
+                    <td><input type="checkbox" class="item-checkbox" data-item-id="${item.id}" ${selectedItems.has(item.id) ? 'checked' : ''}></td>
+                    <td>${item.id}</td>
+                    <td>${item.name}</td>
+                    <td>${item.type}</td>
+                    <td><span class="status-badge ${statusClass}">${item.status.toUpperCase().replace('-', ' ')}</span></td>
+                    <td>${item.assigned || 'N/A'}</td>
+                    <td>${item.district || 'N/A'}</td>
+                    <td>${item.lastUpdate}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-outline btn-sm edit-btn" data-item-id="${item.id}"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn btn-outline btn-sm qr-btn" data-item-id="${item.id}"><i class="fas fa-qrcode"></i> QR</button>
+                        <button class="btn btn-danger btn-sm delete-btn" data-item-id="${item.id}"><i class="fas fa-trash"></i> Delete</button>
+                    </td>
+                `;
+                inventoryTableBody.appendChild(row);
+            });
+            updateSelectAllCheckboxState();
+        }
+        
+        // --- MODIFICATION START: Updated stats calculation to exclude pending/retired items from total ---
+        function updateStats() {
+            const activeInventory = inventory.filter(i => i.status !== 'pending-approval' && i.status !== 'retired');
+            const availableItems = activeInventory.filter(i => i.status === 'available').length;
+            const inUseItems = activeInventory.filter(i => i.status === 'in-use').length;
+            const maintenanceItems = activeInventory.filter(i => i.status === 'maintenance').length;
+            const retiredItems = inventory.filter(i => i.status === 'retired').length;
+
+            // Total items is now the sum of active, working inventory
+            document.getElementById('total-items').textContent = availableItems + inUseItems + maintenanceItems;
+            document.getElementById('available-items').textContent = availableItems;
+            document.getElementById('in-use-items').textContent = inUseItems;
+            document.getElementById('maintenance-items').textContent = maintenanceItems;
+            document.getElementById('retired-items').textContent = retiredItems;
+        }
+
+        function updateTypeStats() {
+            const types = ['tablet', 'phone', 'charger', 'bag', 'power-bank'];
+            const activeInventory = inventory.filter(i => i.status !== 'pending-approval' && i.status !== 'retired');
+
+            types.forEach(type => {
+                const total = activeInventory.filter(i => i.type === type).length;
+                const available = activeInventory.filter(i => i.type === type && i.status === 'available').length;
+                const typeId = type.replace('-', ''); // for power-bank
+                document.getElementById(`${typeId}-total`).textContent = total;
+                document.getElementById(`${typeId}-available`).textContent = available;
+            });
+        }
+        // --- MODIFICATION END ---
+
+        function filterInventory() {
+            const searchTerm = searchBox.value.toLowerCase();
+            if (searchTerm) selectedItems.clear();
+            const filtered = inventory.filter(item => 
+                Object.values(item).some(val => String(val).toLowerCase().includes(searchTerm))
+            );
+            renderInventory(filtered);
+            updateBulkDeleteButton();
+        }
+        
+        function updateSelectAllCheckboxState() {
+            const visibleCheckboxes = inventoryTableBody.querySelectorAll('.item-checkbox');
+            if (visibleCheckboxes.length === 0) {
+                selectAllCheckbox.checked = false;
+                return;
+            }
+            selectAllCheckbox.checked = Array.from(visibleCheckboxes).every(cb => cb.checked);
+        }
+
+        function updateBulkDeleteButton() {
+            const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+            const numSelected = selectedItems.size;
+            if (numSelected > 0) {
+                bulkDeleteBtn.style.display = 'inline-flex';
+                bulkDeleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i> Delete (${numSelected})`;
+            } else {
+                bulkDeleteBtn.style.display = 'none';
+            }
+        }
+        
+        // --- EVENT HANDLERS & DYNAMIC CONTENT ---
+        function populateDropdowns() {
+            const districts = JSON.parse(localStorage.getItem('districts')) || [];
+            const supervisors = JSON.parse(localStorage.getItem('supervisors')) || [];
+            const activeSupervisors = supervisors.filter(s => s.status === 'active');
+
+            itemAssignedSelect.innerHTML = '<option value="">Unassigned</option>';
+            activeSupervisors.forEach(s => {
+                const option = document.createElement('option');
+                option.value = s.name;
+                option.textContent = `${s.name} (${s.district})`;
+                option.dataset.district = s.district;
+                itemAssignedSelect.appendChild(option);
+            });
+
+            itemDistrictSelect.innerHTML = '<option value="">Unassigned</option>';
+            districts.sort().forEach(d => {
+                const option = document.createElement('option');
+                option.value = d;
+                option.textContent = d;
+                itemDistrictSelect.appendChild(option);
+            });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('new-item-btn').addEventListener('click', () => openModal('item-modal'));
+            document.getElementById('bulk-upload-btn').addEventListener('click', () => openModal('bulk-upload-modal'));
+            searchBox.addEventListener('keyup', filterInventory);
+            
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                sessionStorage.removeItem('loggedInUser');
+                window.location.href = 'login.html';
+            });
+
+            document.querySelectorAll('.modal-close').forEach(btn => {
+                btn.addEventListener('click', (e) => closeModal(e.target.closest('.modal')));
+            });
+
+            window.onclick = (event) => {
+                if (event.target.classList.contains('modal')) closeModal(event.target);
+            };
+
+            inventoryTableBody.addEventListener('click', (e) => {
+                const target = e.target;
+                if (target.classList.contains('item-checkbox')) {
+                    const itemId = target.dataset.itemId;
+                    const row = target.closest('tr');
+                    if (target.checked) {
+                        selectedItems.add(itemId);
+                        row.classList.add('selected');
+                    } else {
+                        selectedItems.delete(itemId);
+                        row.classList.remove('selected');
+                    }
+                    updateBulkDeleteButton();
+                    updateSelectAllCheckboxState();
+                    return;
+                }
+                const button = target.closest('button');
+                if (!button) return;
+                const itemId = button.dataset.itemId;
+                if (!itemId) return;
+                const item = inventory.find(i => i.id === itemId);
+                if (button.classList.contains('edit-btn')) openModal('item-modal', true, item);
+                if (button.classList.contains('qr-btn')) openModal('qr-modal', false, item);
+                if (button.classList.contains('delete-btn')) {
+                    if (confirm(`Delete ${item.name} (${item.id})?`)) deleteItem(itemId);
+                }
+            });
+
+            selectAllCheckbox.addEventListener('click', (e) => {
+                const isChecked = e.target.checked;
+                const visibleCheckboxes = inventoryTableBody.querySelectorAll('.item-checkbox');
+                visibleCheckboxes.forEach(checkbox => {
+                    const itemId = checkbox.dataset.itemId;
+                    const row = checkbox.closest('tr');
+                    checkbox.checked = isChecked;
+                    if (isChecked) {
+                        selectedItems.add(itemId);
+                        row.classList.add('selected');
+                    } else {
+                        selectedItems.delete(itemId);
+                        row.classList.remove('selected');
+                    }
+                });
+                updateBulkDeleteButton();
+            });
+
+            document.getElementById('bulk-delete-btn').addEventListener('click', () => {
+                const numSelected = selectedItems.size;
+                if (numSelected === 0) return;
+                if (confirm(`Permanently delete ${numSelected} item(s)?`)) {
+                    inventory = inventory.filter(item => !selectedItems.has(item.id));
+                    logMovement(Array.from(selectedItems).join(', '), 'bulk_deletion', `${numSelected} items permanently deleted.`);
+                    showNotification(`${numSelected} items deleted successfully.`);
+                    selectedItems.clear();
+                    saveData();
+                    updateAllViews();
+                }
+            });
+
+            itemForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const existingId = itemIdHidden.value;
+                let itemData = {
+                    id: itemIdInput.value.trim() || generateId(itemTypeSelect.value),
+                    name: itemNameInput.value.trim(),
+                    type: itemTypeSelect.value,
+                    status: itemStatusSelect.value,
+                    assigned: itemAssignedSelect.value,
+                    district: itemDistrictSelect.value,
+                    notes: itemNotesInput.value.trim(),
+                    lastUpdate: new Date().toLocaleDateString()
+                };
+
+                itemData = applyBusinessRules(itemData);
+
+                if (existingId) {
+                    const itemIndex = inventory.findIndex(i => i.id === existingId);
+                    if (itemIndex > -1) {
+                        inventory[itemIndex] = {...inventory[itemIndex], ...itemData};
+                        logMovement(itemData.id, 'update', `Item updated by Admin.`);
+                        showNotification(`Item ${itemData.id} updated.`);
+                    }
+                } else {
+                    inventory.unshift(itemData);
+                    logMovement(itemData.id, 'creation', `New item added.`);
+                    showNotification(`New item ${itemData.id} added.`);
+                }
+                saveData();
+                updateAllViews();
+                closeModal(itemModal);
+            });
+            
+            itemAssignedSelect.addEventListener('change', (e) => {
+                if (e.target.value === "") { // Unassigned
+                    itemStatusSelect.value = "available";
+                    itemDistrictSelect.value = "";
+                } else { // Assigned to a supervisor
+                    itemStatusSelect.value = "in-use";
+                    const selectedOption = e.target.options[e.target.selectedIndex];
+                    const district = selectedOption.dataset.district;
+                    if (district) itemDistrictSelect.value = district;
+                }
+            });
+            
+            // --- BULK UPLOAD LOGIC ---
+            const fileUploadInput = document.getElementById('file-upload');
+            const confirmUploadBtn = document.getElementById('confirm-upload');
+            const uploadPreview = document.getElementById('upload-preview');
+            let parsedUploadData = [];
+
+            fileUploadInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                uploadPreview.style.display = 'block';
+                uploadPreview.innerHTML = '<h4>File Preview:</h4><p>Processing file...</p>';
+                confirmUploadBtn.disabled = true;
+
+                if (file.name.endsWith('.csv')) {
+                    Papa.parse(file, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: (results) => {
+                            if (results.errors.length > 0) {
+                                console.error("CSV Parsing errors:", results.errors);
+                                uploadPreview.innerHTML += '<p style="color:red;">Error parsing CSV file. Please check the file format and console for details.</p>';
+                                return;
+                            }
+                            parsedUploadData = results.data;
+                            generateUploadPreview(parsedUploadData);
+                        },
+                        error: (err) => {
+                             console.error("CSV Parsing error:", err);
+                             uploadPreview.innerHTML += `<p style="color:red;">Failed to parse CSV: ${err.message}</p>`;
+                        }
+                    });
+                } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const data = new Uint8Array(event.target.result);
+                            const workbook = XLSX.read(data, { type: 'array' });
+                            const sheetName = workbook.SheetNames[0];
+                            const worksheet = workbook.Sheets[sheetName];
+                            parsedUploadData = XLSX.utils.sheet_to_json(worksheet);
+                            generateUploadPreview(parsedUploadData);
+                        } catch (err) {
+                            console.error("Excel parsing error:", err);
+                            uploadPreview.innerHTML += `<p style="color:red;">Failed to parse Excel file: ${err.message}</p>`;
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                } else {
+                    uploadPreview.innerHTML += '<p style="color:red;">Unsupported file type. Please upload a CSV or XLSX file.</p>';
+                }
+            });
+
+            function generateUploadPreview(data) {
+                if (!data || data.length === 0) {
+                    uploadPreview.innerHTML = '<h4>File Preview:</h4><p style="color:orange;">No data found in the file, or file is empty.</p>';
+                    return;
+                }
+
+                const headers = Object.keys(data[0]);
+                const previewData = data.slice(0, 5); // Show first 5 rows
+
+                let tableHTML = `
+                    <h4>File Preview (${data.length} items found):</h4>
+                    <table id="preview-table">
+                        <thead>
+                            <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+                        </thead>
+                        <tbody>
+                            ${previewData.map(row => `
+                                <tr>${headers.map(h => `<td>${row[h] || ''}</td>`).join('')}</tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                if (data.length > 5) {
+                    tableHTML += `<p>...and ${data.length - 5} more row(s).</p>`;
+                }
+                uploadPreview.innerHTML = tableHTML;
+                confirmUploadBtn.disabled = false;
+            }
+
+            confirmUploadBtn.addEventListener('click', () => {
+                if (parsedUploadData.length === 0) {
+                    showNotification('No data to upload.');
+                    return;
+                }
+                
+                let addedCount = 0;
+                let skippedCount = 0;
+                const existingIds = new Set(inventory.map(item => item.id));
+
+                parsedUploadData.forEach(row => {
+                    // Find keys in a case-insensitive way
+                    let nameKey, typeKey, idKey, statusKey, assignedKey, districtKey, notesKey;
+                    for (const key in row) {
+                        const lowerKey = key.toLowerCase();
+                        if (lowerKey.includes('name')) nameKey = key;
+                        if (lowerKey.includes('type')) typeKey = key;
+                        if (lowerKey === 'id') idKey = key;
+                        if (lowerKey === 'status') statusKey = key;
+                        if (lowerKey === 'assigned') assignedKey = key;
+                        if (lowerKey === 'district') districtKey = key;
+                        if (lowerKey === 'notes') notesKey = key;
+                    }
+
+                    const itemName = row[nameKey];
+                    const itemType = row[typeKey];
+
+                    // Basic validation: name and type are required
+                    if (!itemName || !itemType) {
+                        skippedCount++;
+                        return;
+                    }
+                    
+                    const itemId = row[idKey];
+
+                    const newItem = {
+                        id: (itemId && !existingIds.has(String(itemId))) ? String(itemId) : generateId(itemType),
+                        name: itemName,
+                        type: String(itemType).toLowerCase(),
+                        status: row[statusKey] || 'available',
+                        assigned: row[assignedKey] || '',
+                        district: row[districtKey] || 'mbarara',
+                        notes: row[notesKey] || '',
+                        lastUpdate: new Date().toLocaleDateString()
+                    };
+                    
+                    inventory.unshift(newItem); // Add to the beginning of the array
+                    existingIds.add(newItem.id); // Add new ID to set to prevent duplicates within the same upload
+                    addedCount++;
+                });
+
+                logMovement('BULK_UPLOAD', 'creation', `Bulk uploaded ${addedCount} items. Skipped ${skippedCount} rows due to missing data.`);
+                saveData();
+                showNotification(`Successfully added ${addedCount} new items. Skipped ${skippedCount}.`);
+                
+                // Reset upload modal
+                fileUploadInput.value = '';
+                uploadPreview.style.display = 'none';
+                uploadPreview.innerHTML = '';
+                confirmUploadBtn.disabled = true;
+                parsedUploadData = [];
+                
+                closeModal(bulkUploadModal);
+                updateAllViews();
+            });
+        }
+
+        function deleteItem(itemId) {
+            inventory = inventory.filter(item => item.id !== itemId);
+            logMovement(itemId, 'deletion', `Item permanently deleted.`);
+            showNotification(`Item ${itemId} deleted.`);
+            saveData();
+            updateAllViews();
+        }
+        
+        function generateQrCode(text) {
+             QRCode.toCanvas(document.getElementById('qr-canvas'), text, { width: 200 }, (error) => {
+                if (error) console.error(error);
+            });
+        }
+        
+        function updateAllViews() {
+            filterInventory();
+            updateStats();
+            updateTypeStats();
+            updateBulkDeleteButton();
+        }
+
+        function initApp() {
+            initializeData(); // Ensure required data is available
+            loadData();
+            populateDropdowns();
+            setupEventListeners();
+            updateAllViews();
+        }
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'inventoryData' || e.key === 'districts' || e.key === 'supervisors') {
+                loadData();
+                populateDropdowns();
+                updateAllViews();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+
+</html>

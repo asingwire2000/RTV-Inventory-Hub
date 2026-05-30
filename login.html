@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTV Inventory Hub | Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --border: #e2e8f0;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            background-color: #f1f5f9;
+            color: #334155;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 440px;
+            padding: 2.5rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .login-logo {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            margin: 0 auto 1rem;
+        }
+
+        .login-container h1 { font-size: 1.6rem; font-weight: 700; color: var(--dark); margin-bottom: 0.25rem; }
+        .subtitle { color: var(--secondary); margin-bottom: 1.75rem; font-size: 0.95rem; }
+
+        /* --- Role Tabs --- */
+        .role-tabs {
+            display: flex;
+            background: var(--light);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .role-tab {
+            flex: 1;
+            padding: 0.65rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .role-tab.active.admin-tab { background: white; color: #7c3aed; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .role-tab.active.supervisor-tab { background: white; color: var(--primary); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+
+        /* --- Role Indicator --- */
+        .role-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.9rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+        }
+        .role-indicator.admin { background: #ede9fe; color: #7c3aed; }
+        .role-indicator.supervisor { background: #dbeafe; color: var(--primary); }
+
+        .form-group { margin-bottom: 1.25rem; text-align: left; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; }
+
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.85rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 1rem;
+            width: 100%;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-admin { background: #7c3aed; color: white; }
+        .btn-admin:hover { background: #6d28d9; }
+
+        .error-message {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1.25rem;
+            display: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .forgot-link {
+            display: block;
+            text-align: right;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        .forgot-link:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="rtv logo.svg" alt="RTV Inventory Hub Logo" class="login-logo">
+        <h1>RTV Inventory Hub</h1>
+        <p class="subtitle">Sign in to manage district inventory</p>
+
+        <!-- Role Selection Tabs -->
+        <div class="role-tabs">
+            <button class="role-tab admin-tab active" id="tab-admin" type="button">
+                <i class="fas fa-user-shield"></i> Administrator
+            </button>
+            <button class="role-tab supervisor-tab" id="tab-supervisor" type="button">
+                <i class="fas fa-user-tie"></i> Supervisor
+            </button>
+        </div>
+
+        <div id="role-indicator" class="role-indicator admin">
+            <i class="fas fa-user-shield"></i>
+            <span id="role-indicator-text">Logging in as Administrator</span>
+        </div>
+
+        <div id="error-message" class="error-message"></div>
+
+        <form id="login-form">
+            <input type="hidden" id="selected-role" value="admin">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" class="form-control" placeholder="Enter admin username" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div style="position:relative;">
+                    <input type="password" id="password" class="form-control" required style="padding-right:2.5rem;" autocomplete="current-password">
+                    <span id="toggle-password" style="position:absolute; right:0.75rem; top:50%; transform:translateY(-50%); cursor:pointer; color:#64748b;">
+                        <i class="fa fa-eye"></i>
+                    </span>
+                </div>
+            </div>
+            <a href="#" id="forgot-password-link" class="forgot-link">Forgot Password?</a>
+            <button type="submit" class="btn btn-admin" id="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Sign In as Administrator
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // --- AUTO-REDIRECT IF ALREADY LOGGED IN ---
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (loggedInUser) {
+            const roleRedirects = { 'admin': 'index.html', 'supervisor': 'supervisor.html' };
+            window.location.href = roleRedirects[loggedInUser.role] || 'login.html';
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DATA SEEDING FOR FIRST-TIME USE ---
+            function initializeDefaultData() {
+                const init = (key, data) => !localStorage.getItem(key) && localStorage.setItem(key, JSON.stringify(data));
+                init('districts', ["Kagadi", "Kibaale", "Kyenjojo", "Kyegegwa", "Mbarara"]);
+                init('supervisors', [{ id: 1, name: 'Default Supervisor', username: 'kagadi', district: 'Kagadi', status: 'active', password: '12345678' }]);
+                init('fieldOfficers', [{ id: 2, name: 'Default Data Collector', district: 'Kyenjojo', status: 'active' }]);
+                init('adminCredentials', { username: 'admin', password: 'admin123' });
+            }
+            initializeDefaultData();
+
+            const loginForm = document.getElementById('login-form');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const errorMessage = document.getElementById('error-message');
+            const selectedRoleInput = document.getElementById('selected-role');
+            const loginBtn = document.getElementById('login-btn');
+            const roleIndicator = document.getElementById('role-indicator');
+            const roleIndicatorText = document.getElementById('role-indicator-text');
+            const tabAdmin = document.getElementById('tab-admin');
+            const tabSupervisor = document.getElementById('tab-supervisor');
+
+            // --- ROLE TAB SWITCHING ---
+            tabAdmin.addEventListener('click', () => switchRole('admin'));
+            tabSupervisor.addEventListener('click', () => switchRole('supervisor'));
+
+            function switchRole(role) {
+                selectedRoleInput.value = role;
+                errorMessage.style.display = 'none';
+                usernameInput.value = '';
+                passwordInput.value = '';
+
+                if (role === 'admin') {
+                    tabAdmin.classList.add('active');
+                    tabSupervisor.classList.remove('active');
+                    roleIndicator.className = 'role-indicator admin';
+                    roleIndicator.innerHTML = '<i class="fas fa-user-shield"></i><span id="role-indicator-text">Logging in as Administrator</span>';
+                    loginBtn.className = 'btn btn-admin';
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In as Administrator';
+                    usernameInput.placeholder = 'Enter admin username';
+                } else {
+                    tabAdmin.classList.remove('active');
+                    tabSupervisor.classList.add('active');
+                    roleIndicator.className = 'role-indicator supervisor';
+                    roleIndicator.innerHTML = '<i class="fas fa-user-tie"></i><span id="role-indicator-text">Logging in as Supervisor</span>';
+                    loginBtn.className = 'btn btn-primary';
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In as Supervisor';
+                    usernameInput.placeholder = 'Enter supervisor username';
+                }
+            }
+
+            // --- LOGIN SUBMISSION ---
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                errorMessage.style.display = 'none';
+
+                const username = usernameInput.value.trim().toLowerCase();
+                const password = passwordInput.value;
+                const role = selectedRoleInput.value;
+
+                if (role === 'admin') {
+                    const adminCreds = JSON.parse(localStorage.getItem('adminCredentials')) || { username: 'admin', password: 'admin123' };
+                    if (username === adminCreds.username && password === adminCreds.password) {
+                        sessionStorage.setItem('loggedInUser', JSON.stringify({ username: 'Admin', role: 'admin' }));
+                        window.location.href = 'index.html';
+                    } else {
+                        showError('Invalid admin credentials. Please check your username and password.');
+                    }
+                } else {
+                    const supervisors = JSON.parse(localStorage.getItem('supervisors')) || [];
+                    const supervisorUser = supervisors.find(s =>
+                        s.username === username &&
+                        s.password === password &&
+                        s.status === 'active'
+                    );
+                    if (supervisorUser) {
+                        sessionStorage.setItem('loggedInUser', JSON.stringify({
+                            username: supervisorUser.name,
+                            role: 'supervisor',
+                            district: supervisorUser.district,
+                            id: supervisorUser.id
+                        }));
+                        window.location.href = 'supervisor.html';
+                    } else {
+                        showError('Invalid supervisor credentials or your account is inactive.');
+                    }
+                }
+            });
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+        });
+
+        document.getElementById('forgot-password-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+            notifications.push({
+                type: 'password_reset',
+                message: `Password reset requested for username: ${document.getElementById('username').value || '(unknown)'}`,
+                timestamp: Date.now(),
+                read: false,
+                for: 'admin'
+            });
+            localStorage.setItem('notifications', JSON.stringify(notifications));
+            alert('A password reset request has been sent to the admin.');
+        });
+
+        document.getElementById('toggle-password').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
+    </script>
+</body>
+</html>

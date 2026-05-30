@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTV Inventory Hub | Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #053d1a;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+        .sidebar-logo,
+        .logo {
+            height: 80px;
+            width: 80px;
+            object-fit: contain;
+            background: white;
+            padding: 10px;
+            border-radius: 18px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        }
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            text-align: center;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: var(--transition);
+            gap: 0.75rem;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .header-title p {
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+        
+        .header-right {
+             display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .card-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--secondary); }
+        .btn-outline:hover { background: var(--light); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #0da271; }
+        .btn.btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* Table Styles */
+        .table-responsive { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 1rem 1.25rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .data-table th { background-color: var(--light); font-weight: 600; color: var(--secondary); font-size: 0.9rem; }
+        .data-table tbody tr:hover { background-color: #f8fafc; }
+        .table-actions { display: flex; gap: 0.5rem; }
+
+        /* Status & District Badges */
+        .badge { display: inline-block; padding: 0.35em 0.65em; font-size: 0.75em; font-weight: 600; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.375rem; }
+        .badge-success { color: #065f46; background-color: #d1fae5; }
+        .badge-warning { color: #92400e; background-color: #fef3c7; }
+        .district-badge { background-color: #e0e7ff; color: #3730a3; text-transform: capitalize; }
+
+        /* Alert Messages */
+        .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; display: none; }
+        .alert-success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .alert-error { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--dark); }
+        .form-control { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; transition: var(--transition); }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .form-control.error { border-color: var(--danger); }
+        .form-text { font-size: 0.8rem; color: var(--secondary); margin-top: 0.25rem; }
+        .password-toggle { position: relative; }
+        .password-toggle .form-control { padding-right: 2.5rem; }
+        .toggle-password { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--secondary); cursor: pointer; }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-content { background-color: white; border-radius: var(--border-radius); width: 90%; max-width: 600px; box-shadow: var(--shadow); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; }
+        .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 1.2rem; font-weight: 600; color: var(--dark); }
+        .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--secondary); }
+        .modal-body { padding: 1.5rem; overflow-y: auto; flex: 1; min-height: 0; }
+        .modal-footer { padding: 1.25rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; }
+
+        /* Table Controls (Search/Filter) */
+        .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .search-container { position: relative; flex-grow: 1; max-width: 400px; }
+        .search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
+        .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--secondary); }
+        
+        /* Settings Tabs */
+        .settings-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; flex-wrap: wrap;}
+        .settings-tab { padding: 0.75rem 1.5rem; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; color: var(--secondary); transition: var(--transition); }
+        .settings-tab:hover { color: var(--primary); }
+        .settings-tab.active { border-bottom-color: var(--primary); color: var(--primary); }
+        .settings-content { display: none; }
+        .settings-content.active { display: block; }
+
+        /* Danger Zone */
+        .danger-zone { border: 2px solid var(--danger); border-radius: var(--border-radius); margin-top: 2rem; }
+        .danger-zone .card-header { background-color: #fee2e2; }
+        .danger-zone .card-header h3 { color: #b91c1c; }
+        .danger-zone p { margin-bottom: 1rem; color: #b91c1c; }
+    </style>
+</head>
+<body>
+    <script>
+        // Security Check: This script runs first to protect the page.
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (!loggedInUser || loggedInUser.role !== 'admin') {
+            window.location.href = 'login.html';
+        }
+    </script>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                 <img src="rtv logo.svg" alt="RTV Inventory Hub Logo" class="sidebar-logo">
+                 <h2>RTV Inventory Hub</h2>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="index.html" class="menu-item"><i class="fas fa-home"></i><span>Dashboard</span></a>
+                <a href="Inventory.html" class="menu-item"><i class="fas fa-list"></i><span>Inventory</span></a>
+                <a href="supervisor.html" class="menu-item"><i class="fas fa-user-shield"></i><span>Supervisor</span></a>
+                <a href="transfers.html" class="menu-item"><i class="fas fa-exchange-alt"></i><span>Transfers</span></a>
+                <a href="reports.html" class="menu-item"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
+                <a href="settings.html" class="menu-item active"><i class="fas fa-cog"></i><span>Settings</span></a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-title">
+                    <h1>Settings</h1>
+                    <p>Manage system settings and user accounts</p>
+                </div>
+                 <div class="header-right">
+                    <div class="user-profile">
+                        <div class="avatar" id="user-avatar">A</div>
+                        <div>
+                            <div id="user-name">Admin</div>
+                            <small id="user-role">Administrator</small>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+            </header>
+
+            <div class="settings-tabs">
+                <div class="settings-tab active" data-tab="users">User Management</div>
+                <div class="settings-tab" data-tab="admin">Admin Profile</div>
+                <div class="settings-tab" data-tab="system">System Configuration</div>
+            </div>
+            
+            <div class="settings-content active" id="usersTab">
+                <div class="card">
+                    <div class="card-header"><h3>Supervisor Accounts</h3></div>
+                    <div class="card-body">
+                        <div class="table-controls">
+                            <div class="search-container">
+                                <input type="text" class="search-input" placeholder="Search supervisors..." id="supervisorSearchInput">
+                                <i class="fas fa-search search-icon"></i>
+                            </div>
+                             <button type="button" class="btn btn-primary" id="addSupervisorBtn"><i class="fas fa-plus"></i> Add Supervisor</button>
+                        </div>
+                        <div id="supervisorAlert" class="alert"></div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead><tr><th>Supervisor Info</th><th>Contact</th><th>District</th><th>Status</th><th>Actions</th></tr></thead>
+                                <tbody id="supervisorsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3>Data Collector Accounts</h3></div>
+                    <div class="card-body">
+                         <div class="table-controls">
+                            <div class="search-container">
+                                <input type="text" class="search-input" placeholder="Search data collectors..." id="fieldOfficerSearchInput">
+                                <i class="fas fa-search search-icon"></i>
+                            </div>
+                             <button type="button" class="btn btn-primary" id="addFieldOfficerBtn"><i class="fas fa-plus"></i> Add Data Collector</button>
+                        </div>
+                        <div id="fieldOfficerAlert" class="alert"></div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead><tr><th>Data Collector Info</th><th>Contact</th><th>District</th><th>Status</th><th>Actions</th></tr></thead>
+                                <tbody id="fieldOfficersTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-content" id="adminTab">
+                <div class="card">
+                    <div class="card-header"><h3>Change Admin Password</h3></div>
+                    <div class="card-body">
+                        <div id="adminAlert" class="alert"></div>
+                        <p class="form-text">Note: The default admin username is 'admin' and cannot be changed. The default password is 'admin123'. For security, it's recommended to change it.</p>
+                        <form id="adminPasswordForm">
+                            <div class="form-group password-toggle">
+                                <label for="currentPassword">Current Password</label>
+                                <input type="password" class="form-control" id="currentPassword" required>
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="form-group password-toggle">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" class="form-control" id="newPassword" required minlength="6">
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                                <div class="form-text">Password must be at least 6 characters.</div>
+                            </div>
+                            <div class="form-group password-toggle">
+                                <label for="confirmNewPassword">Confirm New Password</label>
+                                <input type="password" class="form-control" id="confirmNewPassword" required>
+                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="adminPasswordSubmitBtn">
+                                Update Password
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-content" id="systemTab">
+                <div class="card">
+                    <div class="card-header"><h3>Manage Districts</h3></div>
+                    <div class="card-body">
+                        <div id="districtAlert" class="alert"></div>
+                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                            <table class="data-table">
+                                <thead><tr><th>District Name</th><th>Users Assigned</th><th>Action</th></tr></thead>
+                                <tbody id="districtsTableBody"></tbody>
+                            </table>
+                        </div>
+                        <form id="addDistrictForm" style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                            <input type="text" id="newDistrictName" class="form-control" placeholder="Enter new district name" required>
+                            <button type="submit" class="btn btn-primary">Add District</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="card danger-zone">
+                     <div class="card-header"><h3>Danger Zone</h3></div>
+                     <div class="card-body">
+                         <p>This action will permanently delete all inventory, users, and logs. This cannot be undone.</p>
+                         <button class="btn btn-danger" id="resetDataBtn">Reset Application Data</button>
+                     </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal" id="supervisorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="supervisorModalTitle">Add Supervisor</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="supervisorForm">
+                    <input type="hidden" id="supervisorId">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="supervisorName">Full Name *</label>
+                            <input type="text" class="form-control" id="supervisorName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="supervisorEmpId">FS ID *</label>
+                            <input type="text" class="form-control" id="supervisorEmpId" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="supervisorEmail">Email *</label>
+                            <input type="email" class="form-control" id="supervisorEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="supervisorPhone">Phone Number</label>
+                            <input type="tel" class="form-control" id="supervisorPhone">
+                        </div>
+                        <div class="form-group full-width">
+                            <hr style="border: none; border-top: 1px solid var(--border); margin: 1rem 0;">
+                            <h4>Login Credentials</h4>
+                        </div>
+                        <div class="form-group">
+                            <label for="supervisorUsername">Username *</label>
+                            <input type="text" class="form-control" id="supervisorUsername" required>
+                        </div>
+                        <div class="form-group password-toggle">
+                            <label for="supervisorPassword">Password *</label>
+                            <input type="password" class="form-control" id="supervisorPassword">
+                            <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                            <div class="form-text">Required for new users. Leave blank to keep current password.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="supervisorDistrict">District *</label>
+                            <select class="form-control supervisorDistrict" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="supervisorStatus">Status *</label>
+                            <select class="form-control supervisorStatus" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline modal-close">Cancel</button>
+                <button type="submit" form="supervisorForm" class="btn btn-primary">Save Supervisor</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="fieldOfficerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="fieldOfficerModalTitle">Add Data Collector</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="fieldOfficerForm">
+                    <input type="hidden" id="fieldOfficerId">
+                     <div class="form-grid">
+                        <div class="form-group">
+                            <label for="fieldOfficerName">Full Name *</label>
+                            <input type="text" class="form-control" id="fieldOfficerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fieldOfficerEmpId">Data Collector ID *</label>
+                            <input type="text" class="form-control" id="fieldOfficerEmpId" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fieldOfficerEmail">Email *</label>
+                            <input type="email" class="form-control" id="fieldOfficerEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fieldOfficerPhone">Phone Number</label>
+                            <input type="tel" class="form-control" id="fieldOfficerPhone">
+                        </div>
+                        <div class="form-group">
+                            <label for="fieldOfficerDistrict">District *</label>
+                            <select class="form-control fieldOfficerDistrict" required></select>
+                        </div>
+                       <div class="form-group">
+                           <label for="fieldOfficerStatus">Status *</label>
+                           <select class="form-control fieldOfficerStatus" required>
+                               <option value="active">Active</option>
+                               <option value="inactive">Inactive</option>
+                           </select>
+                       </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline modal-close">Cancel</button>
+                <button type="submit" form="fieldOfficerForm" class="btn btn-primary">Save Data Collector</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="deleteModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header"><h3>Confirm Deletion</h3><button class="modal-close">&times;</button></div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="deleteObjectName">this item</strong>? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                 <button type="button" class="btn btn-outline modal-close">Cancel</button>
+                 <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Retrieve logged-in user details from sessionStorage
+            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+            
+            // Set up the header with the user's name and avatar
+            document.getElementById('user-name').textContent = loggedInUser.username;
+            document.getElementById('user-avatar').textContent = loggedInUser.username.charAt(0).toUpperCase();
+            
+            // --- LOCAL STORAGE KEYS ---
+            const SUPERVISORS_KEY = 'supervisors';
+            const FIELDOFFICERS_KEY = 'fieldOfficers';
+            const DISTRICTS_KEY = 'districts';
+            const ADMIN_CREDS_KEY = 'adminCredentials';
+
+            // --- DATA HELPERS ---
+            const getData = key => JSON.parse(localStorage.getItem(key)) || [];
+            const saveData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+
+            // --- APP INITIALIZATION ---
+            function initializeApp() {
+                // Seed database with default data if it doesn't exist
+                const initData = (key, defaultData) => !localStorage.getItem(key) && localStorage.setItem(key, JSON.stringify(defaultData()));
+                
+                // --- MODIFICATION: Updated the list of districts as per the user's request ---
+                initData(DISTRICTS_KEY, () => [
+                    "Amuru", "Gulu", "Isingiro", "Kabale", "Kagadi", "Kaliro", "Kamwengye", 
+                    "Kanungu", "Kibaale", "Kiryandongo", "Kisoro", "Kyegegwa", "Kyenjojo", 
+                    "Luuka", "Mbarara", "Mitooma", "Nwoya", "Rubanda", "Rubirizi", 
+                    "Rukiga", "Rukungiri"
+                ].sort());
+
+                initData(SUPERVISORS_KEY, () => [{ id: Date.now(), name: 'Default Supervisor', empId: 'SUP-001', email: 'sup.kagadi@rtv.org', phone: '0700123456', username: 'sup_kagadi', password: 'password123', district: 'Kagadi', status: 'active' }]);
+                initData(FIELDOFFICERS_KEY, () => [{ id: Date.now() + 1, name: 'Default Data Collector', empId: 'FO-001', email: 'fo.kyenjojo@rtv.org', phone: '0700654321', district: 'Kyenjojo', status: 'active' }]);
+                initData(ADMIN_CREDS_KEY, () => ({ username: 'admin', password: 'admin123' }));
+
+                // Initial render of all UI components
+                populateDistrictDropdowns();
+                renderSupervisorsTable();
+                renderFieldOfficersTable();
+                renderDistrictsTable();
+                setupEventListeners();
+            }
+
+            // --- RENDER FUNCTIONS ---
+            function renderSupervisorsTable() {
+                const supervisors = getData(SUPERVISORS_KEY);
+                const tableBody = document.getElementById('supervisorsTableBody');
+                const searchTerm = document.getElementById('supervisorSearchInput').value.toLowerCase();
+                
+                const filtered = supervisors.filter(item => 
+                    item.name.toLowerCase().includes(searchTerm) || 
+                    item.district.toLowerCase().includes(searchTerm) || 
+                    item.username.toLowerCase().includes(searchTerm) ||
+                    item.email.toLowerCase().includes(searchTerm) ||
+                    (item.phone && item.phone.toLowerCase().includes(searchTerm)) ||
+                    (item.empId && item.empId.toLowerCase().includes(searchTerm))
+                );
+                
+                tableBody.innerHTML = filtered.map(item => `
+                    <tr data-id="${item.id}">
+                        <td>
+                            <div><strong>${item.name}</strong></div>
+                            <small style="color: var(--secondary);">ID: ${item.empId} | User: ${item.username}</small>
+                        </td>
+                        <td>
+                            <div>${item.email}</div>
+                            <small style="color: var(--secondary);">${item.phone || 'N/A'}</small>
+                        </td>
+                        <td><span class="badge district-badge">${item.district}</span></td>
+                        <td><span class="badge ${item.status === 'active' ? 'badge-success' : 'badge-warning'}">${item.status}</span></td>
+                        <td class="table-actions">
+                            <button type="button" class="btn btn-sm btn-outline edit-supervisor-btn">Edit</button>
+                            <button type="button" class="btn btn-sm btn-danger delete-supervisor-btn">Delete</button>
+                        </td>
+                    </tr>
+                `).join('') || `<tr><td colspan="5" style="text-align: center;">No supervisors found.</td></tr>`;
+            }
+
+            function renderFieldOfficersTable() {
+                const officers = getData(FIELDOFFICERS_KEY);
+                const tableBody = document.getElementById('fieldOfficersTableBody');
+                const searchTerm = document.getElementById('fieldOfficerSearchInput').value.toLowerCase();
+
+                 const filtered = officers.filter(item => 
+                    item.name.toLowerCase().includes(searchTerm) || 
+                    item.district.toLowerCase().includes(searchTerm) || 
+                    item.email.toLowerCase().includes(searchTerm) ||
+                    (item.phone && item.phone.toLowerCase().includes(searchTerm)) ||
+                    (item.empId && item.empId.toLowerCase().includes(searchTerm))
+                );
+
+                tableBody.innerHTML = filtered.map(item => `
+                    <tr data-id="${item.id}">
+                        <td>
+                            <div><strong>${item.name}</strong></div>
+                            <small style="color: var(--secondary);">ID: ${item.empId}</small>
+                        </td>
+                         <td>
+                            <div>${item.email}</div>
+                            <small style="color: var(--secondary);">${item.phone || 'N/A'}</small>
+                        </td>
+                        <td><span class="badge district-badge">${item.district}</span></td>
+                        <td><span class="badge ${item.status === 'active' ? 'badge-success' : 'badge-warning'}">${item.status}</span></td>
+                        <td class="table-actions">
+                            <button type="button" class="btn btn-sm btn-outline edit-fieldofficer-btn" data-action="edit">Edit</button>
+                            <button type="button" class="btn btn-sm btn-danger delete-fieldofficer-btn" data-action="delete">Delete</button>
+                        </td>
+                    </tr>
+                `).join('') || `<tr><td colspan="5" style="text-align: center;">No data collectors found.</td></tr>`;
+            }
+
+            function renderDistrictsTable() {
+                const districts = getData(DISTRICTS_KEY).sort();
+                const supervisors = getData(SUPERVISORS_KEY);
+                const officers = getData(FIELDOFFICERS_KEY);
+                const tableBody = document.getElementById('districtsTableBody');
+                
+                tableBody.innerHTML = districts.map(d => {
+                    const userCount = [...supervisors, ...officers].filter(u => u.district === d).length;
+                    return `
+                        <tr data-name="${d}">
+                            <td>${d}</td>
+                            <td>${userCount} user(s)</td>
+                            <td class="table-actions">
+                                <button class="btn btn-sm btn-danger delete-district-btn" ${userCount > 0 ? 'disabled title="Cannot delete district with assigned users"' : ''}>Delete</button>
+                            </td>
+                        </tr>`;
+                }).join('') || `<tr><td colspan="3" style="text-align: center;">No districts found.</td></tr>`;
+            }
+            
+            // --- UI & EVENT LISTENERS ---
+            function populateDistrictDropdowns() {
+                const districts = getData(DISTRICTS_KEY).sort();
+                const optionsHTML = '<option value="">Select District</option>' + districts.map(d => `<option value="${d}">${d}</option>`).join('');
+                document.querySelectorAll('.supervisorDistrict, .fieldOfficerDistrict').forEach(select => select.innerHTML = optionsHTML);
+            }
+
+            function setupEventListeners() {
+                document.getElementById('logout-btn').addEventListener('click', () => { sessionStorage.removeItem('loggedInUser'); window.location.href = 'login.html'; });
+                document.querySelectorAll('.settings-tab').forEach(tab => tab.addEventListener('click', function() {
+                    document.querySelectorAll('.settings-tab, .settings-content').forEach(el => el.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab + 'Tab').classList.add('active');
+                }));
+                document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', e => e.target.closest('.modal').style.display = 'none'));
+                document.getElementById('addSupervisorBtn').addEventListener('click', () => openUserModal('supervisor'));
+                document.getElementById('supervisorForm').addEventListener('submit', (e) => handleSaveUser(e, 'supervisor'));
+                document.getElementById('supervisorsTableBody').addEventListener('click', (e) => handleTableAction(e, 'supervisor'));
+                document.getElementById('supervisorSearchInput').addEventListener('input', renderSupervisorsTable);
+                document.getElementById('addFieldOfficerBtn').addEventListener('click', () => openUserModal('fieldOfficer'));
+                document.getElementById('fieldOfficerForm').addEventListener('submit', (e) => handleSaveUser(e, 'fieldOfficer'));
+                document.getElementById('fieldOfficersTableBody').addEventListener('click', (e) => handleTableAction(e, 'fieldOfficer'));
+                document.getElementById('fieldOfficerSearchInput').addEventListener('input', renderFieldOfficersTable);
+                document.getElementById('adminPasswordForm').addEventListener('submit', handleAdminPasswordChange);
+                document.querySelectorAll('.toggle-password').forEach(btn => btn.addEventListener('click', togglePasswordVisibility));
+                document.getElementById('addDistrictForm').addEventListener('submit', handleAddDistrict);
+                document.getElementById('districtsTableBody').addEventListener('click', handleDeleteDistrictClick);
+                document.getElementById('resetDataBtn').addEventListener('click', () => {
+                    if (confirm('DANGER: This will delete ALL data including inventory, users, and logs. Are you absolutely sure?')) {
+                        localStorage.clear();
+                        sessionStorage.clear();
+                        window.location.href = 'login.html';
+                    }
+                });
+            }
+            
+            // --- MODAL & FORM HANDLERS ---
+            function openUserModal(userType, id = null) {
+                const modalId = `${userType}Modal`;
+                const formId = `${userType}Form`;
+                const form = document.getElementById(formId);
+                form.reset();
+                
+                const isSupervisor = userType === 'supervisor';
+                const modalTitle = document.getElementById(`${userType}ModalTitle`);
+                const passwordInput = isSupervisor ? form.querySelector(`#${userType}Password`) : null;
+
+                if (id) {
+                    const dataKey = isSupervisor ? SUPERVISORS_KEY : FIELDOFFICERS_KEY;
+                    const user = getData(dataKey).find(u => u.id === Number(id));
+
+                    if (!user) {
+                        console.error(`User with ID ${id} not found for type ${userType}.`);
+                        showAlert(`${userType}Alert`, 'error', `Could not find user data to edit. Please refresh and try again.`);
+                        return;
+                    }
+
+                    modalTitle.textContent = `Edit ${isSupervisor ? 'Supervisor' : 'Data Collector'}`;
+                    form.querySelector(`#${userType}Id`).value = user.id;
+                    form.querySelector(`#${userType}Name`).value = user.name;
+                    form.querySelector(`#${userType}EmpId`).value = user.empId;
+                    form.querySelector(`#${userType}Email`).value = user.email;
+                    form.querySelector(`#${userType}Phone`).value = user.phone;
+                    if (isSupervisor) {
+                        form.querySelector(`#${userType}Username`).value = user.username;
+                        passwordInput.value = '';
+                        passwordInput.placeholder = 'Leave blank to keep current password';
+                        passwordInput.required = false;
+                    }
+
+                    form.querySelector(`.${userType}District`).value = user.district;
+                    form.querySelector(`.${userType}Status`).value = user.status;
+                } else {
+                    modalTitle.textContent = `Add ${isSupervisor ? 'Supervisor' : 'Data Collector'}`;
+                    form.querySelector(`#${userType}Id`).value = '';
+                    if (isSupervisor) {
+                        passwordInput.placeholder = 'Enter password';
+                        passwordInput.required = true;
+                    }
+                }
+                document.getElementById(modalId).style.display = 'flex';
+            }
+
+            function handleSaveUser(e, userType) {
+                e.preventDefault();
+                const form = e.target;
+                const isSupervisor = userType === 'supervisor';
+                const dataKey = isSupervisor ? SUPERVISORS_KEY : FIELDOFFICERS_KEY;
+                const alertId = isSupervisor ? 'supervisorAlert' : 'fieldOfficerAlert';
+
+                const idValue = form.querySelector(`#${userType}Id`).value;
+                const id = idValue ? Number(idValue) : null;
+                const name = form.querySelector(`#${userType}Name`).value.trim();
+                const empId = form.querySelector(`#${userType}EmpId`).value.trim();
+                const email = form.querySelector(`#${userType}Email`).value.trim().toLowerCase();
+                const phone = form.querySelector(`#${userType}Phone`).value.trim();
+                const district = form.querySelector(`.${userType}District`).value;
+                const status = form.querySelector(`.${userType}Status`).value;
+                const username = isSupervisor ? form.querySelector(`#${userType}Username`).value.trim().toLowerCase() : null;
+                const password = isSupervisor ? form.querySelector(`#${userType}Password`).value : '';
+                
+                if (!name || !district || !empId || !email || (isSupervisor && !username)) {
+                    return showAlert(alertId, 'error', 'Please fill all required fields.');
+                }
+                
+                let allUsers = [...getData(SUPERVISORS_KEY), ...getData(FIELDOFFICERS_KEY)];
+                if (isSupervisor && allUsers.some(u => u.username === username && u.id !== id)) {
+                     return showAlert(alertId, 'error', `Username '${username}' is already taken.`);
+                }
+                
+                const idLabel = isSupervisor ? 'FS ID' : 'Data Collector ID';
+                if (allUsers.some(u => u.empId === empId && u.id !== id)) {
+                     return showAlert(alertId, 'error', `${idLabel} '${empId}' is already in use.`);
+                }
+                
+                let data = getData(dataKey);
+                const userObject = isSupervisor
+                    ? { name, empId, email, phone, username, district, status }
+                    : { name, empId, email, phone, district, status };
+                
+                if (id) { // Editing existing user
+                    const index = data.findIndex(u => u.id === id);
+                    if (index > -1) {
+                        data[index] = { ...data[index], ...userObject };
+                        if (isSupervisor && password) { // Update password only if a new one is provided
+                            data[index].password = password;
+                        }
+                    }
+                } else { // Adding new user
+                    if (isSupervisor && !password) {
+                         return showAlert(alertId, 'error', 'Password is required for new users.');
+                    }
+                    data.unshift({ id: Date.now(), ...userObject, ...(isSupervisor ? { password } : {}) });
+                }
+                
+                saveData(dataKey, data);
+                isSupervisor ? renderSupervisorsTable() : renderFieldOfficersTable();
+                renderDistrictsTable();
+                document.getElementById(`${userType}Modal`).style.display = 'none';
+                showAlert(alertId, 'success', `${isSupervisor ? 'Supervisor' : 'Data Collector'} saved successfully.`);
+            }
+            
+            function handleTableAction(e, userType) {
+                const btn = e.target.closest('button[data-action]');
+                if (!btn) return;
+                const id = Number(btn.closest('tr').dataset.id);
+                const action = btn.dataset.action;
+                
+                if (action === 'edit') {
+                    openUserModal(userType, id);
+                } else if (action === 'delete') {
+                    const isSupervisor = userType === 'supervisor';
+                    const dataKey = isSupervisor ? SUPERVISORS_KEY : FIELDOFFICERS_KEY;
+                    const user = getData(dataKey).find(u => u.id === id);
+                    const deleteAlertId = isSupervisor ? 'supervisorAlert' : 'fieldOfficerAlert';
+                    const deleteCallback = () => {
+                        saveData(dataKey, getData(dataKey).filter(item => item.id !== id));
+                        renderSupervisorsTable();
+                        renderFieldOfficersTable();
+                        renderDistrictsTable();
+                        showAlert(deleteAlertId, 'success', `${isSupervisor ? 'Supervisor' : 'Data Collector'} deleted successfully.`);
+                    };
+                    openDeleteModal(`${user.name} (${isSupervisor ? 'Supervisor' : 'Data Collector'})`, deleteCallback);
+                }
+            }
+
+            function openDeleteModal(name, confirmCallback) {
+                const modal = document.getElementById('deleteModal');
+                document.getElementById('deleteObjectName').textContent = name;
+                
+                const oldBtn = document.getElementById('confirmDeleteBtn');
+                const newBtn = oldBtn.cloneNode(true);
+                oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+
+                newBtn.addEventListener('click', () => {
+                    confirmCallback();
+                    modal.style.display = 'none';
+                });
+                modal.style.display = 'flex';
+            }
+
+            function handleAddDistrict(e) {
+                e.preventDefault();
+                const input = document.getElementById('newDistrictName');
+                const newDistrict = input.value.trim();
+                if (!newDistrict) return;
+
+                let districts = getData(DISTRICTS_KEY);
+                if (districts.some(d => d.toLowerCase() === newDistrict.toLowerCase())) {
+                    return showAlert('districtAlert', 'error', 'District already exists.');
+                }
+                
+                districts.push(newDistrict);
+                saveData(DISTRICTS_KEY, districts.sort());
+                renderDistrictsTable();
+                populateDistrictDropdowns();
+                showAlert('districtAlert', 'success', 'District added successfully.');
+                input.value = '';
+            }
+
+            function handleDeleteDistrictClick(e) {
+                const btn = e.target.closest('.delete-district-btn');
+                if (!btn || btn.disabled) return;
+                const districtName = btn.closest('tr').dataset.name;
+                
+                const deleteCallback = () => {
+                    saveData(DISTRICTS_KEY, getData(DISTRICTS_KEY).filter(d => d !== districtName));
+                    renderDistrictsTable();
+                    populateDistrictDropdowns();
+                    showAlert('districtAlert', 'success', 'District deleted successfully.');
+                };
+                openDeleteModal(`the district "${districtName}"`, deleteCallback);
+            }
+
+            function handleAdminPasswordChange(e) {
+                e.preventDefault();
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+                const adminCreds = JSON.parse(localStorage.getItem(ADMIN_CREDS_KEY));
+
+                if (currentPassword !== adminCreds.password) {
+                    return showAlert('adminAlert', 'error', 'Current password does not match.');
+                }
+                if (newPassword.length < 6) {
+                    return showAlert('adminAlert', 'error', 'New password must be at least 6 characters.');
+                }
+                if (newPassword !== confirmNewPassword) {
+                    return showAlert('adminAlert', 'error', 'New passwords do not match.');
+                }
+                
+                adminCreds.password = newPassword;
+                saveData(ADMIN_CREDS_KEY, adminCreds);
+                showAlert('adminAlert', 'success', 'Admin password updated successfully.');
+                e.target.reset();
+            }
+            
+            function togglePasswordVisibility(e) {
+                const button = e.currentTarget;
+                const input = button.closest('.password-toggle').querySelector('input');
+                const icon = button.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            }
+            
+            function showAlert(alertId, type, message) {
+                const alertBox = document.getElementById(alertId);
+                alertBox.className = `alert alert-${type}`;
+                alertBox.textContent = message;
+                alertBox.style.display = 'block';
+                setTimeout(() => { alertBox.style.display = 'none'; }, 5000);
+            }
+            
+            initializeApp();
+        });
+    </script>
+</body>
+</html>
