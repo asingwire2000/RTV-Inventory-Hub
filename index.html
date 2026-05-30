@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RTV Inventory Hub | Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -42,7 +43,6 @@
             min-height: 100vh;
         }
 
-        /* Sidebar Styles */
         .sidebar {
             width: var(--sidebar-width);
             background: #053d1a;
@@ -63,8 +63,7 @@
             text-align: center;
         }
 
-        .logo,
-        .sidebar-logo {
+        .logo {
             height: 90px;
             width: 90px;
             object-fit: contain;
@@ -99,14 +98,12 @@
 
         .menu-item i { width: 20px; text-align: center; }
 
-        /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
             padding: 1.5rem;
         }
 
-        /* Header */
         .header {
             background: white;
             padding: 1rem 1.5rem;
@@ -123,9 +120,7 @@
         
         .header-right { display: flex; align-items: center; gap: 1.5rem; }
         
-        .notification-container {
-            position: relative;
-        }
+        .notification-container { position: relative; }
 
         .notification-btn {
             background: none; border: none; font-size: 1.5rem; color: var(--secondary);
@@ -146,7 +141,7 @@
             width: 360px;
             background: var(--card-bg);
             border-radius: var(--border-radius);
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
             border: 1px solid var(--border);
             z-index: 1100;
         }
@@ -159,19 +154,8 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .notification-dropdown-header h3 {
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        #clearNotificationsBtn {
-            background: none;
-            border: none;
-            color: var(--primary);
-            font-size: 0.8rem;
-            cursor: pointer;
-            font-weight: 500;
-        }
+        .notification-dropdown-header h3 { font-size: 1rem; font-weight: 600; }
+        #clearNotificationsBtn { background: none; border: none; color: var(--primary); font-size: 0.8rem; cursor: pointer; }
 
         .notification-dropdown-body {
             max-height: 350px;
@@ -185,24 +169,12 @@
             padding: 0.75rem;
             border-radius: 8px;
             transition: background-color 0.2s;
+            cursor: pointer;
         }
-        .notification-item:hover {
-            background-color: var(--light);
-        }
-        .notification-icon {
-            font-size: 1.2rem;
-            color: var(--secondary);
-            padding-top: 0.2rem;
-        }
-        .notification-content p {
-            font-size: 0.9rem;
-            line-height: 1.4;
-            margin: 0;
-        }
-        .notification-content small {
-            font-size: 0.75rem;
-            color: var(--secondary);
-        }
+        .notification-item:hover { background-color: var(--light); }
+        .notification-icon { font-size: 1.2rem; color: var(--secondary); padding-top: 0.2rem; }
+        .notification-content p { font-size: 0.9rem; line-height: 1.4; margin: 0; }
+        .notification-content small { font-size: 0.75rem; color: var(--secondary); }
 
         .user-profile { display: flex; align-items: center; gap: 0.75rem; }
         .avatar {
@@ -210,7 +182,6 @@
             color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;
         }
 
-        /* Dashboard Grid */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -218,19 +189,18 @@
             margin-bottom: 1.5rem;
         }
 
-        /* Card Styles */
         .card {
             background: var(--card-bg);
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             overflow: hidden;
             transition: var(--transition);
-            position: relative; /* For download button positioning */
+            position: relative;
         }
 
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
         .card-header {
@@ -244,12 +214,10 @@
         .card-header h2 { font-size: 1.1rem; font-weight: 600; color: var(--dark); }
         .card-body { padding: 1.5rem; }
 
-        /* Stat Cards */
         .stat-card .card-body { display: flex; flex-direction: column; }
         .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--dark); }
         .stat-label { color: var(--secondary); font-size: 1rem; font-weight: 500;}
 
-        /* Inventory Type Cards */
         .type-card { text-align: center; }
         .type-card .stat-icon { font-size: 1.5rem; color: var(--primary); margin-bottom: 0.5rem; }
         .type-card .stat-label { font-size: 1rem; font-weight: 600; color: var(--dark); }
@@ -258,7 +226,6 @@
         .type-card .stat-breakdown .available { color: var(--success); }
         .type-card .stat-breakdown .in-use { color: var(--info); }
         
-        /* Buttons */
         .btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
             padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 500; cursor: pointer;
@@ -269,7 +236,6 @@
         .btn-success { background: var(--success); color: white; }
         .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
 
-        /* District Inventory Styles */
         .district-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -294,7 +260,6 @@
         .district-breakdown span { background: #eef2ff; padding: 0.2rem 0.5rem; border-radius: 6px; }
         .district-breakdown span strong { color: var(--dark); }
         
-        /* Recent Activity */
         .activity-list { list-style: none; padding: 0; }
         .activity-item { display: flex; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
         .activity-item:last-child { border-bottom: none; }
@@ -311,7 +276,6 @@
         .activity-details p { margin: 0; color: var(--dark); font-size: 0.9rem; }
         .activity-details small { color: var(--secondary); font-size: 0.8rem; }
         
-        /* Approval List Styles */
         .approval-list { list-style: none; padding: 0; }
         .approval-item {
             display: flex;
@@ -325,7 +289,6 @@
         .approval-item-info .item-id { font-weight: 600; color: var(--dark); }
         .approval-item-info .item-origin { font-size: 0.85rem; color: var(--secondary); }
 
-        /* Modal Styles */
         .modal {
             display: none; position: fixed; z-index: 2000; left: 0; top: 0;
             width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);
@@ -340,18 +303,7 @@
         .modal-header h3 { color: var(--dark); }
         .modal-close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
         .modal-body { padding: 1.5rem; overflow-y: auto; }
-        .modal-list { display: flex; flex-direction: column; gap: 0.75rem; }
-        .modal-list-item {
-            display: flex; flex-direction: column;
-            padding: 1rem; border-radius: 8px; background: var(--light);
-        }
-        .modal-list-header { display: flex; justify-content: space-between; align-items: center; }
-        .modal-list-header strong { color: var(--dark); text-transform: capitalize; font-size: 1.1rem; }
-        .modal-list-header .item-count { font-size: 1.2rem; font-weight: 600; color: var(--primary); }
-        .modal-list-details { font-size: 0.85rem; color: var(--secondary); margin-top: 0.25rem; }
-        .modal-list-breakdown { margin-top: 0.75rem; }
 
-        /* Refresh Button */
         .refresh-btn {
             background: none;
             border: none;
@@ -361,45 +313,22 @@
             margin-left: 10px;
         }
 
-        /* --- NEW: Download Button --- */
-        .card-download-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
-            color: var(--secondary);
-            cursor: pointer;
-            font-size: 1rem;
-            padding: 0.5rem;
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary);
             border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border-top-color: transparent;
+            animation: spin 0.6s linear infinite;
         }
-        .card-download-btn:hover {
-            background-color: var(--light);
-            color: var(--primary);
-        }
-        .card-header .card-download-btn {
-            position: static; /* Override absolute for headers */
-            margin-left: 1rem;
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <script>
-        // Security Check: This script runs first.
-        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        if (!loggedInUser) {
-            window.location.href = 'login.html';
-        } else if (loggedInUser.role !== 'admin') {
-            // If logged in but not an admin, redirect to their default page
-            window.location.href = 'supervisor.html';
-        }
-    </script>
     <div class="app-container">
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -419,7 +348,7 @@
         <main class="main-content">
             <header class="header">
                 <div class="header-title">
-                    <h1> INVENTORY DASHBOARD</h1> <button class="refresh-btn" id="refreshBtn" title="Refresh Data"><i class="fas fa-sync-alt"></i></button></h1>
+                    <h1>INVENTORY DASHBOARD <button class="refresh-btn" id="refreshBtn" title="Refresh Data"><i class="fas fa-sync-alt"></i></button></h1>
                     <p>Field equipment tracking & management overview</p>
                 </div>
                 <div class="header-right">
@@ -445,7 +374,7 @@
                             <small id="user-role">Administrator</small>
                         </div>
                     </div>
-                     <button class="btn btn-outline" id="logout-btn" style="margin-left: 1rem;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    <button class="btn btn-outline" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
                 </div>
             </header>
 
@@ -462,15 +391,14 @@
                     <div class="stat-value" id="availableForAssignmentValue">0</div>
                     <div class="stat-label">Available for Assignment</div>
                 </div></div>
-                 <div class="card stat-card"><div class="card-body">
+                <div class="card stat-card"><div class="card-body">
                     <div class="stat-value" id="pendingApprovalValue">0</div>
                     <div class="stat-label">Pending Approval</div>
                 </div></div>
             </div>
             
-             <div class="dashboard-grid">
+            <div class="dashboard-grid">
                 <div class="card type-card"><div class="card-body">
-                    <button class="card-download-btn" title="Download Tablets List" data-download-type="type" data-type="tablet"><i class="fas fa-download"></i></button>
                     <div class="stat-icon"><i class="fas fa-tablet-alt"></i></div>
                     <div class="stat-label">Tablets</div>
                     <div class="stat-value" id="tabletsTotal">0</div>
@@ -480,7 +408,6 @@
                     </div>
                 </div></div>
                 <div class="card type-card"><div class="card-body">
-                    <button class="card-download-btn" title="Download Phones List" data-download-type="type" data-type="phone"><i class="fas fa-download"></i></button>
                     <div class="stat-icon"><i class="fas fa-mobile-alt"></i></div>
                     <div class="stat-label">Phones</div>
                     <div class="stat-value" id="phonesTotal">0</div>
@@ -490,7 +417,6 @@
                     </div>
                 </div></div>
                 <div class="card type-card"><div class="card-body">
-                    <button class="card-download-btn" title="Download Chargers List" data-download-type="type" data-type="charger"><i class="fas fa-download"></i></button>
                     <div class="stat-icon"><i class="fas fa-charging-station"></i></div>
                     <div class="stat-label">Chargers</div>
                     <div class="stat-value" id="chargersTotal">0</div>
@@ -500,7 +426,6 @@
                     </div>
                 </div></div>
                 <div class="card type-card"><div class="card-body">
-                    <button class="card-download-btn" title="Download Bags List" data-download-type="type" data-type="bag"><i class="fas fa-download"></i></button>
                     <div class="stat-icon"><i class="fas fa-briefcase"></i></div>
                     <div class="stat-label">Bags</div>
                     <div class="stat-value" id="bagsTotal">0</div>
@@ -510,7 +435,6 @@
                     </div>
                 </div></div>
                 <div class="card type-card"><div class="card-body">
-                    <button class="card-download-btn" title="Download Power Banks List" data-download-type="type" data-type="power-bank"><i class="fas fa-download"></i></button>
                     <div class="stat-icon"><i class="fas fa-car-battery"></i></div>
                     <div class="stat-label">Power Banks</div>
                     <div class="stat-value" id="powerbanksTotal">0</div>
@@ -524,21 +448,16 @@
             <div class="card" id="approval-card" style="display: none; margin-bottom: 1.5rem;">
                 <div class="card-header">
                     <h2>Items Awaiting Approval</h2>
-                    <button class="card-download-btn" title="Download Pending List" data-download-type="pending"><i class="fas fa-download"></i></button>
                 </div>
                 <div class="card-body">
-                    <div id="approval-list-container">
-                        </div>
+                    <div id="approval-list-container"></div>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">
                     <h2>Inventory by District</h2>
-                    <div>
-                        <button class="btn btn-outline" id="viewAllDistrictsBtn"><i class="fas fa-list"></i> View All</button>
-                        <button class="card-download-btn" title="Download District Summary" data-download-type="all_districts_summary"><i class="fas fa-download"></i></button>
-                    </div>
+                    <button class="btn btn-outline" id="viewAllDistrictsBtn"><i class="fas fa-list"></i> View All</button>
                 </div>
                 <div class="card-body">
                     <div class="district-grid" id="districtGrid">
@@ -550,7 +469,6 @@
             <div class="card" style="margin-top: 1.5rem;">
                 <div class="card-header">
                     <h2>Recent Activity</h2>
-                    <button class="card-download-btn" title="Download Recent Activity" data-download-type="activity"><i class="fas fa-download"></i></button>
                 </div>
                 <div class="card-body">
                     <ul class="activity-list" id="recentActivityList">
@@ -571,472 +489,467 @@
         </div>
     </div>
 
+    <script src="supabase-config.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const user = JSON.parse(sessionStorage.getItem('loggedInUser'));
-            
-            document.getElementById('user-name').textContent = user.username;
-            document.getElementById('user-avatar').textContent = user.username.charAt(0).toUpperCase();
-            document.getElementById('user-role').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+        let currentUser = null;
 
-            const INVENTORY_KEY = 'inventoryData';
-            const SUPERVISORS_KEY = 'supervisors';
-            const DISTRICTS_KEY = 'districts';
-            const LOGS_KEY = 'movementLogs';
-            const NOTIFICATIONS_KEY = 'adminNotifications';
-
-            const refreshBtn = document.getElementById('refreshBtn');
-            const notificationBtn = document.getElementById('notificationBtn');
-            const notificationCount = document.getElementById('notificationCount');
-            const notificationDropdown = document.getElementById('notificationDropdown');
-            const notificationList = document.getElementById('notificationList');
-            const clearNotificationsBtn = document.getElementById('clearNotificationsBtn');
-
-            function initializeData() {
-                if (!localStorage.getItem(INVENTORY_KEY)) {
-                    const today = new Date().toLocaleDateString();
-                    const sampleInventory = [
-                        { id: 'TBL-0421', name: 'iPad Pro 12.9"', type: 'tablet', status: 'available', assigned: '', district: 'mbarara', lastUpdate: today },
-                        { id: 'PHN-1872', name: 'Samsung Galaxy S21', type: 'phone', status: 'in-use', assigned: 'John Smith', district: 'kagadi', lastUpdate: today },
-                        { id: 'CHG-3381', name: 'USB-C Fast Charger', type: 'charger', status: 'pending-approval', assigned: '', district: 'mbarara', lastUpdate: today },
-                    ];
-                    localStorage.setItem(INVENTORY_KEY, JSON.stringify(sampleInventory));
-                }
-                if (!localStorage.getItem(DISTRICTS_KEY)) {
-                    const defaultDistricts = ["Kagadi", "Kibaale", "Kyenjojo", "Kyegegwa", "Mbarara"];
-                    localStorage.setItem(DISTRICTS_KEY, JSON.stringify(defaultDistricts));
-                }
-                if (!localStorage.getItem(SUPERVISORS_KEY)) {
-                    const sampleSupervisors = [{ id: 1, name: 'John Smith', district: 'Kagadi', status: 'active' }];
-                    localStorage.setItem(SUPERVISORS_KEY, JSON.stringify(sampleSupervisors));
-                }
-                if (!localStorage.getItem(LOGS_KEY)) localStorage.setItem(LOGS_KEY, JSON.stringify([]));
-                if (!localStorage.getItem(NOTIFICATIONS_KEY)) localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify([]));
-            }
-
-            const getInventoryData = () => JSON.parse(localStorage.getItem(INVENTORY_KEY)) || [];
-            const getSupervisorData = () => JSON.parse(localStorage.getItem(SUPERVISORS_KEY)) || [];
-            const getDistrictData = () => JSON.parse(localStorage.getItem(DISTRICTS_KEY)) || [];
-            const getMovementLogs = () => JSON.parse(localStorage.getItem(LOGS_KEY)) || [];
-            const getNotifications = () => JSON.parse(localStorage.getItem(NOTIFICATIONS_KEY)) || [];
-            const saveNotifications = (notifications) => localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notifications));
-            
-            function logMovement(itemId, action, details) {
-                const logs = getMovementLogs();
-                logs.unshift({ itemId, action, details, timestamp: new Date().toISOString() });
-                localStorage.setItem(LOGS_KEY, JSON.stringify(logs));
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Security Check
+            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+            if (!loggedInUser) {
+                window.location.href = 'login.html';
+            } else if (loggedInUser.role !== 'admin') {
+                window.location.href = 'supervisor.html';
             }
             
-            function checkForNewNotifications(currentInventory) {
-                const logs = getMovementLogs();
-                const notifications = getNotifications();
-                const itemMap = new Map(currentInventory.map(item => [item.id, item]));
-                const existingNotifIds = new Set(notifications.map(n => n.id));
-                const newNotifications = [];
-
-                logs.forEach(log => {
-                    const notifId = `notif-${log.timestamp}-${log.itemId}`;
-                    if (existingNotifIds.has(notifId)) return;
-
-                    let message = null;
-                    let type = null;
-
-                    if (log.action === 'return_to_store') {
-                        const item = itemMap.get(log.itemId);
-                        message = `<strong>${item?.name || log.itemId}</strong> requires approval. ${log.details}`;
-                        type = 'approval';
-                    } else if (log.action === 'incident_report') {
-                        const item = itemMap.get(log.itemId);
-                        message = `Incident reported for <strong>${item?.name || log.itemId}</strong>.`;
-                        type = 'incident';
-                    }
-
-                    if (message) {
-                        newNotifications.push({ id: notifId, message, timestamp: log.timestamp, read: false, type: type, itemId: log.itemId });
-                    }
-                });
-
-                if (newNotifications.length > 0) {
-                    saveNotifications([...newNotifications, ...notifications]);
-                }
-            }
+            currentUser = loggedInUser;
             
-            function updateNotificationsUI() {
-                const notifications = getNotifications();
-                const unreadCount = notifications.filter(n => !n.read).length;
-                notificationCount.textContent = unreadCount;
-                notificationCount.style.display = unreadCount > 0 ? 'flex' : 'none';
-                
-                notificationList.innerHTML = '';
-                if (notifications.length === 0) {
-                    notificationList.innerHTML = '<p style="text-align:center; padding: 1rem; color: var(--secondary);">No new notifications.</p>';
-                    return;
-                }
+            // Set user info in header
+            document.getElementById('user-name').textContent = currentUser.username;
+            document.getElementById('user-avatar').textContent = currentUser.username.charAt(0).toUpperCase();
+            document.getElementById('user-role').textContent = 'Administrator';
 
-                notifications.forEach(notif => {
-                    const itemEl = document.createElement('div');
-                    itemEl.className = 'notification-item';
-
-                    if (notif.type && notif.itemId) {
-                        itemEl.dataset.type = notif.type;
-                        itemEl.dataset.itemId = notif.itemId;
-                        itemEl.style.cursor = 'pointer';
-                        itemEl.title = 'Click to view';
-                    }
-
-                    const icon = notif.message.includes('approval') ? 'fa-inbox' : 'fa-exclamation-triangle';
-                    itemEl.innerHTML = `
-                        <i class="fas ${icon} notification-icon"></i>
-                        <div class="notification-content">
-                            <p>${notif.message}</p>
-                            <small>${new Date(notif.timestamp).toLocaleString()}</small>
-                        </div>`;
-                    notificationList.appendChild(itemEl);
-                });
-            }
-            
-            function calculateDashboardStats(inventory, supervisors) {
-                const totalInventory = inventory.length;
-                const itemsInUse = inventory.filter(item => item.status === 'in-use').length;
-                const availableForAssignment = inventory.filter(item => item.status === 'available').length;
-                const activeSupervisors = supervisors.filter(s => s.status === 'active').length;
-                const pendingApproval = inventory.filter(item => item.status === 'pending-approval').length;
-                return { totalInventory, itemsInUse, availableForAssignment, activeSupervisors, pendingApproval };
-            }
-
-            function calculateInventoryTypeStats(inventory) {
-                const stats = { tablet: { total: 0, available: 0, inUse: 0 }, phone: { total: 0, available: 0, inUse: 0 }, charger: { total: 0, available: 0, inUse: 0 }, bag: { total: 0, available: 0, inUse: 0 }, 'power-bank': { total: 0, available: 0, inUse: 0 }};
-                inventory.forEach(item => {
-                    if (stats[item.type]) {
-                        stats[item.type].total++;
-                        if (item.status === 'available') stats[item.type].available++;
-                        if (item.status === 'in-use') stats[item.type].inUse++;
-                    }
-                });
-                return stats;
-            }
-
-            function calculateAllDistrictInventories(inventory, supervisors, officialDistricts) {
-                const supervisorMap = supervisors.reduce((map, s) => { if (s.status === 'active' && s.district) map[s.district.toLowerCase()] = s.name; return map; }, {});
-                const allKnownDistricts = new Set([...officialDistricts.map(d => d.trim().toLowerCase()), ...inventory.map(item => item.district?.trim().toLowerCase()).filter(Boolean)]);
-                const districtInventory = {};
-
-                allKnownDistricts.forEach(districtKey => {
-                    const originalDistrictName = officialDistricts.find(d => d.toLowerCase() === districtKey) || districtKey;
-                    districtInventory[districtKey] = { name: originalDistrictName, supervisor: supervisorMap[districtKey] || 'N/A', total: 0, breakdown: {} };
-                });
-                
-                inventory.forEach(item => {
-                    if (item.district) {
-                        const districtKey = item.district.toLowerCase();
-                        if (districtInventory[districtKey]) {
-                            const distData = districtInventory[districtKey];
-                            distData.total++;
-                            distData.breakdown[item.type] = (distData.breakdown[item.type] || 0) + 1;
-                        }
-                    }
-                });
-                return Object.values(districtInventory).sort((a, b) => b.total - a.total || a.name.localeCompare(b.name));
-            }
-
-            function getRecentActivities(logs, inventory) {
-                const inventoryMap = new Map(inventory.map(item => [item.id, item]));
-                return logs.slice(0, 10).map(log => ({ ...log, item: inventoryMap.get(log.itemId) || { name: `Item ${log.itemId}` } }));
-            }
-
-            function renderApprovalQueue(inventory, logs) {
-                const approvalCard = document.getElementById('approval-card');
-                const approvalContainer = document.getElementById('approval-list-container');
-                const returnLogs = new Map();
-
-                logs.forEach(log => {
-                    if (log.action === 'return_to_store' && !returnLogs.has(log.itemId)) {
-                        const match = log.details.match(/from (.*?) field office/);
-                        if (match && match[1]) {
-                            returnLogs.set(log.itemId, match[1]);
-                        }
-                    }
-                });
-
-                const pendingItems = inventory.filter(item => item.status === 'pending-approval');
-
-                if (pendingItems.length > 0) {
-                    approvalCard.style.display = 'block';
-                    const itemsHTML = pendingItems.map(item => {
-                        const originDistrict = returnLogs.get(item.id) || 'Unknown';
-                        return `
-                        <div class="approval-item">
-                            <div class="approval-item-info">
-                                <span class="item-id">${item.name} (${item.id})</span>
-                                <span class="item-origin">Returned from: <strong>${originDistrict}</strong></span>
-                            </div>
-                            <button class="btn btn-success btn-sm approve-btn" data-item-id="${item.id}">
-                                <i class="fas fa-check"></i> Approve
-                            </button>
-                        </div>`;
-                    }).join('');
-                    approvalContainer.innerHTML = `<div class="approval-list">${itemsHTML}</div>`;
-                } else {
-                    approvalCard.style.display = 'none';
-                    approvalContainer.innerHTML = '';
-                }
-            }
-
-            function updateAllUI() {
-                const inventory = getInventoryData();
-                const supervisors = getSupervisorData();
-                const districts = getDistrictData();
-                const logs = getMovementLogs();
-
-                checkForNewNotifications(inventory);
-                updateNotificationsUI();
-
-                const stats = calculateDashboardStats(inventory, supervisors);
-                document.getElementById('totalInventoryValue').textContent = stats.totalInventory;
-                document.getElementById('itemsInUseValue').textContent = stats.itemsInUse;
-                document.getElementById('availableForAssignmentValue').textContent = stats.availableForAssignment;
-                document.getElementById('pendingApprovalValue').textContent = stats.pendingApproval;
-
-                const typeStats = calculateInventoryTypeStats(inventory);
-                Object.keys(typeStats).forEach(type => {
-                    let elementIdPrefix = type.replace('-', '');
-                    if (!elementIdPrefix.endsWith('s')) elementIdPrefix += 's';
-                    document.getElementById(`${elementIdPrefix}Total`).textContent = typeStats[type].total;
-                    document.getElementById(`${elementIdPrefix}Available`).textContent = typeStats[type].available;
-                    document.getElementById(`${elementIdPrefix}InUse`).textContent = typeStats[type].inUse;
-                });
-
-                renderApprovalQueue(inventory, logs);
-                
-                const allDistrictsSorted = calculateAllDistrictInventories(inventory, supervisors, districts);
-                const districtGrid = document.getElementById('districtGrid');
-                const modalBody = document.getElementById('districtModalBody');
-                districtGrid.innerHTML = '';
-                modalBody.innerHTML = '<div class="modal-list"></div>';
-                const modalList = modalBody.querySelector('.modal-list');
-                const createBreakdownHTML = (breakdown) => Object.entries(breakdown).map(([type, count]) => `<span>${type}: <strong>${count}</strong></span>`).join('') || 'No items';
-                
-                const topDistricts = allDistrictsSorted.filter(d => d.total > 0).slice(0, 6);
-                if (topDistricts.length > 0) {
-                    topDistricts.forEach(district => {
-                        const card = document.createElement('div');
-                        card.className = 'district-card';
-                        card.innerHTML = `
-                            <button class="card-download-btn" title="Download ${district.name} Inventory" data-download-type="district" data-district-name="${district.name}"><i class="fas fa-download"></i></button>
-                            <div class="district-header"><h3>${district.name}</h3><span class="district-total">${district.total}</span></div>
-                            <div class="district-body">
-                                <p class="district-supervisor"><i class="fas fa-user-shield"></i> Supervisor: <strong>${district.supervisor}</strong></p>
-                                <div class="district-breakdown">${createBreakdownHTML(district.breakdown)}</div>
-                            </div>`;
-                        districtGrid.appendChild(card);
-                    });
-                } else {
-                    districtGrid.innerHTML = '<p>No district data available.</p>';
-                }
-                
-                allDistrictsSorted.forEach(district => {
-                    const item = document.createElement('div');
-                    item.className = 'modal-list-item';
-                    item.innerHTML = `<div class="modal-list-header"><strong>${district.name}</strong><span class="item-count">${district.total} items</span></div><div class="modal-list-details">Supervisor: ${district.supervisor}</div><div class="district-breakdown modal-list-breakdown">${createBreakdownHTML(district.breakdown)}</div>`;
-                    modalList.appendChild(item);
-                });
-                
-                const recentActivities = getRecentActivities(logs, inventory);
-                const activityList = document.getElementById('recentActivityList');
-                activityList.innerHTML = '';
-                
-                if(recentActivities.length === 0) {
-                    activityList.innerHTML = '<li>No recent activity found.</li>';
-                } else {
-                    recentActivities.forEach(act => {
-                        const li = document.createElement('li');
-                        li.className = 'activity-item';
-                        let detailsText = '', iconClass = 'update', icon = 'fa-check';
-                        switch(act.action) {
-                            case 'creation': detailsText = `<strong>${act.item.name}</strong> (${act.itemId}) was created.`; iconClass = 'create'; icon = 'fa-plus'; break;
-                            case 'assignment_transfer':
-                            case 'transfer': detailsText = `<strong>${act.item.name}</strong> was assigned/transferred. Details: ${act.details}`; iconClass = 'assign'; icon = 'fa-user-check'; break;
-                            case 'deletion': case 'bulk_deletion': detailsText = act.details; iconClass = 'delete'; icon = 'fa-trash-alt'; break;
-                            case 'transfer_initiated':
-                            case 'return_to_store':
-                            case 'approval_complete': detailsText = `<strong>${act.item.name}</strong> transfer process updated. Details: ${act.details}`; iconClass = 'transfer'; icon = 'fa-exchange-alt'; break;
-                            default: detailsText = `<strong>${act.item.name}</strong> was updated. Details: ${act.details}`; iconClass = 'update'; icon = 'fa-check-circle';
-                        }
-                        li.innerHTML = `<div class="activity-icon ${iconClass}"><i class="fas ${icon}"></i></div><div class="activity-details"><p>${detailsText}</p><small>${new Date(act.timestamp).toLocaleString()}</small></div>`;
-                        activityList.appendChild(li);
-                    });
-                }
-            }
-
-            function handleApproval(itemId) {
-                let currentInventory = getInventoryData();
-                const itemIndex = currentInventory.findIndex(item => item.id === itemId);
-
-                if (itemIndex > -1) {
-                    currentInventory[itemIndex].status = 'available';
-                    currentInventory[itemIndex].district = 'mbarara';
-                    currentInventory[itemIndex].lastUpdate = new Date().toLocaleDateString();
-                    
-                    logMovement(itemId, 'approval_complete', 'Item return from field office approved by Admin.');
-                    localStorage.setItem(INVENTORY_KEY, JSON.stringify(currentInventory));
-                    
-                    updateAllUI();
-                }
-            }
-
-            // --- NEW: CSV Download Helper ---
-            function downloadCSV(data, filename = 'export.csv') {
-                if (!data || data.length === 0) {
-                    alert('No data available to download.');
-                    return;
-                }
-
-                const replacer = (key, value) => value === null ? '' : value;
-                const header = Object.keys(data[0]);
-                let csv = data.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','));
-                csv.unshift(header.join(','));
-                csv = csv.join('\r\n');
-
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                if (link.download !== undefined) {
-                    const url = URL.createObjectURL(blob);
-                    link.setAttribute('href', url);
-                    link.setAttribute('download', filename);
-                    link.style.visibility = 'hidden';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }
-            }
-
-            function setupEventListeners() {
-                document.getElementById('logout-btn').addEventListener('click', () => {
-                    sessionStorage.removeItem('loggedInUser');
-                    window.location.href = 'login.html';
-                });
-
-                const modal = document.getElementById('districtModal');
-                document.getElementById('viewAllDistrictsBtn').onclick = () => { modal.style.display = 'flex'; };
-                document.querySelector('.modal-close').onclick = () => { modal.style.display = 'none'; };
-                window.onclick = (event) => { if (event.target == modal) modal.style.display = 'none'; };
-
-                notificationBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    notificationDropdown.style.display = notificationDropdown.style.display === 'block' ? 'none' : 'block';
-                });
-                
-                clearNotificationsBtn.addEventListener('click', () => {
-                    if (getNotifications().length > 0 && confirm('Are you sure you want to clear all notifications?')) {
-                        saveNotifications([]);
-                        updateNotificationsUI();
-                    }
-                });
-
-                document.addEventListener('click', (e) => {
-                    if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
-                       notificationDropdown.style.display = 'none';
-                    }
-                });
-
-                notificationDropdown.addEventListener('click', (e) => e.stopPropagation());
-                
-                notificationList.addEventListener('click', (e) => {
-                    const notificationItem = e.target.closest('.notification-item');
-                    if (!notificationItem) return;
-
-                    const type = notificationItem.dataset.type;
-                    const itemId = notificationItem.dataset.itemId;
-
-                    // Mark notification as read and update UI
-                    const notifications = getNotifications();
-                    const notifIndex = Array.from(notificationList.children).indexOf(notificationItem);
-                    if (notifIndex > -1 && notifications[notifIndex]) {
-                        notifications[notifIndex].read = true;
-                        saveNotifications(notifications);
-                        updateNotificationsUI();
-                    }
-
-                    notificationDropdown.style.display = 'none';
-
-                    if (type === 'approval') {
-                        const approvalCard = document.getElementById('approval-card');
-                        if (approvalCard && approvalCard.style.display !== 'none') {
-                            approvalCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            approvalCard.style.transition = 'box-shadow 0.3s ease-in-out';
-                            approvalCard.style.boxShadow = '0 0 0 3px var(--info)';
-                            setTimeout(() => {
-                                approvalCard.style.boxShadow = '';
-                            }, 2000);
-                        }
-                    } else if (type === 'incident') {
-                        window.location.href = `Inventory.html?highlight=${itemId}`;
-                    }
-                });
-
-                refreshBtn.addEventListener('click', () => {
-                    const icon = refreshBtn.querySelector('i');
-                    icon.classList.add('fa-spin');
-                    updateAllUI();
-                    setTimeout(() => icon.classList.remove('fa-spin'), 500);
-                });
-                
-                document.getElementById('approval-list-container').addEventListener('click', (e) => {
-                    const approveBtn = e.target.closest('.approve-btn');
-                    if (approveBtn) {
-                        const itemId = approveBtn.dataset.itemId;
-                        handleApproval(itemId);
-                    }
-                });
-
-                // --- NEW: Download Event Listener ---
-                document.querySelector('.main-content').addEventListener('click', (e) => {
-                    const downloadBtn = e.target.closest('.card-download-btn');
-                    if (!downloadBtn) return;
-                    
-                    const downloadType = downloadBtn.dataset.downloadType;
-                    const inventory = getInventoryData();
-
-                    switch (downloadType) {
-                        case 'type':
-                            const itemType = downloadBtn.dataset.type;
-                            const typeData = inventory.filter(item => item.type === itemType);
-                            downloadCSV(typeData, `inventory_${itemType}.csv`);
-                            break;
-                        case 'district':
-                            const districtName = downloadBtn.dataset.districtName;
-                            const districtData = inventory.filter(item => item.district && item.district.toLowerCase() === districtName.toLowerCase());
-                            downloadCSV(districtData, `inventory_${districtName}.csv`);
-                            break;
-                        case 'pending':
-                            const pendingData = inventory.filter(item => item.status === 'pending-approval');
-                            downloadCSV(pendingData, 'pending_approval_items.csv');
-                            break;
-                        case 'all_districts_summary':
-                            const supervisors = getSupervisorData();
-                            const districts = getDistrictData();
-                            const summaryData = calculateAllDistrictInventories(inventory, supervisors, districts).map(d => ({
-                                district: d.name,
-                                total_items: d.total,
-                                supervisor: d.supervisor,
-                                breakdown: Object.entries(d.breakdown).map(([k, v]) => `${k}: ${v}`).join(' | ')
-                            }));
-                            downloadCSV(summaryData, 'district_inventory_summary.csv');
-                            break;
-                        case 'activity':
-                            const activityData = getMovementLogs().slice(0, 50); // Download latest 50 activities
-                            downloadCSV(activityData, 'recent_activity.csv');
-                            break;
-                    }
-                });
-
-                window.addEventListener('storage', updateAllUI);
-            }
-
-            initializeData();
-            updateAllUI();
+            // Setup event listeners
             setupEventListeners();
+            
+            // Load all data
+            await loadDashboardData();
         });
+
+        async function loadDashboardData() {
+            try {
+                // Show loading states
+                showLoadingStates();
+                
+                // Get all inventory
+                const { data: inventory, error: inventoryError } = await db.getInventory();
+                if (inventoryError) throw inventoryError;
+                
+                // Get movement logs
+                const { data: logs, error: logsError } = await db.getMovementLogs(20);
+                if (logsError) throw logsError;
+                
+                // Get supervisors
+                const { data: supervisors, error: supError } = await db.getSupervisors();
+                if (supError) throw supError;
+                
+                // Get districts
+                const { data: districts, error: distError } = await db.getDistricts();
+                if (distError) throw distError;
+                
+                // Get notifications
+                const { data: notifications, error: notifError } = await db.getNotifications();
+                if (notifError) throw notifError;
+                
+                // Update UI
+                updateStats(inventory);
+                updateTypeStats(inventory);
+                updateApprovalQueue(inventory, logs);
+                updateDistrictInventory(inventory, supervisors, districts);
+                updateRecentActivity(logs, inventory);
+                updateNotifications(notifications);
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showError('Failed to load dashboard data. Please refresh the page.');
+            }
+        }
+
+        function updateStats(inventory) {
+            const total = inventory.length;
+            const inUse = inventory.filter(item => item.status === 'in-use').length;
+            const available = inventory.filter(item => item.status === 'available').length;
+            const pendingApproval = inventory.filter(item => item.status === 'pending-approval').length;
+            
+            document.getElementById('totalInventoryValue').textContent = total;
+            document.getElementById('itemsInUseValue').textContent = inUse;
+            document.getElementById('availableForAssignmentValue').textContent = available;
+            document.getElementById('pendingApprovalValue').textContent = pendingApproval;
+        }
+
+        function updateTypeStats(inventory) {
+            const types = ['tablet', 'phone', 'charger', 'bag', 'power-bank'];
+            
+            types.forEach(type => {
+                const typeItems = inventory.filter(item => item.type === type);
+                const total = typeItems.length;
+                const available = typeItems.filter(item => item.status === 'available').length;
+                const inUse = typeItems.filter(item => item.status === 'in-use').length;
+                
+                let elementId = type.replace('-', '');
+                if (!elementId.endsWith('s')) elementId += 's';
+                
+                const totalEl = document.getElementById(`${elementId}Total`);
+                const availableEl = document.getElementById(`${elementId}Available`);
+                const inUseEl = document.getElementById(`${elementId}InUse`);
+                
+                if (totalEl) totalEl.textContent = total;
+                if (availableEl) availableEl.textContent = available;
+                if (inUseEl) inUseEl.textContent = inUse;
+            });
+        }
+
+        function updateApprovalQueue(inventory, logs) {
+            const approvalCard = document.getElementById('approval-card');
+            const approvalContainer = document.getElementById('approval-list-container');
+            
+            const pendingItems = inventory.filter(item => item.status === 'pending-approval');
+            
+            if (pendingItems.length > 0) {
+                approvalCard.style.display = 'block';
+                const itemsHTML = pendingItems.map(item => {
+                    // Find return log for this item
+                    const returnLog = logs.find(log => log.item_id === item.id && log.action === 'return_to_store');
+                    const originDistrict = returnLog ? returnLog.details.match(/from (.*?) field office/)?.[1] || 'Unknown' : 'Unknown';
+                    
+                    return `
+                    <div class="approval-item">
+                        <div class="approval-item-info">
+                            <span class="item-id">${item.name} (${item.id})</span>
+                            <span class="item-origin">Returned from: <strong>${originDistrict}</strong></span>
+                        </div>
+                        <button class="btn btn-success btn-sm approve-btn" data-item-id="${item.id}">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                    </div>`;
+                }).join('');
+                approvalContainer.innerHTML = `<div class="approval-list">${itemsHTML}</div>`;
+            } else {
+                approvalCard.style.display = 'none';
+            }
+        }
+
+        function updateDistrictInventory(inventory, supervisors, districts) {
+            const supervisorMap = new Map();
+            supervisors.forEach(s => {
+                if (s.status === 'active') {
+                    supervisorMap.set(s.district?.toLowerCase(), s.name);
+                }
+            });
+            
+            const districtInventory = new Map();
+            
+            districts.forEach(district => {
+                const key = district.toLowerCase();
+                districtInventory.set(key, {
+                    name: district,
+                    supervisor: supervisorMap.get(key) || 'N/A',
+                    total: 0,
+                    breakdown: {}
+                });
+            });
+            
+            inventory.forEach(item => {
+                if (item.district) {
+                    const key = item.district.toLowerCase();
+                    if (districtInventory.has(key)) {
+                        const distData = districtInventory.get(key);
+                        distData.total++;
+                        distData.breakdown[item.type] = (distData.breakdown[item.type] || 0) + 1;
+                    }
+                }
+            });
+            
+            const sortedDistricts = Array.from(districtInventory.values())
+                .filter(d => d.total > 0)
+                .sort((a, b) => b.total - a.total);
+            
+            const districtGrid = document.getElementById('districtGrid');
+            const modalBody = document.getElementById('districtModalBody');
+            
+            districtGrid.innerHTML = '';
+            modalBody.innerHTML = '<div class="modal-list"></div>';
+            const modalList = modalBody.querySelector('.modal-list');
+            
+            const createBreakdownHTML = (breakdown) => {
+                const entries = Object.entries(breakdown);
+                if (entries.length === 0) return 'No items';
+                return entries.map(([type, count]) => `<span>${type}: <strong>${count}</strong></span>`).join('');
+            };
+            
+            const topDistricts = sortedDistricts.slice(0, 6);
+            if (topDistricts.length > 0) {
+                topDistricts.forEach(district => {
+                    const card = document.createElement('div');
+                    card.className = 'district-card';
+                    card.innerHTML = `
+                        <div class="district-header">
+                            <h3>${district.name}</h3>
+                            <span class="district-total">${district.total}</span>
+                        </div>
+                        <div class="district-body">
+                            <p class="district-supervisor"><i class="fas fa-user-shield"></i> Supervisor: <strong>${district.supervisor}</strong></p>
+                            <div class="district-breakdown">${createBreakdownHTML(district.breakdown)}</div>
+                        </div>`;
+                    districtGrid.appendChild(card);
+                });
+            } else {
+                districtGrid.innerHTML = '<p>No district data available.</p>';
+            }
+            
+            sortedDistricts.forEach(district => {
+                const item = document.createElement('div');
+                item.className = 'modal-list-item';
+                item.innerHTML = `
+                    <div class="modal-list-header">
+                        <strong>${district.name}</strong>
+                        <span class="item-count">${district.total} items</span>
+                    </div>
+                    <div class="modal-list-details">Supervisor: ${district.supervisor}</div>
+                    <div class="district-breakdown modal-list-breakdown">${createBreakdownHTML(district.breakdown)}</div>`;
+                modalList.appendChild(item);
+            });
+        }
+
+        function updateRecentActivity(logs, inventory) {
+            const inventoryMap = new Map();
+            inventory.forEach(item => {
+                inventoryMap.set(item.id, item);
+            });
+            
+            const activityList = document.getElementById('recentActivityList');
+            activityList.innerHTML = '';
+            
+            if (!logs || logs.length === 0) {
+                activityList.innerHTML = '<li>No recent activity found.</li>';
+                return;
+            }
+            
+            logs.slice(0, 10).forEach(log => {
+                const item = inventoryMap.get(log.item_id) || { name: `Item ${log.item_id}` };
+                const li = document.createElement('li');
+                li.className = 'activity-item';
+                
+                let detailsText = '', iconClass = 'update', icon = 'fa-check-circle';
+                
+                switch(log.action) {
+                    case 'creation':
+                        detailsText = `<strong>${item.name}</strong> (${log.item_id}) was created.`;
+                        iconClass = 'create';
+                        icon = 'fa-plus';
+                        break;
+                    case 'assignment_transfer':
+                    case 'transfer':
+                        detailsText = `<strong>${item.name}</strong> was assigned/transferred. Details: ${log.details}`;
+                        iconClass = 'assign';
+                        icon = 'fa-user-check';
+                        break;
+                    case 'deletion':
+                    case 'bulk_deletion':
+                        detailsText = log.details;
+                        iconClass = 'delete';
+                        icon = 'fa-trash-alt';
+                        break;
+                    case 'transfer_initiated':
+                    case 'return_to_store':
+                    case 'approval_complete':
+                        detailsText = `<strong>${item.name}</strong> transfer process updated. Details: ${log.details}`;
+                        iconClass = 'transfer';
+                        icon = 'fa-exchange-alt';
+                        break;
+                    default:
+                        detailsText = `<strong>${item.name}</strong> was updated. Details: ${log.details || log.action}`;
+                        iconClass = 'update';
+                        icon = 'fa-check-circle';
+                }
+                
+                li.innerHTML = `
+                    <div class="activity-icon ${iconClass}"><i class="fas ${icon}"></i></div>
+                    <div class="activity-details">
+                        <p>${detailsText}</p>
+                        <small>${new Date(log.timestamp).toLocaleString()}</small>
+                    </div>`;
+                activityList.appendChild(li);
+            });
+        }
+
+        function updateNotifications(notifications) {
+            const unreadCount = notifications.filter(n => !n.read).length;
+            const notificationCount = document.getElementById('notificationCount');
+            const notificationList = document.getElementById('notificationList');
+            
+            notificationCount.textContent = unreadCount;
+            notificationCount.style.display = unreadCount > 0 ? 'flex' : 'none';
+            
+            notificationList.innerHTML = '';
+            if (notifications.length === 0) {
+                notificationList.innerHTML = '<p style="text-align:center; padding: 1rem; color: var(--secondary);">No new notifications.</p>';
+                return;
+            }
+            
+            notifications.forEach(notif => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'notification-item';
+                itemEl.dataset.id = notif.id;
+                
+                const icon = notif.message.includes('approval') ? 'fa-inbox' : 'fa-exclamation-triangle';
+                itemEl.innerHTML = `
+                    <i class="fas ${icon} notification-icon"></i>
+                    <div class="notification-content">
+                        <p>${notif.message}</p>
+                        <small>${new Date(notif.created_at).toLocaleString()}</small>
+                    </div>`;
+                notificationList.appendChild(itemEl);
+            });
+        }
+
+        async function handleApproval(itemId) {
+            try {
+                const { data: inventory, error: getError } = await db.getInventory();
+                if (getError) throw getError;
+                
+                const itemIndex = inventory.findIndex(item => item.id === itemId);
+                if (itemIndex === -1) return;
+                
+                const updatedItem = {
+                    ...inventory[itemIndex],
+                    status: 'available',
+                    district: 'mbarara',
+                    last_update: new Date().toLocaleDateString(),
+                    updated_at: new Date()
+                };
+                
+                const { error: updateError } = await db.updateInventoryItem(itemId, updatedItem);
+                if (updateError) throw updateError;
+                
+                await db.addMovementLog({
+                    item_id: itemId,
+                    action: 'approval_complete',
+                    details: 'Item return from field office approved by Admin.',
+                    actor: currentUser.username,
+                    timestamp: new Date()
+                });
+                
+                await loadDashboardData();
+                showSuccess('Item approved successfully');
+                
+            } catch (error) {
+                console.error('Error approving item:', error);
+                showError('Failed to approve item');
+            }
+        }
+
+        function setupEventListeners() {
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                sessionStorage.removeItem('loggedInUser');
+                window.location.href = 'login.html';
+            });
+            
+            // Refresh button
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.addEventListener('click', async () => {
+                const icon = refreshBtn.querySelector('i');
+                icon.classList.add('fa-spin');
+                await loadDashboardData();
+                setTimeout(() => icon.classList.remove('fa-spin'), 500);
+            });
+            
+            // Notifications
+            const notificationBtn = document.getElementById('notificationBtn');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const clearNotificationsBtn = document.getElementById('clearNotificationsBtn');
+            
+            notificationBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notificationDropdown.style.display = notificationDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            clearNotificationsBtn.addEventListener('click', async () => {
+                if (confirm('Are you sure you want to clear all notifications?')) {
+                    await db.clearNotifications();
+                    await loadDashboardData();
+                }
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
+                    notificationDropdown.style.display = 'none';
+                }
+            });
+            
+            // Modal
+            const modal = document.getElementById('districtModal');
+            document.getElementById('viewAllDistrictsBtn').onclick = () => { modal.style.display = 'flex'; };
+            document.querySelector('.modal-close').onclick = () => { modal.style.display = 'none'; };
+            window.onclick = (event) => { if (event.target == modal) modal.style.display = 'none'; };
+            
+            // Approval actions
+            document.getElementById('approval-list-container').addEventListener('click', async (e) => {
+                const approveBtn = e.target.closest('.approve-btn');
+                if (approveBtn) {
+                    const itemId = approveBtn.dataset.itemId;
+                    await handleApproval(itemId);
+                }
+            });
+            
+            // Notification clicks
+            document.getElementById('notificationList').addEventListener('click', async (e) => {
+                const notificationItem = e.target.closest('.notification-item');
+                if (!notificationItem) return;
+                
+                const notifId = notificationItem.dataset.id;
+                if (notifId) {
+                    await db.markNotificationRead(notifId);
+                    await loadDashboardData();
+                }
+                
+                notificationDropdown.style.display = 'none';
+            });
+        }
+
+        function showLoadingStates() {
+            const elements = ['totalInventoryValue', 'itemsInUseValue', 'availableForAssignmentValue', 'pendingApprovalValue'];
+            elements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '<span class="loading-spinner"></span>';
+            });
+        }
+
+        function showSuccess(message) {
+            showToast(message, 'success');
+        }
+
+        function showError(message) {
+            showToast(message, 'error');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `notification-toast ${type}`;
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : '#ef4444'};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
     </script>
+    <style>
+        .notification-toast {
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
 </body>
 </html>
