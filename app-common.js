@@ -4,27 +4,32 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Setup Menu Toggle Button in Header dynamically if needed
-    const headerLeft = document.querySelector('.header-left');
+    // Create menu toggle button if not exists
     const header = document.querySelector('.header');
+    const headerLeft = document.querySelector('.header-left');
     
-    // Create menu toggle hamburger button if not present in HTML
-    if (!document.querySelector('.menu-toggle') && (headerLeft || header)) {
+    if (!document.querySelector('.menu-toggle') && (header || headerLeft)) {
         const toggleBtn = document.createElement('button');
         toggleBtn.type = 'button';
         toggleBtn.className = 'menu-toggle';
         toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
         toggleBtn.title = 'Toggle Navigation Menu';
         toggleBtn.setAttribute('aria-label', 'Toggle Navigation Menu');
+        toggleBtn.setAttribute('aria-expanded', 'false');
         
         if (headerLeft) {
             headerLeft.insertBefore(toggleBtn, headerLeft.firstChild);
         } else if (header) {
-            header.insertBefore(toggleBtn, header.firstChild);
+            const titleDiv = header.querySelector('.header-title');
+            if (titleDiv) {
+                titleDiv.insertBefore(toggleBtn, titleDiv.firstChild);
+            } else {
+                header.insertBefore(toggleBtn, header.firstChild);
+            }
         }
     }
 
-    // 2. Ensure Backdrop overlay exists in DOM
+    // Create backdrop if not exists
     let backdrop = document.querySelector('.sidebar-backdrop');
     if (!backdrop) {
         backdrop = document.createElement('div');
@@ -34,41 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(backdrop);
     }
 
-    // 3. Get sidebar and menu toggle elements
     const menuToggle = document.querySelector('.menu-toggle');
     const sidebar = document.querySelector('.sidebar');
 
-    // 4. Menu toggle click handler
-    if (menuToggle && sidebar) {
-        menuToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleSidebar();
-        });
-    }
-
-    // 5. Backdrop click handler to close sidebar
-    if (backdrop && sidebar) {
-        backdrop.addEventListener('click', closeSidebar);
-    }
-
-    // 6. Handle window resize for responsive behavior
-    window.addEventListener('resize', () => {
-        if (window.innerWidth >= 1024 && sidebar) {
-            sidebar.classList.remove('open');
-            backdrop.classList.remove('active');
-            backdrop.style.display = 'none';
-        }
-    });
-
-    // 7. Highlight active menu item dynamically
-    highlightActiveMenuItem();
-
-    // 8. Setup menu item click handlers
-    setupMenuItemHandlers();
-
-    /**
-     * Toggle sidebar visibility
-     */
+    // Toggle sidebar function
     function toggleSidebar() {
         if (!sidebar) return;
         
@@ -80,36 +54,60 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * Open sidebar
-     */
     function openSidebar() {
         if (!sidebar) return;
         
         sidebar.classList.add('open');
         backdrop.style.display = 'block';
+        if (menuToggle) {
+            menuToggle.setAttribute('aria-expanded', 'true');
+        }
         // Small delay for animation
         setTimeout(() => {
             backdrop.classList.add('active');
         }, 10);
+        // Prevent body scroll on mobile
+        document.body.style.overflow = 'hidden';
     }
 
-    /**
-     * Close sidebar
-     */
     function closeSidebar() {
         if (!sidebar) return;
         
         sidebar.classList.remove('open');
         backdrop.classList.remove('active');
+        if (menuToggle) {
+            menuToggle.setAttribute('aria-expanded', 'false');
+        }
         setTimeout(() => {
             backdrop.style.display = 'none';
+            document.body.style.overflow = '';
         }, 300);
     }
 
-    /**
-     * Highlight the active menu item based on current page
-     */
+    // Add event listeners
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleSidebar();
+        });
+    }
+
+    if (backdrop) {
+        backdrop.addEventListener('click', closeSidebar);
+    }
+
+    // Close sidebar on window resize (if screen becomes desktop)
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768 && sidebar && sidebar.classList.contains('open')) {
+                closeSidebar();
+            }
+        }, 250);
+    });
+
+    // Highlight active menu item
     function highlightActiveMenuItem() {
         try {
             const currentPath = window.location.pathname.split('/').pop() || 'index.html';
@@ -118,11 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
             menuItems.forEach(item => {
                 const href = item.getAttribute('href');
                 if (!href) return;
-
-                // Remove active class first
+                
                 item.classList.remove('active');
-
-                // Check if this is the current page
+                
                 if (href === currentPath || 
                     (currentPath === '' && href === 'index.html') ||
                     (href && currentPath.includes(href.replace('.html', '')))) {
@@ -134,41 +130,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * Setup click handlers for menu items
-     */
-    function setupMenuItemHandlers() {
-        const menuItems = document.querySelectorAll('.menu-item');
-        
-        menuItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                // Close sidebar on mobile when item is clicked
-                if (window.innerWidth < 1024 && sidebar) {
-                    closeSidebar();
-                }
-            });
+    highlightActiveMenuItem();
 
-            // Add keyboard support
-            item.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    item.click();
-                }
-            });
+    // Close sidebar when clicking on menu item (mobile only)
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => {
+        item.addEventListener('click', () => {
+            if (window.innerWidth < 768 && sidebar) {
+                closeSidebar();
+            }
         });
-    }
-
-    // Prevent sidebar close when clicking inside sidebar
-    if (sidebar) {
-        sidebar.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-    }
+    });
 
     // Close sidebar when pressing Escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && sidebar && sidebar.classList.contains('open')) {
             closeSidebar();
+        }
+    });
+
+    // Prevent body scroll when sidebar is open
+    sidebar?.addEventListener('touchmove', (e) => {
+        if (sidebar.classList.contains('open')) {
+            e.stopPropagation();
         }
     });
 });
