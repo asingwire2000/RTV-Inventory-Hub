@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>RTV Inventory Hub | Supervisor Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ===== GLOBAL & VARIABLES (self-contained to avoid missing index.css) ===== */
+        /* ===== ROOT VARIABLES & RESET ===== */
         :root {
             --primary: #2563eb;
             --primary-dark: #1d4ed8;
@@ -19,9 +19,9 @@
             --card-bg: #ffffff;
             --border: #e2e8f0;
             --sidebar-width: 260px;
-            --border-radius: 16px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+            --border-radius: 20px;
+            --shadow: 0 4px 10px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
             --transition: all 0.25s ease;
         }
 
@@ -29,69 +29,100 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Outfit', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
         }
 
         body {
-            background: #f1f5f9;
-            color: #334155;
+            background: #f4f7fc;
+            color: #1e2a3e;
             line-height: 1.5;
         }
 
-        .app-container { display: flex; min-height: 100vh; }
-        
-        /* SIDEBAR */
+        /* APP LAYOUT */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* SIDEBAR (mobile-ready) */
         .sidebar {
             width: var(--sidebar-width);
-            background: linear-gradient(180deg, #053d1a 0%, #02200d 100%);
+            background: linear-gradient(180deg, #0a2e1a 0%, #021a0a 100%);
             color: white;
             position: fixed;
             height: 100vh;
             overflow-y: auto;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1000;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            z-index: 1100;
+            box-shadow: 4px 0 25px rgba(0, 0, 0, 0.15);
+            transform: translateX(0);
         }
+
         .sidebar-header {
-            padding: 2rem 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 1.8rem 1.2rem;
             text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
+
         .sidebar-logo {
             width: 70px;
             height: 70px;
-            object-fit: contain;
             background: white;
+            border-radius: 20px;
             padding: 8px;
-            border-radius: 18px;
-            margin-bottom: 0.75rem;
+            object-fit: contain;
+            margin-bottom: 0.8rem;
         }
-        .sidebar-header h2 { font-size: 1.2rem; font-weight: 700; }
-        .sidebar-menu { padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 0.3rem; }
+
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+
+        .sidebar-menu {
+            padding: 1.5rem 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
         .menu-item {
             display: flex;
             align-items: center;
-            gap: 0.85rem;
-            padding: 0.8rem 1.2rem;
-            color: #cbd5e1;
+            gap: 0.9rem;
+            padding: 0.75rem 1.2rem;
+            color: #cbd5e6;
             text-decoration: none;
-            border-radius: 12px;
-            transition: var(--transition);
+            border-radius: 14px;
+            transition: all 0.2s;
             font-weight: 500;
         }
-        .menu-item i { width: 22px; text-align: center; }
-        .menu-item.active, .menu-item:hover { background: var(--primary); color: white; box-shadow: 0 6px 12px rgba(37,99,235,0.2); }
-        
+
+        .menu-item i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .menu-item.active, .menu-item:hover {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.25);
+        }
+
         /* MAIN CONTENT */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
-            padding: 1.8rem;
+            padding: 1.5rem 2rem;
             transition: margin-left 0.3s;
         }
-        /* Header */
+
+        /* HEADER */
         .header {
-            background: rgba(255,255,255,0.85);
+            background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(12px);
             border-radius: var(--border-radius);
             padding: 1rem 1.8rem;
@@ -102,46 +133,82 @@
             flex-wrap: wrap;
             gap: 1rem;
             box-shadow: var(--shadow);
-            border: 1px solid rgba(255,255,255,0.7);
+            border: 1px solid rgba(255,255,255,0.6);
         }
-        .header-title h1 { font-size: 1.6rem; font-weight: 700; color: var(--dark); }
-        .header-title p { color: var(--secondary); font-size: 0.85rem; margin-top: 4px; }
-        .user-profile { display: flex; align-items: center; gap: 0.8rem; }
+
+        .header-title h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        .header-title p {
+            color: var(--secondary);
+            font-size: 0.85rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
         .avatar {
-            width: 44px; height: 44px; background: var(--primary);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 1.2rem; color: white;
+            width: 44px;
+            height: 44px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
         }
         .district-badge {
-            background: #eef2ff; color: var(--primary); padding: 0.3rem 0.9rem;
-            border-radius: 40px; font-size: 0.8rem; font-weight: 600; display: inline-flex;
-            align-items: center; gap: 6px;
+            background: #eef2ff;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        /* Stats Grid */
+
+        /* STATS GRID (clean) */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
         .stat-card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 1.2rem;
+            background: white;
+            border-radius: 24px;
+            padding: 1.2rem 1rem;
             box-shadow: var(--shadow);
-            border-left: 5px solid var(--primary);
-            transition: transform 0.2s;
+            transition: 0.2s;
+            border-left: 4px solid var(--primary);
         }
-        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-        .stat-value { font-size: 2rem; font-weight: 800; color: var(--dark); line-height: 1.2; }
-        .stat-label { color: var(--secondary); font-size: 0.85rem; font-weight: 500; margin-top: 0.3rem; }
-        
-        /* Tables and Cards */
+        .stat-value {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: var(--dark);
+            line-height: 1.2;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            font-weight: 500;
+            margin-top: 0.3rem;
+        }
+
+        /* CARDS & TABLES */
         .card {
             background: white;
-            border-radius: var(--border-radius);
+            border-radius: 24px;
             box-shadow: var(--shadow);
-            margin-bottom: 1.8rem;
+            margin-bottom: 2rem;
             overflow: hidden;
         }
         .card-header {
@@ -153,8 +220,17 @@
             flex-wrap: wrap;
             gap: 0.8rem;
         }
-        .card-header h3 { font-size: 1.2rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
-        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 0 0 0.2rem 0; }
+        .card-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -165,513 +241,552 @@
             text-align: left;
             border-bottom: 1px solid var(--border);
         }
-        .data-table th { background: #f8fafc; font-weight: 600; color: #1e293b; }
-        .data-table tr:hover { background: #fafcff; }
+        .data-table th {
+            background: #fafcff;
+            font-weight: 600;
+            color: #334155;
+        }
         .status-badge {
             display: inline-block;
-            padding: 0.25rem 0.7rem;
-            border-radius: 40px;
-            font-size: 0.75rem;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
             font-weight: 600;
         }
         .status-available { background: #d1fae5; color: #065f46; }
         .status-in-use { background: #dbeafe; color: #1e40af; }
-        .status-maintenance { background: #fef3c7; color: #92400e; }
-        .status-pending-transfer { background: #ffedd5; color: #9a3412; }
+        .status-maintenance { background: #fed7aa; color: #9a3412; }
+        .status-pending { background: #fff3c4; color: #a16207; }
         .btn {
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
-            padding: 0.5rem 1rem;
-            border-radius: 10px;
+            padding: 0.45rem 1rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
             font-weight: 500;
             border: none;
             cursor: pointer;
             transition: 0.2s;
-            font-size: 0.8rem;
         }
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
-        .btn-outline { background: white; border: 1px solid var(--border); color: var(--dark); }
+        .btn-outline { background: white; border: 1px solid var(--border); color: #334155; }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-sm { padding: 0.3rem 0.75rem; font-size: 0.75rem; }
-        
-        /* modals */
+        .btn-sm { padding: 0.3rem 0.8rem; font-size: 0.7rem; }
+        .btn-warning { background: #f59e0b; color: white; }
+
+        /* MODAL */
         .modal {
-            display: none; position: fixed; z-index: 1200; left: 0; top: 0;
-            width: 100%; height: 100%; background: rgba(0,0,0,0.4);
-            align-items: center; justify-content: center;
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1300;
         }
         .modal-content {
-            background: white; border-radius: 20px; max-width: 500px; width: 90%;
-            padding: 1.8rem; animation: fadeUp 0.2s ease;
+            background: white;
+            max-width: 480px;
+            width: 90%;
+            border-radius: 28px;
+            padding: 1.8rem;
+            animation: fadeUp 0.2s;
         }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .form-group { margin-bottom: 1rem; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .form-group { margin-bottom: 1.2rem; }
         .form-group label { font-weight: 600; display: block; margin-bottom: 0.4rem; }
         .form-control, select.form-control {
-            width: 100%; padding: 0.7rem; border: 1px solid var(--border);
-            border-radius: 12px; font-size: 0.9rem;
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            font-size: 0.9rem;
         }
         .modal-footer { display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem; }
-        .notification {
-            position: fixed; bottom: 20px; right: 20px; background: var(--dark);
-            color: white; padding: 12px 20px; border-radius: 40px; z-index: 2000;
-            opacity: 0; visibility: hidden; transition: 0.2s; font-size: 0.85rem;
+
+        /* MOBILE TOGGLE */
+        .mobile-menu-toggle {
+            display: none;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 0.6rem;
+            cursor: pointer;
+            width: 42px;
+            height: 42px;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
         }
-        .notification.show { opacity: 1; visibility: visible; }
-        .notification.success { background: #10b981; }
-        .notification.error { background: #ef4444; }
-        .mobile-toggle { display: none; background: white; border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; cursor: pointer; }
-        
+
+        /* RESPONSIVE */
         @media (max-width: 992px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 1.2rem; }
-            .mobile-toggle { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; margin-right: 0.5rem; }
-            .stats-grid { gap: 1rem; }
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: none;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: 5px 0 25px rgba(0,0,0,0.2);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            .mobile-menu-toggle {
+                display: inline-flex;
+            }
+            .stats-grid {
+                gap: 0.8rem;
+            }
+            .stat-value {
+                font-size: 1.6rem;
+            }
         }
         @media (max-width: 640px) {
-            .header { flex-direction: column; align-items: stretch; }
-            .stat-value { font-size: 1.5rem; }
-            .data-table th, .data-table td { padding: 0.7rem 0.5rem; font-size: 0.8rem; }
-            .card-header h3 { font-size: 1rem; }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1rem;
+            }
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .data-table th, .data-table td {
+                padding: 0.7rem 0.5rem;
+                font-size: 0.8rem;
+            }
+            .btn {
+                padding: 0.35rem 0.7rem;
+                font-size: 0.7rem;
+            }
+            .district-badge {
+                font-size: 0.75rem;
+            }
         }
-        .empty-row { text-align: center; padding: 2rem; color: var(--secondary); }
-        .highlight { background: #fef9c3; transition: 0.3s; }
+        .empty-row {
+            text-align: center;
+            padding: 2rem;
+            color: #94a3b8;
+        }
+        .refresh-icon {
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .refresh-icon:hover {
+            transform: rotate(15deg);
+        }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2310b981'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-weight='bold'%3ERTV%3C/text%3E%3C/svg%3E" alt="Logo" class="sidebar-logo">
-                <h2>RTV Inventory Hub</h2>
-            </div>
-            <nav class="sidebar-menu">
-                <a href="index.html" class="menu-item"><i class="fas fa-home"></i><span>Dashboard</span></a>
-                <a href="Inventory.html" class="menu-item"><i class="fas fa-list"></i><span>Inventory</span></a>
-                <a href="supervisor.html" class="menu-item active"><i class="fas fa-user-shield"></i><span>Supervisor</span></a>
-                <a href="transfers.html" class="menu-item"><i class="fas fa-exchange-alt"></i><span>Transfers</span></a>
-                <a href="reports.html" class="menu-item"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
-                <a href="data-collectors.html" class="menu-item"><i class="fas fa-users"></i><span>Data Collectors</span></a>
-                <a href="settings.html" class="menu-item"><i class="fas fa-cog"></i><span>Settings</span></a>
-            </nav>
-        </aside>
-
-        <main class="main-content">
-            <div class="header">
-                <div style="display: flex; align-items: center; gap: 0.6rem;">
-                    <button class="mobile-toggle" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
-                    <div class="header-title">
-                        <h1><i class="fas fa-user-shield"></i> Supervisor Panel</h1>
-                        <p>Manage equipment & track your district inventory</p>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div class="district-badge" id="districtBadge"><i class="fas fa-map-marker-alt"></i> <span id="districtNameDisplay">—</span></div>
-                    <div class="user-profile">
-                        <div class="avatar" id="userAvatar">S</div>
-                        <div><div id="userNameDisplay">Supervisor</div><small>Field Supervisor</small></div>
-                    </div>
-                    <button class="btn btn-outline" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Exit</button>
-                </div>
-            </div>
-
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card"><div class="stat-value" id="totalItems">0</div><div class="stat-label">Total Items in District</div></div>
-                <div class="stat-card"><div class="stat-value" id="availableItems">0</div><div class="stat-label">Available for Assignment</div></div>
-                <div class="stat-card"><div class="stat-value" id="inUseItems">0</div><div class="stat-label">Assigned to Data Collectors</div></div>
-                <div class="stat-card"><div class="stat-value" id="pendingTransfers">0</div><div class="stat-label">Pending Transfer Acknowledge</div></div>
-            </div>
-
-            <!-- Data Collectors under this district (active list) -->
-            <div class="card">
-                <div class="card-header">
-                    <h3><i class="fas fa-users"></i> Data Collectors in <span id="districtCollectorLabel">your district</span></h3>
-                    <button class="btn btn-outline btn-sm" id="refreshCollectorsBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
-                </div>
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead><tr><th>Name</th><th>EM CODE</th><th>Phone</th><th>Status</th></tr></thead>
-                        <tbody id="collectorsTableBody"><tr><td colspan="4" class="empty-row">Loading collectors...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Inventory Items Table (full list) -->
-            <div class="card">
-                <div class="card-header">
-                    <h3><i class="fas fa-boxes"></i> District Inventory</h3>
-                    <div><input type="text" id="searchInventory" class="form-control" placeholder="Search by ID, name, type..." style="width: 220px;"></div>
-                </div>
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Status</th><th>Assigned To</th><th>Last Update</th><th>Actions</th></tr></thead>
-                        <tbody id="inventoryTableBody"><tr><td colspan="7" class="empty-row">Loading district inventory...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Action Modals -->
-    <div id="assignModal" class="modal">
-        <div class="modal-content">
-            <h3><i class="fas fa-user-plus"></i> Assign Item to Data Collector</h3>
-            <form id="assignForm">
-                <input type="hidden" id="assignItemId">
-                <div class="form-group">
-                    <label>Item</label>
-                    <input type="text" id="assignItemName" class="form-control" readonly>
-                </div>
-                <div class="form-group">
-                    <label>Select Data Collector</label>
-                    <select id="assignCollectorSelect" class="form-control" required>
-                        <option value="">-- Choose collector --</option>
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline modal-close">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Confirm Assignment</button>
-                </div>
-            </form>
+<div class="app-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2310b981'/%3E%3Ctext x='50' y='68' font-size='46' text-anchor='middle' fill='white' font-weight='bold'%3ERTV%3C/text%3E%3C/svg%3E" alt="RTV" class="sidebar-logo">
+            <h2>RTV Inventory Hub</h2>
         </div>
-    </div>
+        <nav class="sidebar-menu">
+            <a href="index.html" class="menu-item"><i class="fas fa-home"></i><span>Dashboard</span></a>
+            <a href="Inventory.html" class="menu-item"><i class="fas fa-list"></i><span>Inventory</span></a>
+            <a href="supervisor.html" class="menu-item active"><i class="fas fa-user-shield"></i><span>Supervisor</span></a>
+            <a href="transfers.html" class="menu-item"><i class="fas fa-exchange-alt"></i><span>Transfers</span></a>
+            <a href="reports.html" class="menu-item"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
+            <a href="data-collectors.html" class="menu-item"><i class="fas fa-users"></i><span>Data Collectors</span></a>
+            <a href="settings.html" class="menu-item"><i class="fas fa-cog"></i><span>Settings</span></a>
+        </nav>
+    </aside>
 
-    <div id="receiveModal" class="modal">
-        <div class="modal-content">
-            <h3>Receive Item from Collector</h3>
-            <p>Mark item as <strong>available</strong> and remove assignment.</p>
-            <input type="hidden" id="receiveItemId">
-            <div class="modal-footer">
-                <button class="btn btn-outline modal-close">Cancel</button>
-                <button class="btn btn-primary" id="confirmReceiveBtn">Yes, Receive & Make Available</button>
+    <main class="main-content">
+        <div class="header">
+            <div style="display: flex; align-items: center; gap: 0.8rem;">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-title">
+                    <h1><i class="fas fa-chalkboard-user"></i> Supervisor Panel</h1>
+                    <p>Monitor district assets & collector assignments</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <div class="district-badge" id="districtBadge">
+                    <i class="fas fa-map-marker-alt"></i> <span id="districtNameDisplay">—</span>
+                </div>
+                <div class="user-profile">
+                    <div class="avatar" id="userAvatar">S</div>
+                    <div><strong id="userNameDisplay">Supervisor</strong><br><small style="color:var(--secondary)">Field Supervisor</small></div>
+                </div>
+                <button class="btn btn-outline" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Exit</button>
             </div>
         </div>
-    </div>
 
-    <div id="maintenanceModal" class="modal">
-        <div class="modal-content">
-            <h3>Send to Maintenance</h3>
-            <p>Item will be marked as 'maintenance' and unavailable.</p>
-            <input type="hidden" id="maintenanceItemId">
-            <div class="modal-footer">
-                <button class="btn btn-outline modal-close">Cancel</button>
-                <button class="btn btn-warning" id="confirmMaintenanceBtn" style="background:#f59e0b;color:white;">Mark Maintenance</button>
+        <!-- KPI CARDS -->
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-value" id="totalItems">0</div><div class="stat-label">Total District Items</div></div>
+            <div class="stat-card"><div class="stat-value" id="availableItems">0</div><div class="stat-label">Available for Assignment</div></div>
+            <div class="stat-card"><div class="stat-value" id="inUseItems">0</div><div class="stat-label">Assigned to Collectors</div></div>
+            <div class="stat-card"><div class="stat-value" id="pendingItems">0</div><div class="stat-label">Pending Transfer</div></div>
+        </div>
+
+        <!-- DATA COLLECTORS TABLE -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-users"></i> Data Collectors · <span id="districtCollectorLabel">—</span></h3>
+                <button class="btn btn-outline btn-sm" id="refreshCollectorsBtn"><i class="fas fa-rotate-right"></i> Refresh</button>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead><tr><th>Full Name</th><th>EM CODE</th><th>Phone</th><th>Status</th></tr></thead>
+                    <tbody id="collectorsTableBody"><tr><td colspan="4" class="empty-row">Loading collectors...</td></tr></tbody>
+                </table>
             </div>
         </div>
-    </div>
 
-    <div id="notificationToast" class="notification"></div>
+        <!-- DISTRICT INVENTORY -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-boxes"></i> District Inventory</h3>
+                <input type="text" id="searchInventory" class="form-control" placeholder="🔍 Search by ID, name..." style="width: 220px;">
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Status</th><th>Assigned To</th><th>Last Update</th><th>Actions</th></tr></thead>
+                    <tbody id="inventoryTableBody"><tr><td colspan="7" class="empty-row">Loading inventory...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        // ---------- SUPABASE CONFIG (must match supabase-config.js)
-        const SUPABASE_URL = 'https://xrfmfiaemmyfbizwafgv.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_txbmwoxN4cU1i-abV6pvoA_oIoF2OWJ';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        // ---------- GLOBAL STATE ----------
-        let currentSupervisor = null;      // { id, name, district, user_id, status }
-        let inventoryItems = [];
-        let collectorsList = [];
-        
-        // DOM elements
-        const districtNameSpan = document.getElementById('districtNameDisplay');
-        const userNameSpan = document.getElementById('userNameDisplay');
-        const userAvatarSpan = document.getElementById('userAvatar');
-        const totalItemsSpan = document.getElementById('totalItems');
-        const availableSpan = document.getElementById('availableItems');
-        const inUseSpan = document.getElementById('inUseItems');
-        const pendingSpan = document.getElementById('pendingTransfers');
-        const inventoryTbody = document.getElementById('inventoryTableBody');
-        const collectorsTbody = document.getElementById('collectorsTableBody');
-        const searchInput = document.getElementById('searchInventory');
-        
-        // Helper: show toast
-        function showToast(msg, type = 'success') {
-            const toast = document.getElementById('notificationToast');
-            toast.textContent = msg;
-            toast.className = `notification show ${type}`;
-            setTimeout(() => toast.classList.remove('show'), 3000);
+<!-- MODALS -->
+<div id="assignModal" class="modal"><div class="modal-content"><h3><i class="fas fa-user-plus"></i> Assign Item</h3><form id="assignForm"><input type="hidden" id="assignItemId"><div class="form-group"><label>Item</label><input type="text" id="assignItemName" class="form-control" readonly></div><div class="form-group"><label>Select Data Collector</label><select id="assignCollectorSelect" class="form-control" required><option value="">-- Choose collector --</option></select></div><div class="modal-footer"><button type="button" class="btn btn-outline modal-close">Cancel</button><button type="submit" class="btn btn-primary">Confirm</button></div></form></div></div>
+<div id="receiveModal" class="modal"><div class="modal-content"><h3>Receive Item</h3><p>This item will become <strong>Available</strong> and unassigned.</p><input type="hidden" id="receiveItemId"><div class="modal-footer"><button class="btn btn-outline modal-close">Cancel</button><button class="btn btn-primary" id="confirmReceiveBtn">Confirm Receive</button></div></div></div>
+<div id="maintenanceModal" class="modal"><div class="modal-content"><h3>Maintenance</h3><p>Move item to maintenance status (unavailable).</p><input type="hidden" id="maintenanceItemId"><div class="modal-footer"><button class="btn btn-outline modal-close">Cancel</button><button class="btn btn-warning" id="confirmMaintenanceBtn">Mark Maintenance</button></div></div></div>
+<div id="toastMsg" class="notification" style="position:fixed; bottom:20px; right:20px; background:#1e293b; color:white; padding:10px 20px; border-radius:40px; opacity:0; visibility:hidden; transition:0.2s; z-index:2000; font-size:0.85rem;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // ------------------- SUPABASE INIT -------------------
+    const SUPABASE_URL = 'https://xrfmfiaemmyfbizwafgv.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_txbmwoxN4cU1i-abV6pvoA_oIoF2OWJ';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    window.supabaseClient = supabaseClient; // for compat
+
+    // Global state
+    let currentSupervisor = null;     // { id, name, district, user_id }
+    let inventoryItems = [];
+    let collectors = [];
+
+    // DOM elements
+    const districtNameSpan = document.getElementById('districtNameDisplay');
+    const districtCollectorLabel = document.getElementById('districtCollectorLabel');
+    const userNameSpan = document.getElementById('userNameDisplay');
+    const userAvatarSpan = document.getElementById('userAvatar');
+    const totalSpan = document.getElementById('totalItems');
+    const availableSpan = document.getElementById('availableItems');
+    const inUseSpan = document.getElementById('inUseItems');
+    const pendingSpan = document.getElementById('pendingItems');
+    const inventoryTbody = document.getElementById('inventoryTableBody');
+    const collectorsTbody = document.getElementById('collectorsTableBody');
+    const searchInput = document.getElementById('searchInventory');
+    const refreshCollectorsBtn = document.getElementById('refreshCollectorsBtn');
+
+    // Helper: Toast
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = message;
+        toast.style.background = type === 'error' ? '#ef4444' : '#10b981';
+        toast.style.opacity = '1';
+        toast.style.visibility = 'visible';
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.visibility = 'hidden';
+        }, 2800);
+    }
+
+    // 1. FETCH SUPERVISOR PROFILE (district from DB)
+    async function loadSupervisorProfile() {
+        const loggedUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (!loggedUser) {
+            window.location.href = 'login.html';
+            return null;
         }
-        
-        // Fetch supervisor details from users & supervisors table
-        async function loadSupervisorProfile() {
-            const loggedUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-            if (!loggedUser || (loggedUser.role !== 'supervisor' && loggedUser.role !== 'super_admin')) {
-                window.location.href = 'login.html';
-                return null;
-            }
-            if (loggedUser.role === 'super_admin') {
-                // fallback demo for super_admin testing (not typical)
-                currentSupervisor = { id: 1, name: 'Super Admin', district: 'Mbarara', user_id: loggedUser.id, status: 'active' };
-                districtNameSpan.innerText = 'Mbarara (Demo)';
-                userNameSpan.innerText = 'Super Admin';
-                userAvatarSpan.innerText = 'SA';
-                return currentSupervisor;
-            }
-            // supervisor role: fetch from supervisors table using user_id
-            const { data: supData, error } = await supabase
-                .from('supervisors')
-                .select('id, name, district, user_id, status, email')
-                .eq('user_id', loggedUser.id)
-                .maybeSingle();
-            if (error || !supData) {
-                console.error('Supervisor profile error', error);
-                showToast('Could not load supervisor district. Contact admin.', 'error');
-                window.location.href = 'login.html';
-                return null;
-            }
-            currentSupervisor = supData;
-            districtNameSpan.innerText = supData.district || 'Unknown District';
-            userNameSpan.innerText = supData.name || loggedUser.username;
-            userAvatarSpan.innerText = (supData.name?.charAt(0) || 'S').toUpperCase();
-            document.getElementById('districtCollectorLabel').innerText = supData.district;
+        // For super_admin testing fallback (optional)
+        if (loggedUser.role === 'super_admin') {
+            // Demo fallback to avoid redirect, but supervisor mode not intended
+            currentSupervisor = { id: 999, name: 'Supervisor Demo', district: 'Mbarara', user_id: loggedUser.id };
+            districtNameSpan.innerText = 'Mbarara (Demo)';
+            districtCollectorLabel.innerText = 'Mbarara';
+            userNameSpan.innerText = 'Supervisor Demo';
+            userAvatarSpan.innerText = 'SD';
             return currentSupervisor;
         }
-        
-        // Load inventory for this district
-        async function loadInventory() {
-            if (!currentSupervisor) return;
-            const { data, error } = await supabase
-                .from('inventory_items')
-                .select('*')
-                .eq('district', currentSupervisor.district)
-                .order('created_at', { ascending: false });
-            if (error) {
-                console.error(error);
-                inventoryItems = [];
-            } else {
-                inventoryItems = data || [];
-            }
-            renderInventoryTable();
-            updateStats();
+        if (loggedUser.role !== 'supervisor') {
+            window.location.href = 'login.html';
+            return null;
         }
-        
-        // Load data collectors belonging to same district (active)
-        async function loadCollectors() {
-            if (!currentSupervisor) return;
-            const { data, error } = await supabase
-                .from('data_collectors')
-                .select('*')
-                .eq('district', currentSupervisor.district)
-                .order('name');
-            if (error) {
-                collectorsList = [];
-            } else {
-                collectorsList = data || [];
-            }
-            renderCollectorsTable();
+        // Fetch from supervisors table using user_id
+        const { data: supData, error } = await supabaseClient
+            .from('supervisors')
+            .select('id, name, district, user_id, status, email')
+            .eq('user_id', loggedUser.id)
+            .maybeSingle();
+        if (error || !supData) {
+            console.error('Error loading supervisor', error);
+            showToast('Failed to load your district assignment. Contact admin.', 'error');
+            setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+            return null;
         }
-        
-        function renderCollectorsTable() {
-            if (!collectorsTbody) return;
-            if (collectorsList.length === 0) {
-                collectorsTbody.innerHTML = '<tr><td colspan="4" class="empty-row">No data collectors found in this district.</td></tr>';
-                return;
+        currentSupervisor = supData;
+        districtNameSpan.innerText = supData.district || 'Not Assigned';
+        districtCollectorLabel.innerText = supData.district || 'District';
+        userNameSpan.innerText = supData.name || loggedUser.username;
+        userAvatarSpan.innerText = (supData.name?.charAt(0) || 'S').toUpperCase();
+        return currentSupervisor;
+    }
+
+    // 2. LOAD INVENTORY FOR DISTRICT
+    async function loadInventory() {
+        if (!currentSupervisor) return;
+        const { data, error } = await supabaseClient
+            .from('inventory_items')
+            .select('*')
+            .eq('district', currentSupervisor.district)
+            .order('created_at', { ascending: false });
+        if (error) {
+            console.error(error);
+            inventoryItems = [];
+        } else {
+            inventoryItems = data || [];
+        }
+        renderInventoryTable();
+        updateStats();
+    }
+
+    function updateStats() {
+        const total = inventoryItems.length;
+        const available = inventoryItems.filter(i => i.status === 'available').length;
+        const inUse = inventoryItems.filter(i => i.status === 'in-use').length;
+        const pending = inventoryItems.filter(i => i.status === 'pending-transfer').length;
+        totalSpan.innerText = total;
+        availableSpan.innerText = available;
+        inUseSpan.innerText = inUse;
+        pendingSpan.innerText = pending;
+    }
+
+    // 3. LOAD DATA COLLECTORS (active only)
+    async function loadCollectors() {
+        if (!currentSupervisor) return;
+        const { data, error } = await supabaseClient
+            .from('data_collectors')
+            .select('*')
+            .eq('district', currentSupervisor.district)
+            .order('name');
+        if (error) {
+            collectors = [];
+        } else {
+            collectors = data || [];
+        }
+        renderCollectorsTable();
+    }
+
+    function renderCollectorsTable() {
+        if (!collectorsTbody) return;
+        if (collectors.length === 0) {
+            collectorsTbody.innerHTML = '<tr><td colspan="4" class="empty-row">No data collectors assigned to this district.</td></tr>';
+            return;
+        }
+        collectorsTbody.innerHTML = collectors.map(c => `
+            <tr>
+                <td><i class="fas fa-user-check"></i> ${escapeHtml(c.name)}</td>
+                <td><code>${escapeHtml(c.emp_id || '—')}</code></td>
+                <td>${escapeHtml(c.phone || '—')}</td>
+                <td><span class="status-badge ${c.status === 'active' ? 'status-available' : 'status-pending'}">${c.status === 'active' ? 'Active' : 'Inactive'}</span></td>
+            </tr>
+        `).join('');
+    }
+
+    // 4. RENDER INVENTORY with search and actions
+    function renderInventoryTable() {
+        const term = searchInput?.value.toLowerCase() || '';
+        let filtered = inventoryItems.filter(i => 
+            i.id.toLowerCase().includes(term) || 
+            i.name.toLowerCase().includes(term) ||
+            (i.type && i.type.toLowerCase().includes(term))
+        );
+        if (filtered.length === 0) {
+            inventoryTbody.innerHTML = '<tr><td colspan="7" class="empty-row">No items found in this district.</td></tr>';
+            return;
+        }
+        inventoryTbody.innerHTML = filtered.map(item => {
+            let statusClass = '';
+            if (item.status === 'available') statusClass = 'status-available';
+            else if (item.status === 'in-use') statusClass = 'status-in-use';
+            else if (item.status === 'maintenance') statusClass = 'status-maintenance';
+            else if (item.status === 'pending-transfer') statusClass = 'status-pending';
+            else statusClass = 'status-available';
+            
+            let actions = '';
+            if (item.status === 'available') {
+                actions = `<button class="btn btn-primary btn-sm assign-action" data-id="${item.id}" data-name="${escapeHtml(item.name)}"><i class="fas fa-user-plus"></i> Assign</button>`;
+            } else if (item.status === 'in-use') {
+                actions = `<button class="btn btn-outline btn-sm receive-action" data-id="${item.id}"><i class="fas fa-handshake"></i> Receive</button>
+                           <button class="btn btn-danger btn-sm maintenance-action" data-id="${item.id}"><i class="fas fa-tools"></i> Maintenance</button>`;
+            } else if (item.status === 'maintenance') {
+                actions = `<button class="btn btn-success btn-sm repair-action" data-id="${item.id}"><i class="fas fa-check-circle"></i> Mark Available</button>`;
+            } else {
+                actions = `<span class="status-badge">Pending</span>`;
             }
-            collectorsTbody.innerHTML = collectorsList.map(c => `
+            return `
                 <tr>
-                    <td><i class="fas fa-user-circle"></i> ${escapeHtml(c.name)}</td>
-                    <td><code>${escapeHtml(c.emp_id || '—')}</code></td>
-                    <td>${escapeHtml(c.phone || '—')}</td>
-                    <td><span class="status-badge status-available">${c.status === 'active' ? 'Active' : 'Inactive'}</span></td>
-                </tr>
-            `).join('');
-        }
-        
-        function renderInventoryTable() {
-            const searchTerm = searchInput?.value.toLowerCase() || '';
-            let filtered = inventoryItems.filter(item => 
-                item.id.toLowerCase().includes(searchTerm) ||
-                item.name.toLowerCase().includes(searchTerm) ||
-                (item.type && item.type.toLowerCase().includes(searchTerm))
-            );
-            if (filtered.length === 0) {
-                inventoryTbody.innerHTML = '<tr><td colspan="7" class="empty-row">No items in this district.</td></tr>';
-                return;
-            }
-            inventoryTbody.innerHTML = filtered.map(item => {
-                let statusClass = '';
-                if (item.status === 'available') statusClass = 'status-available';
-                else if (item.status === 'in-use') statusClass = 'status-in-use';
-                else if (item.status === 'maintenance') statusClass = 'status-maintenance';
-                else if (item.status === 'pending-transfer') statusClass = 'status-pending-transfer';
-                else statusClass = 'status-available';
-                
-                let actions = '';
-                if (item.status === 'available') {
-                    actions = `<button class="btn btn-primary btn-sm assign-action" data-id="${item.id}" data-name="${escapeHtml(item.name)}"><i class="fas fa-user-plus"></i> Assign</button>`;
-                } else if (item.status === 'in-use') {
-                    actions = `<button class="btn btn-outline btn-sm receive-action" data-id="${item.id}"><i class="fas fa-handshake"></i> Receive</button>
-                               <button class="btn btn-danger btn-sm maintenance-action" data-id="${item.id}"><i class="fas fa-tools"></i> Maintenance</button>`;
-                } else if (item.status === 'maintenance') {
-                    actions = `<button class="btn btn-success btn-sm repair-action" data-id="${item.id}"><i class="fas fa-check-circle"></i> Mark Available</button>`;
-                } else {
-                    actions = `<span class="status-badge">Awaiting</span>`;
-                }
-                return `<tr>
                     <td><code>${escapeHtml(item.id)}</code></td>
                     <td><strong>${escapeHtml(item.name)}</strong></td>
                     <td>${escapeHtml(item.type)}</td>
-                    <td><span class="status-badge ${statusClass}">${item.status?.replace(/-/g, ' ').toUpperCase() || 'UNKNOWN'}</span></td>
+                    <td><span class="status-badge ${statusClass}">${item.status?.toUpperCase().replace('-', ' ')}</span></td>
                     <td>${escapeHtml(item.assigned) || '—'}</td>
                     <td>${item.lastUpdate || item.updated_at?.slice(0,10) || '—'}</td>
                     <td class="table-actions">${actions}</td>
-                </tr>`;
-            }).join('');
-            
-            // Attach event listeners dynamically
-            document.querySelectorAll('.assign-action').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = btn.dataset.id;
-                    const name = btn.dataset.name;
-                    openAssignModal(id, name);
-                });
+                </tr>
+            `;
+        }).join('');
+
+        // attach dynamic events
+        document.querySelectorAll('.assign-action').forEach(btn => {
+            btn.addEventListener('click', () => openAssignModal(btn.dataset.id, btn.dataset.name));
+        });
+        document.querySelectorAll('.receive-action').forEach(btn => {
+            btn.addEventListener('click', () => openReceiveModal(btn.dataset.id));
+        });
+        document.querySelectorAll('.maintenance-action').forEach(btn => {
+            btn.addEventListener('click', () => openMaintenanceModal(btn.dataset.id));
+        });
+        document.querySelectorAll('.repair-action').forEach(btn => {
+            btn.addEventListener('click', () => markAsAvailable(btn.dataset.id));
+        });
+    }
+
+    // ---- MODAL HANDLERS ----
+    function openAssignModal(itemId, itemName) {
+        const activeCollectors = collectors.filter(c => c.status === 'active');
+        if (activeCollectors.length === 0) {
+            showToast('No active data collectors available in this district.', 'error');
+            return;
+        }
+        const select = document.getElementById('assignCollectorSelect');
+        select.innerHTML = '<option value="">-- Select Collector --</option>' + 
+            activeCollectors.map(c => `<option value="${c.id}|${escapeHtml(c.name)}">${escapeHtml(c.name)} (${c.emp_id || 'No ID'})</option>`).join('');
+        document.getElementById('assignItemId').value = itemId;
+        document.getElementById('assignItemName').value = itemName;
+        document.getElementById('assignModal').style.display = 'flex';
+    }
+    async function confirmAssignment() {
+        const itemId = document.getElementById('assignItemId').value;
+        const val = document.getElementById('assignCollectorSelect').value;
+        if (!val) { showToast('Select a collector', 'error'); return; }
+        const [collectorId, collectorName] = val.split('|');
+        const { error } = await supabaseClient
+            .from('inventory_items')
+            .update({ status: 'in-use', assigned: collectorName, lastUpdate: new Date().toLocaleDateString(), updated_at: new Date() })
+            .eq('id', itemId);
+        if (error) { showToast('Assignment failed', 'error'); return; }
+        await supabaseClient.from('movement_logs').insert([{ item_id: itemId, action: 'assignment', details: `Assigned to ${collectorName}`, actor: currentSupervisor.name, timestamp: new Date() }]);
+        showToast(`Assigned to ${collectorName}`);
+        document.getElementById('assignModal').style.display = 'none';
+        await loadInventory();
+    }
+    function openReceiveModal(itemId) {
+        document.getElementById('receiveItemId').value = itemId;
+        document.getElementById('receiveModal').style.display = 'flex';
+    }
+    async function confirmReceive() {
+        const itemId = document.getElementById('receiveItemId').value;
+        const { error } = await supabaseClient
+            .from('inventory_items')
+            .update({ status: 'available', assigned: null, lastUpdate: new Date().toLocaleDateString() })
+            .eq('id', itemId);
+        if (error) { showToast('Receive failed', 'error'); return; }
+        await supabaseClient.from('movement_logs').insert([{ item_id: itemId, action: 'receive', details: `Item received and made available`, actor: currentSupervisor.name, timestamp: new Date() }]);
+        showToast('Item received successfully');
+        document.getElementById('receiveModal').style.display = 'none';
+        await loadInventory();
+    }
+    function openMaintenanceModal(itemId) {
+        document.getElementById('maintenanceItemId').value = itemId;
+        document.getElementById('maintenanceModal').style.display = 'flex';
+    }
+    async function confirmMaintenance() {
+        const itemId = document.getElementById('maintenanceItemId').value;
+        const { error } = await supabaseClient
+            .from('inventory_items')
+            .update({ status: 'maintenance', assigned: null, lastUpdate: new Date().toLocaleDateString() })
+            .eq('id', itemId);
+        if (error) { showToast('Error', 'error'); return; }
+        await supabaseClient.from('movement_logs').insert([{ item_id: itemId, action: 'maintenance', details: 'Sent to maintenance', actor: currentSupervisor.name, timestamp: new Date() }]);
+        showToast('Item moved to maintenance');
+        document.getElementById('maintenanceModal').style.display = 'none';
+        await loadInventory();
+    }
+    async function markAsAvailable(itemId) {
+        const { error } = await supabaseClient
+            .from('inventory_items')
+            .update({ status: 'available', assigned: null, lastUpdate: new Date().toLocaleDateString() })
+            .eq('id', itemId);
+        if (error) { showToast('Update failed', 'error'); return; }
+        await supabaseClient.from('movement_logs').insert([{ item_id: itemId, action: 'repair_complete', details: 'Marked available after maintenance', actor: currentSupervisor.name, timestamp: new Date() }]);
+        showToast('Item is now available');
+        await loadInventory();
+    }
+
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+
+    // EVENT BINDINGS & MOBILE MENU
+    function bindEvents() {
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', function() { this.closest('.modal').style.display = 'none'; });
+        });
+        window.addEventListener('click', (e) => { if(e.target.classList.contains('modal')) e.target.style.display = 'none'; });
+        document.getElementById('assignForm')?.addEventListener('submit', (e) => { e.preventDefault(); confirmAssignment(); });
+        document.getElementById('confirmReceiveBtn')?.addEventListener('click', confirmReceive);
+        document.getElementById('confirmMaintenanceBtn')?.addEventListener('click', confirmMaintenance);
+        document.getElementById('logoutBtn')?.addEventListener('click', () => { sessionStorage.removeItem('loggedInUser'); window.location.href = 'login.html'; });
+        refreshCollectorsBtn?.addEventListener('click', () => { loadCollectors(); showToast('Collectors refreshed'); });
+        if (searchInput) searchInput.addEventListener('input', () => renderInventoryTable());
+        
+        // mobile sidebar toggle (WORKING)
+        const mobileToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('sidebar');
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sidebar.classList.toggle('open');
             });
-            document.querySelectorAll('.receive-action').forEach(btn => {
-                btn.addEventListener('click', () => openReceiveModal(btn.dataset.id));
-            });
-            document.querySelectorAll('.maintenance-action').forEach(btn => {
-                btn.addEventListener('click', () => openMaintenanceModal(btn.dataset.id));
-            });
-            document.querySelectorAll('.repair-action').forEach(btn => {
-                btn.addEventListener('click', () => markAsAvailable(btn.dataset.id));
+            // Close sidebar when clicking outside (except toggle)
+            document.addEventListener('click', (event) => {
+                if (sidebar.classList.contains('open') && !sidebar.contains(event.target) && !mobileToggle.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                }
             });
         }
-        
-        function updateStats() {
-            const total = inventoryItems.length;
-            const available = inventoryItems.filter(i => i.status === 'available').length;
-            const inUse = inventoryItems.filter(i => i.status === 'in-use').length;
-            const pending = inventoryItems.filter(i => i.status === 'pending-transfer').length;
-            totalItemsSpan.innerText = total;
-            availableSpan.innerText = available;
-            inUseSpan.innerText = inUse;
-            pendingSpan.innerText = pending;
-        }
-        
-        // ----- Action Logic -----
-        function openAssignModal(itemId, itemName) {
-            if (!collectorsList.length) {
-                showToast('No active data collectors in this district. Please add collectors first.', 'error');
-                return;
-            }
-            const select = document.getElementById('assignCollectorSelect');
-            select.innerHTML = '<option value="">-- Select Collector --</option>' + 
-                collectorsList.filter(c => c.status === 'active').map(c => `<option value="${c.id}|${escapeHtml(c.name)}">${escapeHtml(c.name)} (${c.emp_id || 'No ID'})</option>`).join('');
-            document.getElementById('assignItemId').value = itemId;
-            document.getElementById('assignItemName').value = itemName;
-            document.getElementById('assignModal').style.display = 'flex';
-        }
-        
-        async function confirmAssignment() {
-            const itemId = document.getElementById('assignItemId').value;
-            const selectedValue = document.getElementById('assignCollectorSelect').value;
-            if (!selectedValue) { showToast('Please select a data collector', 'error'); return; }
-            const [collectorId, collectorName] = selectedValue.split('|');
-            if (!collectorId) return;
-            
-            // update inventory item
-            const { error } = await supabase
-                .from('inventory_items')
-                .update({ status: 'in-use', assigned: collectorName, lastUpdate: new Date().toLocaleDateString(), updated_at: new Date() })
-                .eq('id', itemId);
-            if (error) { showToast('Assignment failed', 'error'); return; }
-            // log movement
-            await supabase.from('movement_logs').insert([{
-                item_id: itemId, action: 'assignment', details: `Assigned to collector ${collectorName} (district ${currentSupervisor.district})`,
-                actor: currentSupervisor.name, timestamp: new Date()
-            }]);
-            showToast(`Item assigned to ${collectorName}`);
-            document.getElementById('assignModal').style.display = 'none';
-            await loadInventory();
-            await loadCollectors(); // refresh just in case
-        }
-        
-        function openReceiveModal(itemId) {
-            document.getElementById('receiveItemId').value = itemId;
-            document.getElementById('receiveModal').style.display = 'flex';
-        }
-        async function confirmReceive() {
-            const itemId = document.getElementById('receiveItemId').value;
-            const { error } = await supabase
-                .from('inventory_items')
-                .update({ status: 'available', assigned: null, lastUpdate: new Date().toLocaleDateString() })
-                .eq('id', itemId);
-            if (error) { showToast('Receive failed', 'error'); return; }
-            await supabase.from('movement_logs').insert([{ item_id: itemId, action: 'receive', details: `Item received at ${currentSupervisor.district} and made available`, actor: currentSupervisor.name, timestamp: new Date() }]);
-            showToast('Item received and available now');
-            document.getElementById('receiveModal').style.display = 'none';
-            await loadInventory();
-        }
-        
-        function openMaintenanceModal(itemId) {
-            document.getElementById('maintenanceItemId').value = itemId;
-            document.getElementById('maintenanceModal').style.display = 'flex';
-        }
-        async function confirmMaintenance() {
-            const itemId = document.getElementById('maintenanceItemId').value;
-            const { error } = await supabase
-                .from('inventory_items')
-                .update({ status: 'maintenance', assigned: null, lastUpdate: new Date().toLocaleDateString() })
-                .eq('id', itemId);
-            if (error) { showToast('Update failed', 'error'); return; }
-            await supabase.from('movement_logs').insert([{ item_id: itemId, action: 'maintenance', details: `Item sent to maintenance by supervisor ${currentSupervisor.name}`, actor: currentSupervisor.name, timestamp: new Date() }]);
-            showToast('Item moved to maintenance');
-            document.getElementById('maintenanceModal').style.display = 'none';
-            await loadInventory();
-        }
-        
-        async function markAsAvailable(itemId) {
-            const { error } = await supabase
-                .from('inventory_items')
-                .update({ status: 'available', assigned: null, lastUpdate: new Date().toLocaleDateString() })
-                .eq('id', itemId);
-            if (error) { showToast('Error', 'error'); return; }
-            await supabase.from('movement_logs').insert([{ item_id: itemId, action: 'repair_complete', details: 'Repaired and back to available pool', actor: currentSupervisor.name, timestamp: new Date() }]);
-            showToast('Item marked available');
-            await loadInventory();
-        }
-        
-        // Helper
-        function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-        
-        // Event listeners & close modals
-        function bindGlobalEvents() {
-            document.querySelectorAll('.modal-close').forEach(btn => {
-                btn.addEventListener('click', function() { this.closest('.modal').style.display = 'none'; });
-            });
-            window.addEventListener('click', (e) => { if(e.target.classList.contains('modal')) e.target.style.display = 'none'; });
-            document.getElementById('assignForm')?.addEventListener('submit', (e) => { e.preventDefault(); confirmAssignment(); });
-            document.getElementById('confirmReceiveBtn')?.addEventListener('click', confirmReceive);
-            document.getElementById('confirmMaintenanceBtn')?.addEventListener('click', confirmMaintenance);
-            document.getElementById('logoutBtn')?.addEventListener('click', () => { sessionStorage.removeItem('loggedInUser'); window.location.href = 'login.html'; });
-            document.getElementById('refreshCollectorsBtn')?.addEventListener('click', () => { loadCollectors(); showToast('Collectors refreshed'); });
-            if (searchInput) searchInput.addEventListener('input', () => renderInventoryTable());
-            const mobileToggle = document.getElementById('mobileMenuToggle');
-            const sidebar = document.getElementById('sidebar');
-            if (mobileToggle) {
-                mobileToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
-                document.addEventListener('click', (e) => { if (!sidebar.contains(e.target) && !mobileToggle.contains(e.target) && sidebar.classList.contains('open')) sidebar.classList.remove('open'); });
-            }
-        }
-        
-        async function init() {
-            const supervisor = await loadSupervisorProfile();
-            if (!supervisor) return;
-            await Promise.all([loadInventory(), loadCollectors()]);
-            bindGlobalEvents();
-            // realtime subscription for inventory changes (optional)
-            supabase.channel('inventory-changes')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory_items', filter: `district=eq.${currentSupervisor.district}` }, () => { loadInventory(); })
-                .subscribe();
-        }
-        
-        init();
-    </script>
+    }
+
+    async function init() {
+        const supervisor = await loadSupervisorProfile();
+        if (!supervisor) return;
+        await Promise.all([loadInventory(), loadCollectors()]);
+        bindEvents();
+        // realtime subscription for inventory
+        supabaseClient.channel('inventory-supervisor')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory_items', filter: `district=eq.${currentSupervisor.district}` }, () => { loadInventory(); })
+            .subscribe();
+    }
+    init();
+</script>
 </body>
 </html>
