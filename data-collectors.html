@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTV Inventory Hub | Data Collectors</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --sidebar-width: 260px;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f1f5f9; color: #334155; line-height: 1.6; }
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { width: var(--sidebar-width); background: linear-gradient(180deg, #053d1a 0%, #02200d 100%); color: white; height: 100vh; position: fixed; overflow-y: auto; transition: var(--transition); z-index: 1000; box-shadow: 4px 0 25px rgba(0, 0, 0, 0.1); }
+        .sidebar-header { padding: 1.5rem 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; align-items: center; gap: 0.75rem; text-align: center; }
+        .sidebar-logo { height: 80px; width: 80px; object-fit: contain; background: white; padding: 10px; border-radius: 18px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25); }
+        .sidebar-header h2 { font-size: 1.25rem; font-weight: 600; }
+        .sidebar-menu { padding: 1rem 0; }
+        .menu-item { display: flex; align-items: center; padding: 0.75rem 1.5rem; color: #cbd5e1; text-decoration: none; transition: var(--transition); gap: 0.75rem; }
+        .menu-item:hover, .menu-item.active { background: rgba(255, 255, 255, 0.1); color: white; }
+        .menu-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
+        .menu-item i { width: 20px; text-align: center; }
+        .main-content { flex: 1; margin-left: var(--sidebar-width); padding: 1.5rem; }
+        .header { background: white; padding: 1rem 1.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow); margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .header-title h1 { font-size: 1.75rem; font-weight: 700; color: var(--dark); }
+        .header-title p { color: var(--secondary); font-size: 0.9rem; margin-top: 0.25rem; }
+        .header-right { display: flex; align-items: center; gap: 1.5rem; }
+        .user-profile { display: flex; align-items: center; gap: 0.75rem; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+        .card { background: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--shadow); overflow: hidden; }
+        .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .card-header h2 { font-size: 1.1rem; font-weight: 600; color: var(--dark); }
+        .card-body { padding: 1.5rem; }
+        .search-wrapper { position: relative; display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .search-input { flex: 1; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; background: white; }
+        .search-input:focus { outline: none; border-color: var(--primary); }
+        .search-wrapper i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--secondary); }
+        .filter-group { display: inline-flex; gap: 0.5rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+        .filter-select { padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; background: white; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.65rem 1.25rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: var(--transition); border: none; font-size: 0.9rem; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline { background: white; border: 1px solid var(--border); color: var(--secondary); }
+        .btn-outline:hover { background: var(--light); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+        .table-responsive { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; background: white; border-radius: var(--border-radius); }
+        .data-table thead th { text-align: left; padding: 1rem; background: var(--light); color: var(--secondary); font-weight: 600; border-bottom: 2px solid var(--border); }
+        .data-table tbody tr { border-bottom: 1px solid var(--border); }
+        .data-table tbody tr:hover { background-color: var(--light); }
+        .data-table td { padding: 1rem; vertical-align: middle; }
+        .emp-code { font-weight: 600; color: var(--dark); font-size: 0.85rem; background: var(--light); padding: 0.25rem 0.5rem; border-radius: 4px; display: inline-block; margin-top: 0.25rem; }
+        .table-actions { display: flex; gap: 0.5rem; }
+        .status-badge { display: inline-block; padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .status-active { background: #ecfdf5; color: #065f46; }
+        .status-inactive { background: #fee2e2; color: #991b1b; }
+        .modal { display: none; position: fixed; z-index: 1200; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.4); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 2rem; border-radius: var(--border-radius); width: 90%; max-width: 600px; position: relative; }
+        .modal-close { position: absolute; top: 1rem; right: 1.5rem; font-size: 28px; cursor: pointer; color: var(--secondary); }
+        .modal-close:hover { color: var(--dark); }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .form-control, .form-select { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; }
+        .form-control:focus, .form-select:focus { outline: none; border-color: var(--primary); }
+        .modal-footer { margin-top: 1.5rem; text-align: right; display: flex; justify-content: flex-end; gap: 0.75rem; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        .notification { position: fixed; bottom: 20px; right: 20px; padding: 15px 25px; border-radius: var(--border-radius); z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.3s ease; font-size: 0.9rem; box-shadow: var(--shadow-md); }
+        .notification.show { opacity: 1; visibility: visible; }
+        .notification.success { background: var(--success); color: white; }
+        .notification.error { background: var(--danger); color: white; }
+        .empty-state { text-align: center; padding: 3rem; color: var(--secondary); }
+        @media (max-width: 1024px) { .sidebar { transform: translateX(-100%); } .main-content { margin-left: 0; } }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script>
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (!loggedInUser) window.location.href = 'login.html';
+        else if (loggedInUser.role !== 'admin') window.location.href = 'supervisor.html';
+    </script>
+    
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="rtv logo.svg" alt="Logo" class="sidebar-logo">
+                <h2>RTV Inventory Hub</h2>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="index.html" class="menu-item"><i class="fas fa-home"></i><span>Dashboard</span></a>
+                <a href="Inventory.html" class="menu-item"><i class="fas fa-list"></i><span>Inventory</span></a>
+                <a href="supervisor.html" class="menu-item"><i class="fas fa-user-shield"></i><span>Supervisor</span></a>
+                <a href="transfers.html" class="menu-item"><i class="fas fa-exchange-alt"></i><span>Transfers</span></a>
+                <a href="reports.html" class="menu-item"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
+                <a href="data-collectors.html" class="menu-item active"><i class="fas fa-users"></i><span>Data Collectors</span></a>
+                <a href="settings.html" class="menu-item"><i class="fas fa-cog"></i><span>Settings</span></a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-title">
+                    <h1><i class="fas fa-users"></i> Data Collectors</h1>
+                    <p>Manage field data collector accounts</p>
+                </div>
+                <div class="header-right">
+                    <div class="user-profile"><div class="avatar" id="user-avatar">A</div><div><div id="user-name">Admin</div><small>Administrator</small></div></div>
+                    <button class="btn btn-outline" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+            </header>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>All Data Collectors</h2>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button class="btn btn-primary" id="addBtn"><i class="fas fa-plus"></i> Add Collector</button>
+                        <button class="btn btn-outline" id="bulkBtn"><i class="fas fa-upload"></i> Bulk Upload</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search by name, EM CODE, email, phone, or district...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Filter by District:</label>
+                        <select id="filterDistrict" class="filter-select"><option value="">All Districts</option></select>
+                        <label style="margin-left: 1rem;">Status:</label>
+                        <select id="filterStatus" class="filter-select"><option value="">All</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
+                        <button class="btn btn-outline btn-sm" id="clearFilters"><i class="fas fa-times"></i> Clear</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Name & EM CODE</th><th>Contact</th><th>District</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody id="tableBody"><tr><td colspan="5" style="text-align:center;padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3 id="modalTitle">Add Data Collector</h3>
+            <form id="collectorForm">
+                <input type="hidden" id="collectorId">
+                <div class="form-grid">
+                    <div class="form-group"><label>Full Name *</label><input type="text" id="name" class="form-control" required></div>
+                    <div class="form-group"><label>EM CODE *</label><input type="text" id="empId" class="form-control" required placeholder="e.g., DC-001"></div>
+                    <div class="form-group"><label>Email *</label><input type="email" id="email" class="form-control" required></div>
+                    <div class="form-group"><label>Phone</label><input type="text" id="phone" class="form-control" placeholder="+256..."></div>
+                    <div class="form-group"><label>District *</label><select id="district" class="form-select" required></select></div>
+                    <div class="form-group"><label>Status *</label><select id="status" class="form-select"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline modal-close">Cancel</button><button type="submit" class="btn btn-primary">Save</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bulk Upload Modal -->
+    <div id="bulkModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Bulk Upload Data Collectors</h3>
+            <form id="bulkForm">
+                <div class="form-group">
+                    <label>Select CSV File *</label>
+                    <input type="file" id="csvFile" class="form-control" accept=".csv" required>
+                    <small style="color: var(--secondary); margin-top: 0.25rem; display: block;">
+                        <i class="fas fa-info-circle"></i> Required columns: name, empId, email, district, status (optional: phone)
+                    </small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline modal-close">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> Upload</button>
+                </div>
+            </form>
+            <div style="margin-top: 1rem; text-align: center;">
+                <button id="downloadTemplate" class="btn btn-outline btn-sm"><i class="fas fa-download"></i> Download Template CSV</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete <strong id="deleteName"></strong>? This cannot be undone.</p>
+            <div class="modal-footer"><button class="btn btn-outline modal-close">Cancel</button><button class="btn btn-danger" id="confirmDelete">Delete</button></div>
+        </div>
+    </div>
+
+    <div id="toast" class="notification"></div>
+
+    <script>
+        let allCollectors = [];
+        let allDistricts = [];
+
+        async function loadDistricts() {
+            const result = await db.getDistricts();
+            if (!result.error) allDistricts = result.data;
+            else allDistricts = ["Amuru", "Gulu", "Kagadi", "Kyenjojo", "Mbarara"];
+            populateDistrictSelects();
+        }
+
+        function populateDistrictSelects() {
+            const districtSelect = document.getElementById('district');
+            const filterDistrict = document.getElementById('filterDistrict');
+            [districtSelect, filterDistrict].forEach(select => {
+                if (!select) return;
+                const current = select.value;
+                select.innerHTML = select === filterDistrict ? '<option value="">All Districts</option>' : '';
+                allDistricts.forEach(d => { const opt = document.createElement('option'); opt.value = d; opt.textContent = d; select.appendChild(opt); });
+                if (select === districtSelect && current) select.value = current;
+            });
+        }
+
+        async function loadCollectors() {
+            const result = await db.getDataCollectors();
+            if (!result.error) allCollectors = result.data;
+            else allCollectors = [];
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const search = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+            const filterDist = document.getElementById('filterDistrict')?.value || '';
+            const filterStat = document.getElementById('filterStatus')?.value || '';
+
+            let filtered = allCollectors.filter(c => {
+                const matchSearch = !search || c.name?.toLowerCase().includes(search) || c.emp_id?.toLowerCase().includes(search) || c.email?.toLowerCase().includes(search) || c.phone?.includes(search) || c.district?.toLowerCase().includes(search);
+                const matchDist = !filterDist || c.district === filterDist;
+                const matchStat = !filterStat || c.status === filterStat;
+                return matchSearch && matchDist && matchStat;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><i class="fas fa-users fa-3x"></i><p>No data collectors found</p></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(c => `
+                <tr data-id="${c.id}">
+                    <td><strong>${escapeHtml(c.name)}</strong><br><span class="emp-code">${escapeHtml(c.emp_id)}</span></td>
+                    <td><i class="fas fa-envelope"></i> ${escapeHtml(c.email)}<br><i class="fas fa-phone"></i> ${escapeHtml(c.phone) || 'N/A'}</td>
+                    <td><strong>${escapeHtml(c.district)}</strong></td>
+                    <td><span class="status-badge status-${c.status === 'active' ? 'active' : 'inactive'}">${c.status === 'active' ? '✓ Active' : '✗ Inactive'}</span></td>
+                    <td class="table-actions"><button class="btn btn-outline btn-sm edit-btn" data-action="edit">✏️ Edit</button><button class="btn btn-danger btn-sm delete-btn" data-action="delete">🗑️ Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = `notification show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        async function init() {
+            document.getElementById('user-avatar').textContent = (loggedInUser?.username || 'A').charAt(0).toUpperCase();
+            document.getElementById('user-name').textContent = loggedInUser?.username || 'Admin';
+            await loadDistricts();
+            await loadCollectors();
+            setupEvents();
+        }
+
+        function setupEvents() {
+            document.getElementById('logout-btn').onclick = () => { sessionStorage.removeItem('loggedInUser'); window.location.href = 'login.html'; };
+            document.getElementById('addBtn').onclick = () => openModal();
+            document.getElementById('bulkBtn').onclick = () => document.getElementById('bulkModal').style.display = 'flex';
+            document.getElementById('searchInput').oninput = () => renderTable();
+            document.getElementById('filterDistrict').onchange = () => renderTable();
+            document.getElementById('filterStatus').onchange = () => renderTable();
+            document.getElementById('clearFilters').onclick = () => { document.getElementById('filterDistrict').value = ''; document.getElementById('filterStatus').value = ''; renderTable(); };
+            document.getElementById('downloadTemplate').onclick = downloadTemplate;
+            document.getElementById('collectorForm').onsubmit = handleSubmit;
+            document.getElementById('bulkForm').onsubmit = handleBulkUpload;
+            document.querySelectorAll('.modal-close').forEach(btn => btn.onclick = (e) => e.target.closest('.modal').style.display = 'none');
+            window.onclick = (e) => { if (e.target.classList.contains('modal')) e.target.style.display = 'none'; };
+            document.getElementById('tableBody').onclick = (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                const row = btn.closest('tr');
+                const id = row?.dataset.id;
+                if (btn.classList.contains('edit-btn')) openModal(id);
+                else if (btn.classList.contains('delete-btn')) {
+                    const collector = allCollectors.find(c => String(c.id) === String(id));
+                    if (collector) {
+                        document.getElementById('deleteName').innerHTML = `${collector.name} (${collector.emp_id})`;
+                        const oldBtn = document.getElementById('confirmDelete');
+                        const newBtn = oldBtn.cloneNode(true);
+                        oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+                        newBtn.onclick = async () => {
+                            await db.deleteDataCollector(id);
+                            await loadCollectors();
+                            document.getElementById('deleteModal').style.display = 'none';
+                            showToast('Deleted successfully.', 'success');
+                        };
+                        document.getElementById('deleteModal').style.display = 'flex';
+                    }
+                }
+            };
+        }
+
+        function openModal(id = null) {
+            document.getElementById('collectorForm').reset();
+            document.getElementById('collectorId').value = '';
+            document.getElementById('modalTitle').innerHTML = id ? 'Edit Data Collector' : 'Add Data Collector';
+            if (id) {
+                const c = allCollectors.find(x => String(x.id) === String(id));
+                if (c) {
+                    document.getElementById('collectorId').value = c.id;
+                    document.getElementById('name').value = c.name || '';
+                    document.getElementById('empId').value = c.emp_id || '';
+                    document.getElementById('email').value = c.email || '';
+                    document.getElementById('phone').value = c.phone || '';
+                    document.getElementById('district').value = c.district || '';
+                    document.getElementById('status').value = c.status || 'active';
+                }
+            }
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('collectorId').value;
+            const name = document.getElementById('name').value.trim();
+            const empId = document.getElementById('empId').value.trim().toUpperCase();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const phone = document.getElementById('phone').value.trim();
+            const district = document.getElementById('district').value;
+            const status = document.getElementById('status').value;
+
+            if (!name || !empId || !email || !district) { showToast('Please fill all required fields.', 'error'); return; }
+            if (!email.includes('@')) { showToast('Valid email required.', 'error'); return; }
+
+            if (id) {
+                const result = await db.updateDataCollector(id, { name, emp_id: empId, email, phone, district, status });
+                if (result.error) { showToast('Update failed: ' + result.error.message, 'error'); return; }
+                showToast('Updated successfully.', 'success');
+            } else {
+                if (allCollectors.some(c => c.emp_id?.toUpperCase() === empId)) { showToast('EM CODE already exists.', 'error'); return; }
+                const result = await db.addDataCollector({ name, emp_id: empId, email, phone, district, status });
+                if (result.error) { showToast('Add failed: ' + result.error.message, 'error'); return; }
+                showToast('Added successfully.', 'success');
+            }
+            await loadCollectors();
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        async function handleBulkUpload(e) {
+            e.preventDefault();
+            const file = document.getElementById('csvFile').files?.[0];
+            if (!file) { showToast('Please select a CSV file.', 'error'); return; }
+
+            try {
+                const text = await file.text();
+                const rows = parseCSV(text);
+                if (rows.length === 0) { showToast('No valid records found.', 'error'); return; }
+
+                let added = 0, skipped = 0;
+                for (const row of rows) {
+                    const name = row.name?.trim();
+                    const empId = (row.empid?.trim() || row.emcode?.trim() || '').toUpperCase();
+                    const email = row.email?.trim().toLowerCase();
+                    const phone = row.phone?.trim() || '';
+                    const district = row.district?.trim();
+                    const status = (row.status?.trim() || 'active').toLowerCase();
+
+                    if (!name || !empId || !email || !district) { skipped++; continue; }
+                    if (!email.includes('@')) { skipped++; continue; }
+                    if (allCollectors.some(c => c.emp_id?.toUpperCase() === empId)) { skipped++; continue; }
+
+                    const result = await db.addDataCollector({ name, emp_id: empId, email, phone, district, status: status === 'active' ? 'active' : 'inactive' });
+                    if (!result.error) added++;
+                    else skipped++;
+                }
+
+                await loadCollectors();
+                document.getElementById('bulkModal').style.display = 'none';
+                document.getElementById('csvFile').value = '';
+                showToast(`${added} uploaded, ${skipped} skipped.`, added > 0 ? 'success' : 'error');
+            } catch (err) {
+                showToast('Error processing file: ' + err.message, 'error');
+            }
+        }
+
+        function parseCSV(text) {
+            const lines = text.split(/\r?\n/).filter(l => l.trim());
+            if (lines.length < 2) return [];
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            return lines.slice(1).map(line => {
+                const vals = line.split(',').map(v => v.trim());
+                const obj = {};
+                headers.forEach((h, i) => obj[h] = vals[i] || '');
+                return obj;
+            });
+        }
+
+        function downloadTemplate() {
+            const csv = 'name,empId,email,phone,district,status\nJohn Doe,DC-001,john@example.com,0700123456,Kyenjojo,active\nJane Smith,DC-002,jane@example.com,0700654321,Kagadi,active';
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data-collectors-template.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Template downloaded.', 'success');
+        }
+
+        init();
+    </script>
+</body>
+</html>

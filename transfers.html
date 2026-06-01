@@ -5,84 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RTV Inventory Hub | Inventory Transfers</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="index.css">
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --light: #f8fafc;
-            --dark: #1e293b;
-            --card-bg: #ffffff;
-            --border: #e2e8f0;
-            --sidebar-width: 260px;
-            --border-radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --transition: all 0.3s ease;
-        }
-
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body { background-color: #f1f5f9; color: #334155; line-height: 1.6; }
-        .app-container { display: flex; min-height: 100vh; }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: var(--sidebar-width); background: #053d1a; color: white;
-            height: 100vh; position: fixed; overflow-y: auto; z-index: 1000;
-        }
-        .sidebar-logo,
-        .logo {
-            height: 80px;
-            width: 80px;
-            object-fit: contain;
-            background: white;
-            padding: 10px;
-            border-radius: 18px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-        }
-        .sidebar-header {
-            padding: 1.5rem 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
-            text-align: center;
-        }
-        .sidebar-header h2 { font-size: 1.25rem; font-weight: 600; }
-        .sidebar-menu { padding: 1rem 0; }
-        .menu-item {
-            display: flex; align-items: center; padding: 0.75rem 1.5rem;
-            color: #cbd5e1; text-decoration: none; transition: var(--transition); gap: 0.75rem;
-        }
-        .menu-item:hover, .menu-item.active { background: rgba(255, 255, 255, 0.1); color: white; }
-        .menu-item i { width: 20px; text-align: center; }
-
-        /* Main Content */
-        .main-content { flex: 1; margin-left: var(--sidebar-width); padding: 1.5rem; }
-        .header {
-            background: white; padding: 1rem 1.5rem; border-radius: var(--border-radius);
-            box-shadow: var(--shadow); margin-bottom: 1.5rem;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .header-title h1 { font-size: 1.75rem; font-weight: 700; color: var(--dark); }
-        .header-title p { color: var(--secondary); font-size: 0.9rem; }
-        
-        .header-right { display: flex; align-items: center; gap: 1.5rem; }
-        .user-profile { display: flex; align-items: center; gap: 0.75rem; }
-        .avatar {
-            width: 40px; height: 40px; border-radius: 50%; background: var(--primary);
-            color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;
-        }
-        
-        /* Card Styles */
-        .card { background: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--shadow); }
-        .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); }
-        .card-header h3 { font-size: 1.1rem; font-weight: 600; color: var(--dark); }
-        .card-body { padding: 1.5rem; }
-        
         /* Transfer Page Layout */
         .transfer-grid {
             display: grid;
@@ -93,28 +17,7 @@
 
         /* Table Styles */
         .table-container { max-height: 500px; overflow-y: auto; }
-        .data-table { width: 100%; border-collapse: collapse; }
-        .data-table th, .data-table td {
-            padding: 1rem 1.25rem; text-align: left; border-bottom: 1px solid var(--border);
-        }
-        .data-table th { background-color: var(--light); font-weight: 600; color: var(--secondary); font-size: 0.9rem; position: sticky; top: 0;}
-        .data-table tbody tr:hover { background-color: #f8fafc; }
         
-        /* Form & Button Styles */
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-        .form-control { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; }
-        .btn {
-            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-            padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 500; cursor: pointer;
-            transition: var(--transition); border: none; font-size: 1rem; width: 100%;
-        }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--secondary); }
-        .btn-outline:hover { background: var(--light); }
-        .btn:disabled { background: var(--secondary); cursor: not-allowed; opacity: 0.7; }
-
         /* Selected Items List */
         .selected-items-list { list-style: none; padding: 0; max-height: 300px; overflow-y: auto; margin-bottom: 1rem; }
         .selected-item {
@@ -123,20 +26,6 @@
         }
         .remove-item-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.1rem; }
 
-        /* Notification Toast */
-        .notification {
-            position: fixed; bottom: 20px; right: 20px; background-color: #333; color: white;
-            padding: 15px 25px; border-radius: var(--border-radius); z-index: 2000;
-            opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-        .notification.show { opacity: 1; visibility: visible; }
-        
-        .status-badge {
-            display: inline-block; padding: 0.35em 0.65em; font-size: 0.75em; font-weight: 600;
-            line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline;
-            border-radius: 0.375rem; color: #9a3412; background-color: #ffedd5;
-        }
-        
         @media (max-width: 992px) {
             .transfer-grid { grid-template-columns: 1fr; }
         }
@@ -166,6 +55,7 @@
                 <a href="supervisor.html" class="menu-item"><i class="fas fa-user-shield"></i><span>Supervisor</span></a>
                 <a href="transfers.html" class="menu-item active"><i class="fas fa-exchange-alt"></i><span>Transfers</span></a>
                 <a href="reports.html" class="menu-item"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
+                <a href="data-collectors.html" class="menu-item"><i class="fas fa-users"></i><span>Data Collectors</span></a>
                 <a href="settings.html" class="menu-item"><i class="fas fa-cog"></i><span>Settings</span></a>
             </nav>
         </aside>
@@ -255,8 +145,12 @@
 
     <div id="notification-toast" class="notification"></div>
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="db-bridge.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            await dbBridge.hydrateLocalCache();
             const itemsToTransfer = new Map();
 
             // --- DOM Elements ---
@@ -287,10 +181,12 @@
             
             function saveInventoryData(inventory) {
                 localStorage.setItem('inventoryData', JSON.stringify(inventory));
+                dbBridge.persistInventory(inventory);
                 window.dispatchEvent(new Event('storage'));
             }
             function saveMovementLogs(logs) {
                 localStorage.setItem('movementLogs', JSON.stringify(logs));
+                dbBridge.persistMovementLogs(logs);
             }
             
             // --- UI Setup ---
@@ -492,5 +388,6 @@
             loadPage();
         });
     </script>
+    <script src="app-common.js"></script>
 </body>
 </html>
