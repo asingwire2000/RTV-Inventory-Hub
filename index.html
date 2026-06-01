@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="index.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- CSS styles (unchanged) -->
     <style>
         :root {
             --primary: #2563eb;
@@ -468,6 +469,20 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        .notification-toast {
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -642,24 +657,28 @@
 
     <script src="supabase-config.js"></script>
     <script>
+        // No shared.js – using the db object from supabase-config.js directly
         let currentUser = null;
         let dashboardInventory = [];
 
         document.addEventListener('DOMContentLoaded', async function() {
-            // Security Check
-            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-            if (!loggedInUser) {
+            // Security Check using sessionStorage
+            const loggedUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+            if (!loggedUser) {
                 window.location.href = 'login.html';
-            } else if (loggedInUser.role !== 'admin') {
+                return;
+            }
+            if (loggedUser.role !== 'admin' && loggedUser.role !== 'super_admin') {
                 window.location.href = 'supervisor.html';
+                return;
             }
             
-            currentUser = loggedInUser;
+            currentUser = loggedUser;
             
             // Set user info in header
-            document.getElementById('user-name').textContent = currentUser.username;
-            document.getElementById('user-avatar').textContent = currentUser.username.charAt(0).toUpperCase();
-            document.getElementById('user-role').textContent = 'Administrator';
+            document.getElementById('user-name').textContent = currentUser.username || currentUser.name || 'Admin';
+            document.getElementById('user-avatar').textContent = (currentUser.username || currentUser.name || 'A').charAt(0).toUpperCase();
+            document.getElementById('user-role').textContent = currentUser.role === 'super_admin' ? 'Super Administrator' : 'Administrator';
 
             // Setup event listeners
             setupEventListeners();
@@ -673,27 +692,31 @@
                 // Show loading states
                 showLoadingStates();
                 
-                // Get all inventory
-                const { data: inventory, error: inventoryError } = await db.getInventory();
-                if (inventoryError) throw inventoryError;
+                // Get all inventory using db from supabase-config.js
+                const inventoryResult = await db.getInventory();
+                if (inventoryResult.error) throw inventoryResult.error;
                 
                 // Get movement logs
-                const { data: logs, error: logsError } = await db.getMovementLogs(20);
-                if (logsError) throw logsError;
+                const logsResult = await db.getMovementLogs(20);
+                if (logsResult.error) throw logsResult.error;
                 
                 // Get supervisors
-                const { data: supervisors, error: supError } = await db.getSupervisors();
-                if (supError) throw supError;
+                const supervisorsResult = await db.getSupervisors();
+                if (supervisorsResult.error) throw supervisorsResult.error;
                 
                 // Get districts
-                const { data: districts, error: distError } = await db.getDistricts();
-                if (distError) throw distError;
+                const districtsResult = await db.getDistricts();
+                if (districtsResult.error) throw districtsResult.error;
                 
                 // Get notifications
-                const { data: notifications, error: notifError } = await db.getNotifications();
-                if (notifError) throw notifError;
+                const notificationsResult = await db.getNotifications();
+                if (notificationsResult.error) throw notificationsResult.error;
 
-                dashboardInventory = inventory || [];
+                dashboardInventory = inventoryResult.data || [];
+                const logs = logsResult.data || [];
+                const supervisors = supervisorsResult.data || [];
+                const districts = districtsResult.data || [];
+                const notifications = notificationsResult.data || [];
                 
                 // Update UI
                 updateStats(dashboardInventory);
@@ -783,15 +806,14 @@
             if (pendingItems.length > 0) {
                 approvalCard.style.display = 'block';
                 const itemsHTML = pendingItems.map(item => {
-                    // Find return log for this item
                     const returnLog = logs.find(log => log.item_id === item.id && log.action === 'return_to_store');
-                    const originDistrict = returnLog ? returnLog.details.match(/from (.*?) field office/)?.[1] || 'Unknown' : 'Unknown';
+                    const originDistrict = returnLog ? (returnLog.details.match(/from (.*?) field office/)?.[1] || 'Unknown') : 'Unknown';
                     
                     return `
                     <div class="approval-item">
                         <div class="approval-item-info">
-                            <span class="item-id">${item.name} (${item.id})</span>
-                            <span class="item-origin">Returned from: <strong>${originDistrict}</strong></span>
+                            <span class="item-id">${escapeHtml(item.name)} (${escapeHtml(item.id)})</span>
+                            <span class="item-origin">Returned from: <strong>${escapeHtml(originDistrict)}</strong></span>
                         </div>
                         <button class="btn btn-success btn-sm approve-btn" data-item-id="${item.id}">
                             <i class="fas fa-check"></i> Approve
@@ -859,11 +881,11 @@
                     card.className = 'district-card';
                     card.innerHTML = `
                         <div class="district-header">
-                            <h3>${district.name}</h3>
+                            <h3>${escapeHtml(district.name)}</h3>
                             <span class="district-total">${district.total}</span>
                         </div>
                         <div class="district-body">
-                            <p class="district-supervisor"><i class="fas fa-user-shield"></i> Supervisor: <strong>${district.supervisor}</strong></p>
+                            <p class="district-supervisor"><i class="fas fa-user-shield"></i> Supervisor: <strong>${escapeHtml(district.supervisor)}</strong></p>
                             <div class="district-breakdown">${createBreakdownHTML(district.breakdown)}</div>
                         </div>`;
                     districtGrid.appendChild(card);
@@ -877,10 +899,10 @@
                 item.className = 'modal-list-item';
                 item.innerHTML = `
                     <div class="modal-list-header">
-                        <strong>${district.name}</strong>
+                        <strong>${escapeHtml(district.name)}</strong>
                         <span class="item-count">${district.total} items</span>
                     </div>
-                    <div class="modal-list-details">Supervisor: ${district.supervisor}</div>
+                    <div class="modal-list-details">Supervisor: ${escapeHtml(district.supervisor)}</div>
                     <div class="district-breakdown modal-list-breakdown">${createBreakdownHTML(district.breakdown)}</div>`;
                 modalList.appendChild(item);
             });
@@ -909,31 +931,31 @@
                 
                 switch(log.action) {
                     case 'creation':
-                        detailsText = `<strong>${item.name}</strong> (${log.item_id}) was created.`;
+                        detailsText = `<strong>${escapeHtml(item.name)}</strong> (${escapeHtml(log.item_id)}) was created.`;
                         iconClass = 'create';
                         icon = 'fa-plus';
                         break;
                     case 'assignment_transfer':
                     case 'transfer':
-                        detailsText = `<strong>${item.name}</strong> was assigned/transferred. Details: ${log.details}`;
+                        detailsText = `<strong>${escapeHtml(item.name)}</strong> was assigned/transferred. Details: ${escapeHtml(log.details)}`;
                         iconClass = 'assign';
                         icon = 'fa-user-check';
                         break;
                     case 'deletion':
                     case 'bulk_deletion':
-                        detailsText = log.details;
+                        detailsText = escapeHtml(log.details);
                         iconClass = 'delete';
                         icon = 'fa-trash-alt';
                         break;
                     case 'transfer_initiated':
                     case 'return_to_store':
                     case 'approval_complete':
-                        detailsText = `<strong>${item.name}</strong> transfer process updated. Details: ${log.details}`;
+                        detailsText = `<strong>${escapeHtml(item.name)}</strong> transfer process updated. Details: ${escapeHtml(log.details)}`;
                         iconClass = 'transfer';
                         icon = 'fa-exchange-alt';
                         break;
                     default:
-                        detailsText = `<strong>${item.name}</strong> was updated. Details: ${log.details || log.action}`;
+                        detailsText = `<strong>${escapeHtml(item.name)}</strong> was updated. Details: ${escapeHtml(log.details || log.action)}`;
                         iconClass = 'update';
                         icon = 'fa-check-circle';
                 }
@@ -971,7 +993,7 @@
                 itemEl.innerHTML = `
                     <i class="fas ${icon} notification-icon"></i>
                     <div class="notification-content">
-                        <p>${notif.message}</p>
+                        <p>${escapeHtml(notif.message)}</p>
                         <small>${new Date(notif.created_at).toLocaleString()}</small>
                     </div>`;
                 notificationList.appendChild(itemEl);
@@ -980,9 +1002,10 @@
 
         async function handleApproval(itemId) {
             try {
-                const { data: inventory, error: getError } = await db.getInventory();
-                if (getError) throw getError;
+                const inventoryResult = await db.getInventory();
+                if (inventoryResult.error) throw inventoryResult.error;
                 
+                const inventory = inventoryResult.data;
                 const itemIndex = inventory.findIndex(item => item.id === itemId);
                 if (itemIndex === -1) return;
                 
@@ -990,19 +1013,18 @@
                     ...inventory[itemIndex],
                     status: 'available',
                     district: 'mbarara',
-                    last_update: new Date().toLocaleDateString(),
-                    updated_at: new Date()
+                    last_update: new Date().toLocaleDateString()
                 };
                 
-                const { error: updateError } = await db.updateInventoryItem(itemId, updatedItem);
-                if (updateError) throw updateError;
+                const updateResult = await db.updateInventoryItem(itemId, updatedItem);
+                if (updateResult.error) throw updateResult.error;
                 
                 await db.addMovementLog({
                     item_id: itemId,
                     action: 'approval_complete',
                     details: 'Item return from field office approved by Admin.',
                     actor: currentUser.username,
-                    timestamp: new Date()
+                    timestamp: new Date().toISOString()
                 });
                 
                 await loadDashboardData();
@@ -1011,6 +1033,27 @@
             } catch (error) {
                 console.error('Error approving item:', error);
                 showError('Failed to approve item');
+            }
+        }
+
+        async function clearNotifications() {
+            if (confirm('Are you sure you want to clear all notifications?')) {
+                try {
+                    await db.clearNotifications();
+                    await loadDashboardData();
+                    showSuccess('Notifications cleared');
+                } catch (error) {
+                    showError('Failed to clear notifications');
+                }
+            }
+        }
+
+        async function markNotificationRead(notificationId) {
+            try {
+                await db.markNotificationRead(notificationId);
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Error marking notification read:', error);
             }
         }
 
@@ -1067,12 +1110,7 @@
                 notificationDropdown.style.display = notificationDropdown.style.display === 'block' ? 'none' : 'block';
             });
             
-            clearNotificationsBtn.addEventListener('click', async () => {
-                if (confirm('Are you sure you want to clear all notifications?')) {
-                    await db.clearNotifications();
-                    await loadDashboardData();
-                }
-            });
+            clearNotificationsBtn.addEventListener('click', clearNotifications);
             
             document.addEventListener('click', (e) => {
                 if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
@@ -1080,7 +1118,7 @@
                 }
             });
             
-            // Modal
+            // District modal
             const modal = document.getElementById('districtModal');
             document.getElementById('viewAllDistrictsBtn').onclick = () => { modal.style.display = 'flex'; };
             document.querySelector('.modal-close').onclick = () => { modal.style.display = 'none'; };
@@ -1102,13 +1140,12 @@
                 
                 const notifId = notificationItem.dataset.id;
                 if (notifId) {
-                    await db.markNotificationRead(notifId);
-                    await loadDashboardData();
+                    await markNotificationRead(notifId);
                 }
-                
                 notificationDropdown.style.display = 'none';
             });
 
+            // Download buttons
             document.querySelector('.main-content').addEventListener('click', (e) => {
                 const downloadBtn = e.target.closest('.card-download-btn');
                 if (!downloadBtn) return;
@@ -1159,22 +1196,17 @@
                 toast.remove();
             }, 3000);
         }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
     </script>
-    <style>
-        .notification-toast {
-            animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-    </style>
     <script src="responsive.js"></script>
 </body>
 </html>

@@ -2,730 +2,725 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>RTV Inventory Hub | Reports</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="index.css">
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        .selector-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .selector-container label {
-            font-weight: 500;
-            color: var(--dark);
-        }
-        
-        .selector-container select {
-            padding: 0.5rem;
-            border-radius: 6px;
-            border: 1px solid var(--border);
+        /* Professional Reports Page Styles */
+        .reports-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
             background: white;
-        }
-        
-        .quick-actions {
-            display: flex;
-            gap: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 0.8rem 1.8rem;
             margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .quick-action-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: var(--border-radius);
-            padding: 1rem;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            min-width: 150px;
-            cursor: pointer;
-            transition: var(--transition);
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-radius: 12px;
         }
-        
-        .quick-action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow);
+        .reports-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
-        
-        .quick-action-btn i {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-        
-        .quick-action-btn span {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--dark);
-        }
-
         .mobile-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--dark);
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
             padding: 0.5rem;
+            cursor: pointer;
             width: 40px;
             height: 40px;
-            border-radius: 8px;
-            background: var(--light);
+            display: inline-flex;
             align-items: center;
             justify-content: center;
         }
-
-        @media (max-width: 1024px) {
-            .dashboard-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .quick-actions {
-                gap: 0.75rem;
-            }
-            .quick-action-btn {
-                min-width: 120px;
-                padding: 0.75rem;
-            }
+        .reports-header-title h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
         }
-
+        .reports-header-title p {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin: 0;
+        }
+        .reports-header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1rem;
+        }
+        .user-info {
+            text-align: right;
+            line-height: 1.3;
+        }
+        .user-info .user-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        .user-info .user-role {
+            font-size: 0.7rem;
+            color: var(--secondary);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--secondary);
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-outline:hover {
+            background: var(--light);
+        }
+        .report-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+        .report-tab {
+            padding: 0.6rem 1.2rem;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: var(--secondary);
+        }
+        .report-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        .report-tab:hover:not(.active) {
+            background: var(--light);
+        }
+        .report-panel {
+            display: none;
+        }
+        .report-panel.active {
+            display: block;
+        }
+        .report-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            font-size: 0.85rem;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .date-filter {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            background: var(--light);
+            padding: 0.8rem;
+            border-radius: 8px;
+        }
+        .date-filter input {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
         @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                left: 0;
-                top: 0;
-                width: var(--sidebar-width);
-                height: 100vh;
-                z-index: 999;
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-
-            .mobile-menu-toggle {
-                display: flex;
-            }
-
-            .header {
-                padding: 0.75rem 1rem;
-                margin-bottom: 1rem;
-                flex-wrap: wrap;
-            }
-
-            .header-title h1 {
-                font-size: 1.4rem;
-            }
-
-            .header-title p {
-                display: none;
-            }
-
-            .selector-container {
-                flex-wrap: wrap;
-                padding: 0.75rem;
-                gap: 0.5rem;
-            }
-
-            .selector-container label {
-                font-size: 0.9rem;
-            }
-
-            .selector-container select {
-                padding: 0.5rem;
-                font-size: 0.9rem;
-            }
-
-            .quick-actions {
-                gap: 0.5rem;
-                margin-bottom: 1rem;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .quick-action-btn {
-                min-width: 100px;
-                padding: 0.6rem;
-                font-size: 0.8rem;
-            }
-
-            .quick-action-btn i {
-                font-size: 1.2rem;
-                margin-bottom: 0.3rem;
-            }
-
-            .quick-action-btn span {
-                font-size: 0.75rem;
-            }
-
-            .card {
-                padding: 1rem;
-                margin-bottom: 1rem;
-            }
-
-            .card-title {
-                font-size: 1rem;
-            }
-
-            table {
-                font-size: 0.85rem;
-            }
-
-            th, td {
-                padding: 0.75rem 0.5rem;
-            }
-
-            .table-responsive {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .modal-content {
-                width: 90%;
-                padding: 1.5rem;
-            }
-
-            .btn {
-                padding: 0.5rem 0.75rem;
-                font-size: 0.8rem;
-            }
+            .reports-header { flex-direction: column; align-items: stretch; }
+            .reports-header-left { justify-content: space-between; }
+            .reports-header-right { justify-content: flex-end; }
+            .user-info { display: none; }
+            .report-tabs { justify-content: center; }
+            .date-filter { flex-direction: column; align-items: stretch; }
         }
-
-        @media (max-width: 480px) {
-            .main-content {
-                padding: 0.75rem;
-            }
-
-            .header {
-                padding: 0.5rem 0.75rem;
-                margin-bottom: 0.75rem;
-            }
-
-            .header-title h1 {
-                font-size: 1.1rem;
-            }
-
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
-            }
-
-            .quick-action-btn {
-                flex: 0 1 calc(50% - 0.25rem);
-                min-width: 80px;
-            }
-
-            .selector-container {
-                flex-direction: column;
-                padding: 0.75rem 0;
-            }
-
-            .selector-container label {
-                width: 100%;
-                margin-bottom: 0.25rem;
-            }
-
-            .selector-container select {
-                width: 100%;
-            }
-
-            table {
-                font-size: 0.75rem;
-            }
-
-            th, td {
-                padding: 0.5rem 0.35rem;
-            }
-
-            .modal-content {
-                width: 95%;
-                padding: 1rem;
-            }
-
-            .btn {
-                padding: 0.45rem 0.6rem;
-                font-size: 0.75rem;
-            }
+        .table-container {
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
         }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .data-table th, .data-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+        .data-table th {
+            background: var(--light);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--secondary);
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <script>
-        // --- SECURITY CHECK (ADMIN ONLY) ---
-        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        if (!loggedInUser) {
-            // If no user is logged in, redirect to the login page immediately.
-            window.location.href = 'login.html';
-        } else if (loggedInUser.role !== 'admin') {
-            // If the user is logged in but is not an admin, redirect them away.
-            window.location.href = 'supervisor.html';
-        }
-    </script>
     <div class="app-container">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <img src="rtv logo.svg" alt="RTV Inventory Hub Logo" class="sidebar-logo">
+                <img src="rtv logo.svg" alt="RTV Logo" class="sidebar-logo">
                 <h2>RTV Inventory Hub</h2>
             </div>
             <nav class="sidebar-menu">
-                <a href="index.html" class="menu-item">
-                    <i class="fas fa-home"></i>
-                    <span class="menu-text">Dashboard</span>
-                </a>
-                <a href="Inventory.html" class="menu-item">
-                    <i class="fas fa-list"></i>
-                    <span class="menu-text">Inventory</span>
-                </a>
-                <a href="supervisor.html" class="menu-item">
-                    <i class="fas fa-user-shield"></i>
-                    <span class="menu-text">Supervisor</span>
-                </a>
-                <a href="transfers.html" class="menu-item">
-                    <i class="fas fa-exchange-alt"></i>
-                    <span class="menu-text">Transfers</span>
-                </a>
-                <a href="reports.html" class="menu-item active">
-                    <i class="fas fa-chart-bar"></i>
-                    <span class="menu-text">Reports</span>
-                </a>
-                <a href="data-collectors.html" class="menu-item">
-                    <i class="fas fa-users"></i>
-                    <span class="menu-text">Data Collectors</span>
-                </a>
-                <a href="settings.html" class="menu-item">
-                    <i class="fas fa-cog"></i>
-                    <span class="menu-text">Settings</span>
-                </a>
+                <a href="index.html" class="menu-item"><i class="fas fa-home"></i><span>Dashboard</span></a>
+                <a href="Inventory.html" class="menu-item"><i class="fas fa-list"></i><span>Inventory</span></a>
+                <a href="supervisor.html" class="menu-item"><i class="fas fa-user-shield"></i><span>Supervisor</span></a>
+                <a href="transfers.html" class="menu-item"><i class="fas fa-exchange-alt"></i><span>Transfers</span></a>
+                <a href="reports.html" class="menu-item active"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
+                <a href="data-collectors.html" class="menu-item"><i class="fas fa-users"></i><span>Data Collectors</span></a>
+                <a href="settings.html" class="menu-item"><i class="fas fa-cog"></i><span>Settings</span></a>
             </nav>
         </aside>
 
         <main class="main-content">
-            <header class="header">
-                <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="header-title">
-                    <h1>Reports Dashboard</h1>
-                    <p>View a consolidated snapshot of inventory and movement activity.</p>
-                </div>
-                <div class="user-profile">
-                    <div class="avatar" id="report-avatar">A</div>
-                    <div>
-                        <div id="report-name">Admin</div>
-                        <small id="report-role">Administrator</small>
+            <div class="reports-header">
+                <div class="reports-header-left">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
+                    <div class="reports-header-title">
+                        <h1>Reports Dashboard</h1>
+                        <p>Generate and export system reports</p>
                     </div>
                 </div>
-            </header>
-
-            <div class="selector-container">
-                <label for="report-district-select">Filter by District:</label>
-                <select id="report-district-select">
-                    <option value="all">All Districts</option>
-                </select>
-                <div style="margin-left:auto; display:flex; gap:0.75rem;">
-                    <button class="btn btn-primary" id="download-pdf-btn"><i class="fas fa-file-pdf"></i> Download PDF</button>
-                    <button class="btn btn-outline" id="download-spreadsheet-btn"><i class="fas fa-file-csv"></i> Download Spreadsheet</button>
+                <div class="reports-header-right">
+                    <div class="user-profile">
+                        <div class="avatar" id="userAvatar">A</div>
+                        <div class="user-info">
+                            <div class="user-name" id="userName">Admin</div>
+                            <div class="user-role" id="userRole">Administrator</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" id="logoutBtn">Logout</button>
                 </div>
             </div>
 
-            <div class="dashboard-grid">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-value" id="report-total-items">0</div>
-                        <div class="stat-label">Total Inventory Items</div>
-                    </div>
+            <!-- Report Tabs -->
+            <div class="report-tabs">
+                <button class="report-tab active" data-report="inventory">Inventory Summary</button>
+                <button class="report-tab" data-report="district">District Report</button>
+                <button class="report-tab" data-report="activity">Activity Logs</button>
+                <button class="report-tab" data-report="supervisors">Supervisor Performance</button>
+                <button class="report-tab" data-report="transfers">Transfer History</button>
+            </div>
+
+            <!-- Inventory Summary Panel -->
+            <div id="inventory-panel" class="report-panel active">
+                <div class="report-actions">
+                    <button class="btn btn-success" id="exportInventoryCSV"><i class="fas fa-file-csv"></i> CSV</button>
+                    <button class="btn btn-primary" id="exportInventoryExcel"><i class="fas fa-file-excel"></i> Excel</button>
+                    <button class="btn btn-secondary" id="exportInventoryPDF"><i class="fas fa-file-pdf"></i> PDF</button>
                 </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-value" id="report-available-items">0</div>
-                        <div class="stat-label">Available Items</div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-value" id="report-in-use-items">0</div>
-                        <div class="stat-label">Items In Use</div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="stat-value" id="report-maintenance-items">0</div>
-                        <div class="stat-label">Items in Maintenance</div>
-                    </div>
+                <div class="table-container" id="inventoryTableContainer">
+                    <table class="data-table" id="inventoryTable">
+                        <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Status</th><th>Assigned To</th><th>District</th><th>Last Update</th></tr></thead>
+                        <tbody><tr><td colspan="7" class="empty-state"><span class="loading-spinner"></span> Loading...</td></tr></tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header"><h3>Inventory Status Summary</h3></div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="inventory-table">
-                            <thead>
-                                <tr>
-                                    <th>Status</th>
-                                    <th>Count</th>
-                                </tr>
-                            </thead>
-                            <tbody id="report-status-summary"></tbody>
-                        </table>
-                    </div>
+            <!-- District Report Panel -->
+            <div id="district-panel" class="report-panel">
+                <div class="report-actions">
+                    <button class="btn btn-success" id="exportDistrictCSV"><i class="fas fa-file-csv"></i> CSV</button>
+                    <button class="btn btn-primary" id="exportDistrictExcel"><i class="fas fa-file-excel"></i> Excel</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="districtTable">
+                        <thead><tr><th>District</th><th>Total Items</th><th>Available</th><th>In Use</th><th>Maintenance</th><th>Pending Approval</th><th>Supervisors</th></tr></thead>
+                        <tbody><tr><td colspan="7" class="empty-state"><span class="loading-spinner"></span> Loading...</td></tr></tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="card" style="margin-top: 1.5rem;">
-                <div class="card-header"><h3>District Inventory Report</h3></div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="inventory-table">
-                            <thead>
-                                <tr>
-                                    <th>District</th>
-                                    <th>Total Items</th>
-                                    <th>Available</th>
-                                    <th>In Use</th>
-                                    <th>Maintenance</th>
-                                    <th>Supervisors</th>
-                                </tr>
-                            </thead>
-                            <tbody id="district-report-body"></tbody>
-                        </table>
-                    </div>
+            <!-- Activity Logs Panel -->
+            <div id="activity-panel" class="report-panel">
+                <div class="date-filter">
+                    <label>From: <input type="date" id="activityFrom"></label>
+                    <label>To: <input type="date" id="activityTo"></label>
+                    <button class="btn btn-outline" id="filterActivityBtn">Apply Filter</button>
+                    <button class="btn btn-outline" id="resetActivityBtn">Reset</button>
+                </div>
+                <div class="report-actions">
+                    <button class="btn btn-success" id="exportActivityCSV"><i class="fas fa-file-csv"></i> CSV</button>
+                    <button class="btn btn-primary" id="exportActivityExcel"><i class="fas fa-file-excel"></i> Excel</button>
+                    <button class="btn btn-secondary" id="exportActivityPDF"><i class="fas fa-file-pdf"></i> PDF</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="activityTable">
+                        <thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Item ID</th><th>Details</th></tr></thead>
+                        <tbody><tr><td colspan="5" class="empty-state"><span class="loading-spinner"></span> Loading...</td></tr></tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="card" style="margin-top: 1.5rem;">
-                <div class="card-header"><h3>Recent Movement Logs</h3></div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="inventory-table">
-                            <thead>
-                                <tr>
-                                    <th>Item ID</th>
-                                    <th>Action</th>
-                                    <th>Details</th>
-                                    <th>Timestamp</th>
-                                </tr>
-                            </thead>
-                            <tbody id="movement-log-body"></tbody>
-                        </table>
-                    </div>
+            <!-- Supervisor Performance Panel -->
+            <div id="supervisors-panel" class="report-panel">
+                <div class="report-actions">
+                    <button class="btn btn-success" id="exportSupervisorsCSV"><i class="fas fa-file-csv"></i> CSV</button>
+                    <button class="btn btn-primary" id="exportSupervisorsExcel"><i class="fas fa-file-excel"></i> Excel</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="supervisorsTable">
+                        <thead><tr><th>Name</th><th>District</th><th>Email</th><th>Items in District</th><th>Status</th><th>Active Collectors</th></tr></thead>
+                        <tbody><tr><td colspan="6" class="empty-state"><span class="loading-spinner"></span> Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Transfer History Panel -->
+            <div id="transfers-panel" class="report-panel">
+                <div class="date-filter">
+                    <label>From: <input type="date" id="transferFrom"></label>
+                    <label>To: <input type="date" id="transferTo"></label>
+                    <button class="btn btn-outline" id="filterTransferBtn">Apply Filter</button>
+                    <button class="btn btn-outline" id="resetTransferBtn">Reset</button>
+                </div>
+                <div class="report-actions">
+                    <button class="btn btn-success" id="exportTransferCSV"><i class="fas fa-file-csv"></i> CSV</button>
+                    <button class="btn btn-primary" id="exportTransferExcel"><i class="fas fa-file-excel"></i> Excel</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="transferTable">
+                        <thead><tr><th>Item ID</th><th>Item Name</th><th>From District</th><th>To District</th><th>Status</th><th>Initiated By</th><th>Date</th></tr></thead>
+                        <tbody><tr><td colspan="7" class="empty-state"><span class="loading-spinner"></span> Loading...</td></tr></tbody>
+                    </table>
                 </div>
             </div>
         </main>
     </div>
-    
-    <div id="notification-toast" class="notification"></div>
+
+    <div id="global-toast" class="notification"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
-    <script src="db-bridge.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        const INVENTORY_KEY = 'inventoryData';
-        const DISTRICTS_KEY = 'districts';
-        const MOVEMENT_LOGS_KEY = 'movementLogs';
-        const SUPERVISORS_KEY = 'supervisors';
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            await dbBridge.hydrateLocalCache();
-            initializeReportsDashboard();
-        });
-
-        window.addEventListener('storage', (e) => {
-            if ([INVENTORY_KEY, DISTRICTS_KEY, MOVEMENT_LOGS_KEY, SUPERVISORS_KEY].includes(e.key)) {
-                loadReportData();
-            }
-        });
-
-        function initializeReportsDashboard() {
-            const user = JSON.parse(sessionStorage.getItem('loggedInUser')) || { username: 'Admin' };
-            document.getElementById('report-name').textContent = user.username;
-            document.getElementById('report-avatar').textContent = user.username.charAt(0).toUpperCase();
-            document.getElementById('report-role').textContent = 'Administrator';
-
-            populateDistrictSelect();
-            setupEventListeners();
-            loadReportData();
-        }
-
-        function getInventoryData() {
-            return JSON.parse(localStorage.getItem(INVENTORY_KEY)) || [];
-        }
-
-        function getDistricts() {
-            return JSON.parse(localStorage.getItem(DISTRICTS_KEY)) || [];
-        }
-
-        function getMovementLogs() {
-            return JSON.parse(localStorage.getItem(MOVEMENT_LOGS_KEY)) || [];
-        }
-
-        function getSupervisors() {
-            return JSON.parse(localStorage.getItem(SUPERVISORS_KEY)) || [];
-        }
-
-        function populateDistrictSelect() {
-            const districts = getDistricts().sort();
-            const select = document.getElementById('report-district-select');
-            select.innerHTML = '<option value="all">All Districts</option>' + districts.map(d => `<option value="${d}">${d}</option>`).join('');
-        }
-
-        function setupEventListeners() {
-            // Mobile menu toggle
-            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-            const sidebar = document.querySelector('.sidebar');
-            if (mobileMenuToggle) {
-                mobileMenuToggle.addEventListener('click', () => {
-                    sidebar.classList.toggle('active');
-                });
-            }
-
-            // Close sidebar when clicking on a menu item
-            if (sidebar) {
-                sidebar.querySelectorAll('a').forEach(link => {
-                    link.addEventListener('click', () => {
-                        sidebar.classList.remove('active');
-                    });
-                });
-            }
-
-            // Close sidebar when clicking outside of it
-            document.addEventListener('click', (e) => {
-                if (sidebar && sidebar.classList.contains('active') && 
-                    !sidebar.contains(e.target) && 
-                    !mobileMenuToggle?.contains(e.target)) {
-                    sidebar.classList.remove('active');
-                }
-            });
-
-            document.getElementById('report-district-select').addEventListener('change', loadReportData);
-            document.getElementById('download-pdf-btn').addEventListener('click', downloadReportPDF);
-            document.getElementById('download-spreadsheet-btn').addEventListener('click', downloadReportSpreadsheet);
-        }
-
-        function loadReportData() {
-            const selectedDistrict = document.getElementById('report-district-select').value;
-            const allInventory = getInventoryData();
-            const filteredInventory = selectedDistrict === 'all'
-                ? allInventory
-                : allInventory.filter(item => item.district === selectedDistrict);
-
-            updateSummaryCards(filteredInventory);
-            renderStatusSummary(filteredInventory);
-            renderDistrictSummary(allInventory);
-            renderMovementLogs(selectedDistrict, allInventory);
-        }
-
-        function updateSummaryCards(items) {
-            document.getElementById('report-total-items').textContent = items.length;
-            document.getElementById('report-available-items').textContent = items.filter(i => i.status === 'available').length;
-            document.getElementById('report-in-use-items').textContent = items.filter(i => i.status === 'in-use').length;
-            document.getElementById('report-maintenance-items').textContent = items.filter(i => i.status === 'maintenance').length;
-        }
-
-        function renderStatusSummary(items) {
-            const statusCounts = items.reduce((acc, item) => {
-                const status = item.status || 'unknown';
-                acc[status] = (acc[status] || 0) + 1;
-                return acc;
-            }, {});
-
-            const tbody = document.getElementById('report-status-summary');
-            tbody.innerHTML = Object.entries(statusCounts)
-                .sort((a, b) => b[1] - a[1])
-                .map(([status, count]) => `
-                    <tr>
-                        <td>${status.replace(/-/g, ' ').toUpperCase()}</td>
-                        <td>${count}</td>
-                    </tr>
-                `).join('') || '<tr><td colspan="2" style="text-align:center;">No items to summarize.</td></tr>';
-        }
-
-        function renderDistrictSummary(allInventory) {
-            const districts = getDistricts().sort();
-            const supervisors = getSupervisors();
-            const tbody = document.getElementById('district-report-body');
-
-            tbody.innerHTML = districts.map(district => {
-                const districtItems = allInventory.filter(item => item.district === district);
-                const total = districtItems.length;
-                const available = districtItems.filter(item => item.status === 'available').length;
-                const inUse = districtItems.filter(item => item.status === 'in-use').length;
-                const maintenance = districtItems.filter(item => item.status === 'maintenance').length;
-                const activeSupervisors = supervisors.filter(s => s.district === district && s.status === 'active').length;
-
-                return `
-                    <tr>
-                        <td>${district}</td>
-                        <td>${total}</td>
-                        <td>${available}</td>
-                        <td>${inUse}</td>
-                        <td>${maintenance}</td>
-                        <td>${activeSupervisors}</td>
-                    </tr>
-                `;
-            }).join('') || '<tr><td colspan="6" style="text-align:center;">No districts available.</td></tr>';
-        }
-
-        function renderMovementLogs(selectedDistrict, allInventory) {
-            const logs = getMovementLogs();
-            let filteredLogs = logs.slice(0, 30);
-
-            if (selectedDistrict !== 'all') {
-                const districtItemIds = new Set(allInventory.filter(item => item.district === selectedDistrict).map(item => String(item.id)));
-                filteredLogs = logs.filter(log => districtItemIds.has(String(log.itemId)));
-            }
-
-            const tbody = document.getElementById('movement-log-body');
-            tbody.innerHTML = filteredLogs.map(log => `
-                <tr>
-                    <td>${log.itemId}</td>
-                    <td>${log.action.replace(/_/g, ' ').toUpperCase()}</td>
-                    <td>${log.details}</td>
-                    <td>${new Date(log.timestamp).toLocaleString()}</td>
-                </tr>
-            `).join('') || '<tr><td colspan="4" style="text-align:center;">No movement logs available.</td></tr>';
-        }
-
-        function downloadReportSpreadsheet() {
-            const selectedDistrict = document.getElementById('report-district-select').value;
-            const allInventory = getInventoryData();
-            const districtSummary = buildDistrictSummary(allInventory);
-            const reportRows = [
-                ['District', 'Total Items', 'Available', 'In Use', 'Maintenance', 'Supervisors']
-            ];
-
-            districtSummary.forEach(row => reportRows.push([row.name, row.total, row.available, row.inUse, row.maintenance, row.supervisors]));
-            reportRows.push([]);
-            reportRows.push(['Recent Movement Logs']);
-            reportRows.push(['Timestamp', 'Item ID', 'Action', 'Details']);
-
-            const logs = getMovementLogsForDownload(selectedDistrict, allInventory);
-            logs.forEach(log => reportRows.push([new Date(log.timestamp).toLocaleString(), log.itemId, log.action.replace(/_/g, ' '), log.details]));
-
-            downloadCSV(`rtv-report-${selectedDistrict}-${Date.now()}.csv`, reportRows);
-        }
-
-        function downloadCSV(filename, rows) {
-            const csv = rows.map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(',')).join('\r\n');
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', filename);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }
-
-        function downloadReportPDF() {
-            if (!window.jspdf) {
-                showNotification('PDF export is unavailable.');
-                return;
-            }
-
-            const selectedDistrict = document.getElementById('report-district-select').value;
-            const allInventory = getInventoryData();
-            const filteredInventory = selectedDistrict === 'all'
-                ? allInventory
-                : allInventory.filter(item => item.district === selectedDistrict);
-            const districtRows = buildDistrictSummary(allInventory);
-            const logs = getMovementLogsForDownload(selectedDistrict, allInventory).slice(0, 15);
-            const statusCounts = filteredInventory.reduce((acc, item) => {
-                const status = item.status || 'unknown';
-                acc[status] = (acc[status] || 0) + 1;
-                return acc;
-            }, {});
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.setFontSize(18);
-            doc.text('RTV Inventory Report', 14, 20);
-            doc.setFontSize(11);
-            doc.text(`District: ${selectedDistrict === 'all' ? 'All Districts' : selectedDistrict}`, 14, 30);
-            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 36);
-            doc.text(`Total Inventory: ${filteredInventory.length}`, 14, 44);
-            doc.text(`Available: ${statusCounts.available || 0}`, 14, 50);
-            doc.text(`In Use: ${statusCounts['in-use'] || 0}`, 14, 56);
-            doc.text(`Maintenance: ${statusCounts.maintenance || 0}`, 14, 62);
-
-            let y = 75;
-            doc.setFontSize(12);
-            doc.text('District Summary', 14, y);
-            y += 8;
-            districtRows.forEach(row => {
-                const line = `${row.name}: total ${row.total}, available ${row.available}, in use ${row.inUse}, maintenance ${row.maintenance}, supervisors ${row.supervisors}`;
-                doc.text(line, 14, y);
-                y += 6;
-                if (y > 270) {
-                    doc.addPage();
-                    y = 20;
-                }
-            });
-
-            if (logs.length > 0) {
-                doc.addPage();
-                y = 20;
-                doc.text('Recent Movement Logs', 14, y);
-                y += 8;
-                logs.forEach(log => {
-                    const line = `${new Date(log.timestamp).toLocaleString()} | ${log.itemId} | ${log.action.replace(/_/g, ' ')} | ${log.details}`;
-                    const splitted = doc.splitTextToSize(line, 180);
-                    doc.text(splitted, 14, y);
-                    y += splitted.length * 6;
-                    if (y > 270) {
-                        doc.addPage();
-                        y = 20;
-                    }
-                });
-            }
-
-            doc.save(`rtv-report-${selectedDistrict}-${Date.now()}.pdf`);
-        }
-
-        function buildDistrictSummary(allInventory) {
-            const districts = getDistricts().sort();
-            const supervisors = getSupervisors();
-            return districts.map(district => {
-                const districtItems = allInventory.filter(item => item.district === district);
-                return {
-                    name: district,
-                    total: districtItems.length,
-                    available: districtItems.filter(item => item.status === 'available').length,
-                    inUse: districtItems.filter(item => item.status === 'in-use').length,
-                    maintenance: districtItems.filter(item => item.status === 'maintenance').length,
-                    supervisors: supervisors.filter(s => s.district === district && s.status === 'active').length,
-                };
-            });
-        }
-
-        function getMovementLogsForDownload(selectedDistrict, allInventory) {
-            const logs = getMovementLogs();
-            if (selectedDistrict === 'all') {
-                return logs.slice(0, 100);
-            }
-            const districtItemIds = new Set(allInventory.filter(item => item.district === selectedDistrict).map(item => String(item.id)));
-            return logs.filter(log => districtItemIds.has(String(log.itemId))).slice(0, 100);
-        }
-
-        function showNotification(message) {
-            const toast = document.getElementById('notification-toast');
-            toast.textContent = message;
-            toast.classList.add('show');
+        // Helper functions
+        function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+        function showToast(msg, type='success') {
+            const toast = document.getElementById('global-toast');
+            toast.textContent = msg;
+            toast.className = `notification show ${type}`;
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
+
+        let currentUser = null;
+        let inventoryData = [], districtData = [], activityLogs = [], supervisorsData = [], transferLogs = [];
+
+        // Fetch all data from Supabase
+        async function fetchAllData() {
+            try {
+                const [inventoryRes, districtsRes, logsRes, supervisorsRes] = await Promise.all([
+                    supabaseClient.from('inventory_items').select('*').order('created_at', { ascending: false }),
+                    supabaseClient.from('districts').select('name'),
+                    supabaseClient.from('movement_logs').select('*').order('timestamp', { ascending: false }).limit(500),
+                    supabaseClient.from('supervisors').select('*, users!user_id(username, name)')
+                ]);
+                inventoryData = inventoryRes.data || [];
+                districtData = districtsRes.data?.map(d => d.name) || [];
+                activityLogs = logsRes.data || [];
+                supervisorsData = supervisorsRes.data || [];
+                
+                // Build transfer logs (filter from movement logs)
+                transferLogs = activityLogs.filter(log => log.action === 'transfer_initiated' || log.action === 'transfer_approved');
+                
+                return true;
+            } catch (err) {
+                console.error('Error fetching data:', err);
+                showToast('Failed to load report data', 'error');
+                return false;
+            }
+        }
+
+        // Render Inventory Summary
+        function renderInventory() {
+            const tbody = document.querySelector('#inventoryTable tbody');
+            if (inventoryData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No inventory data found</td></tr>';
+                return;
+            }
+            tbody.innerHTML = inventoryData.map(item => `
+                <tr>
+                    <td><code>${escapeHtml(item.id)}</code></td>
+                    <td>${escapeHtml(item.name)}</td>
+                    <td>${escapeHtml(item.type)}</td>
+                    <td><span class="status-badge">${escapeHtml(item.status)}</span></td>
+                    <td>${escapeHtml(item.assigned || '—')}</td>
+                    <td>${escapeHtml(item.district || '—')}</td>
+                    <td>${escapeHtml(item.lastUpdate || item.updated_at?.slice(0,10) || '—')}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Render District Report
+        function renderDistrict() {
+            const tbody = document.querySelector('#districtTable tbody');
+            const districtStats = new Map();
+            districtData.forEach(district => districtStats.set(district, { total:0, available:0, inUse:0, maintenance:0, pending:0 }));
+            inventoryData.forEach(item => {
+                const dist = item.district;
+                if (dist && districtStats.has(dist)) {
+                    const stats = districtStats.get(dist);
+                    stats.total++;
+                    if (item.status === 'available') stats.available++;
+                    else if (item.status === 'in-use') stats.inUse++;
+                    else if (item.status === 'maintenance') stats.maintenance++;
+                    else if (item.status === 'pending-approval') stats.pending++;
+                }
+            });
+            // Count supervisors per district
+            const supervisorCount = new Map();
+            supervisorsData.forEach(sup => {
+                if (sup.district) supervisorCount.set(sup.district, (supervisorCount.get(sup.district)||0)+1);
+            });
+            if (districtStats.size === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No district data found</td></tr>';
+                return;
+            }
+            tbody.innerHTML = Array.from(districtStats.entries()).map(([district, stats]) => `
+                <tr>
+                    <td>${escapeHtml(district)}</td>
+                    <td>${stats.total}</td>
+                    <td>${stats.available}</td>
+                    <td>${stats.inUse}</td>
+                    <td>${stats.maintenance}</td>
+                    <td>${stats.pending}</td>
+                    <td>${supervisorCount.get(district) || 0}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Render Activity Logs with date filter
+        let activityFilter = { from: null, to: null };
+        function renderActivity() {
+            let filtered = [...activityLogs];
+            if (activityFilter.from) filtered = filtered.filter(l => new Date(l.timestamp) >= new Date(activityFilter.from));
+            if (activityFilter.to) filtered = filtered.filter(l => new Date(l.timestamp) <= new Date(activityFilter.to + 'T23:59:59'));
+            const tbody = document.querySelector('#activityTable tbody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No activity logs found</td></tr>';
+                return;
+            }
+            tbody.innerHTML = filtered.map(log => `
+                <tr>
+                    <td>${new Date(log.timestamp).toLocaleString()}</td>
+                    <td>${escapeHtml(log.actor || 'System')}</td>
+                    <td>${escapeHtml(log.action)}</td>
+                    <td><code>${escapeHtml(log.item_id || '—')}</code></td>
+                    <td>${escapeHtml(log.details || '—')}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Render Supervisor Performance
+        async function renderSupervisors() {
+            const tbody = document.querySelector('#supervisorsTable tbody');
+            // Get collector count per district
+            const { data: collectors } = await supabaseClient.from('data_collectors').select('district, status');
+            const collectorCount = new Map();
+            (collectors || []).forEach(c => {
+                if (c.status === 'active' && c.district) collectorCount.set(c.district, (collectorCount.get(c.district)||0)+1);
+            });
+            if (supervisorsData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No supervisor data found</td></tr>';
+                return;
+            }
+            tbody.innerHTML = supervisorsData.map(sup => {
+                const itemsCount = inventoryData.filter(i => i.district === sup.district).length;
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(sup.name)}</strong><br><small>${escapeHtml(sup.username)}</small></td>
+                        <td>${escapeHtml(sup.district || '—')}</td>
+                        <td>${escapeHtml(sup.email)}</td>
+                        <td>${itemsCount}</td>
+                        <td><span class="status-badge">${escapeHtml(sup.status)}</span></td>
+                        <td>${collectorCount.get(sup.district) || 0}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Render Transfer History
+        let transferFilter = { from: null, to: null };
+        function renderTransfers() {
+            let filtered = [...transferLogs];
+            if (transferFilter.from) filtered = filtered.filter(l => new Date(l.timestamp) >= new Date(transferFilter.from));
+            if (transferFilter.to) filtered = filtered.filter(l => new Date(l.timestamp) <= new Date(transferFilter.to + 'T23:59:59'));
+            const tbody = document.querySelector('#transferTable tbody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No transfer history found</td></tr>';
+                return;
+            }
+            tbody.innerHTML = filtered.map(log => {
+                // Parse details for from/to districts
+                let fromDist = 'Mbarara', toDist = 'Unknown', status = log.action === 'transfer_initiated' ? 'Pending' : 'Approved';
+                if (log.details) {
+                    const toMatch = log.details.match(/to ([\w\s]+)/i);
+                    if (toMatch) toDist = toMatch[1];
+                }
+                const item = inventoryData.find(i => i.id === log.item_id);
+                return `
+                    <tr>
+                        <td><code>${escapeHtml(log.item_id)}</code></td>
+                        <td>${escapeHtml(item?.name || 'Unknown')}</td>
+                        <td>${fromDist}</td>
+                        <td>${escapeHtml(toDist)}</td>
+                        <td><span class="status-badge">${status}</span></td>
+                        <td>${escapeHtml(log.actor || 'System')}</td>
+                        <td>${new Date(log.timestamp).toLocaleString()}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Export functions
+        function exportToCSV(data, filename, columns) {
+            const headers = columns.map(c => c.title);
+            const rows = data.map(row => columns.map(c => row[c.key] || ''));
+            const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${filename}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`${filename} exported as CSV`);
+        }
+
+        function exportToExcel(data, filename, columns) {
+            const wsData = [columns.map(c => c.title), ...data.map(row => columns.map(c => row[c.key] || ''))];
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, filename);
+            XLSX.writeFile(wb, `${filename}.xlsx`);
+            showToast(`${filename} exported as Excel`);
+        }
+
+        async function exportToPDF(elementId, filename) {
+            if (!window.jspdf) { showToast('PDF export not available', 'error'); return; }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            const htmlContent = element.cloneNode(true);
+            htmlContent.style.width = '100%';
+            htmlContent.style.fontSize = '10px';
+            await doc.html(htmlContent, {
+                callback: function(doc) { doc.save(`${filename}.pdf`); },
+                x: 5, y: 5, html2canvas: { scale: 0.2, letterRendering: true }
+            });
+            showToast(`${filename} exported as PDF`);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Mobile menu
+            const mobileToggle = document.getElementById('mobileMenuToggle');
+            const sidebar = document.getElementById('sidebar');
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+                document.addEventListener('click', (e) => {
+                    if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !mobileToggle.contains(e.target))
+                        sidebar.classList.remove('open');
+                });
+            }
+            document.getElementById('logoutBtn')?.addEventListener('click', () => { sessionStorage.removeItem('loggedInUser'); window.location.href = 'login.html'; });
+            
+            // Tab switching
+            document.querySelectorAll('.report-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.report-panel').forEach(p => p.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(`${tab.dataset.report}-panel`).classList.add('active');
+                });
+            });
+            
+            // Inventory exports
+            document.getElementById('exportInventoryCSV')?.addEventListener('click', () => {
+                const data = inventoryData.map(item => ({ ID: item.id, Name: item.name, Type: item.type, Status: item.status, Assigned: item.assigned || '', District: item.district || '', LastUpdate: item.lastUpdate || '' }));
+                exportToCSV(data, 'inventory_summary', [{key:'ID',title:'ID'},{key:'Name',title:'Name'},{key:'Type',title:'Type'},{key:'Status',title:'Status'},{key:'Assigned',title:'Assigned To'},{key:'District',title:'District'},{key:'LastUpdate',title:'Last Update'}]);
+            });
+            document.getElementById('exportInventoryExcel')?.addEventListener('click', () => {
+                const data = inventoryData.map(item => ({ ID: item.id, Name: item.name, Type: item.type, Status: item.status, Assigned: item.assigned || '', District: item.district || '', LastUpdate: item.lastUpdate || '' }));
+                exportToExcel(data, 'inventory_summary', [{key:'ID',title:'ID'},{key:'Name',title:'Name'},{key:'Type',title:'Type'},{key:'Status',title:'Status'},{key:'Assigned',title:'Assigned To'},{key:'District',title:'District'},{key:'LastUpdate',title:'Last Update'}]);
+            });
+            document.getElementById('exportInventoryPDF')?.addEventListener('click', () => exportToPDF('inventoryTableContainer', 'inventory_report'));
+            
+            // District exports
+            const getDistrictReportData = () => {
+                const stats = [];
+                districtData.forEach(district => {
+                    const items = inventoryData.filter(i => i.district === district);
+                    stats.push({ District: district, Total: items.length, Available: items.filter(i=>i.status==='available').length, InUse: items.filter(i=>i.status==='in-use').length, Maintenance: items.filter(i=>i.status==='maintenance').length, Pending: items.filter(i=>i.status==='pending-approval').length });
+                });
+                return stats;
+            };
+            document.getElementById('exportDistrictCSV')?.addEventListener('click', () => {
+                const data = getDistrictReportData();
+                exportToCSV(data, 'district_report', [{key:'District',title:'District'},{key:'Total',title:'Total Items'},{key:'Available',title:'Available'},{key:'InUse',title:'In Use'},{key:'Maintenance',title:'Maintenance'},{key:'Pending',title:'Pending Approval'}]);
+            });
+            document.getElementById('exportDistrictExcel')?.addEventListener('click', () => {
+                const data = getDistrictReportData();
+                exportToExcel(data, 'district_report', [{key:'District',title:'District'},{key:'Total',title:'Total Items'},{key:'Available',title:'Available'},{key:'InUse',title:'In Use'},{key:'Maintenance',title:'Maintenance'},{key:'Pending',title:'Pending Approval'}]);
+            });
+            
+            // Activity filters
+            document.getElementById('filterActivityBtn')?.addEventListener('click', () => {
+                activityFilter.from = document.getElementById('activityFrom').value;
+                activityFilter.to = document.getElementById('activityTo').value;
+                renderActivity();
+            });
+            document.getElementById('resetActivityBtn')?.addEventListener('click', () => {
+                activityFilter.from = null; activityFilter.to = null;
+                document.getElementById('activityFrom').value = '';
+                document.getElementById('activityTo').value = '';
+                renderActivity();
+            });
+            document.getElementById('exportActivityCSV')?.addEventListener('click', () => {
+                const data = activityLogs.map(l => ({ Timestamp: new Date(l.timestamp).toLocaleString(), User: l.actor || 'System', Action: l.action, ItemID: l.item_id || '', Details: l.details || '' }));
+                exportToCSV(data, 'activity_logs', [{key:'Timestamp',title:'Timestamp'},{key:'User',title:'User'},{key:'Action',title:'Action'},{key:'ItemID',title:'Item ID'},{key:'Details',title:'Details'}]);
+            });
+            document.getElementById('exportActivityExcel')?.addEventListener('click', () => {
+                const data = activityLogs.map(l => ({ Timestamp: new Date(l.timestamp).toLocaleString(), User: l.actor || 'System', Action: l.action, ItemID: l.item_id || '', Details: l.details || '' }));
+                exportToExcel(data, 'activity_logs', [{key:'Timestamp',title:'Timestamp'},{key:'User',title:'User'},{key:'Action',title:'Action'},{key:'ItemID',title:'Item ID'},{key:'Details',title:'Details'}]);
+            });
+            document.getElementById('exportActivityPDF')?.addEventListener('click', () => exportToPDF('activityTable', 'activity_logs'));
+            
+            // Supervisor exports
+            document.getElementById('exportSupervisorsCSV')?.addEventListener('click', async () => {
+                const { data: collectors } = await supabaseClient.from('data_collectors').select('district, status');
+                const collectorCount = new Map();
+                (collectors || []).forEach(c => { if (c.status === 'active' && c.district) collectorCount.set(c.district, (collectorCount.get(c.district)||0)+1); });
+                const data = supervisorsData.map(sup => ({ Name: sup.name, District: sup.district || '', Email: sup.email, ItemsInDistrict: inventoryData.filter(i=>i.district===sup.district).length, Status: sup.status, ActiveCollectors: collectorCount.get(sup.district) || 0 }));
+                exportToCSV(data, 'supervisor_performance', [{key:'Name',title:'Name'},{key:'District',title:'District'},{key:'Email',title:'Email'},{key:'ItemsInDistrict',title:'Items in District'},{key:'Status',title:'Status'},{key:'ActiveCollectors',title:'Active Collectors'}]);
+            });
+            document.getElementById('exportSupervisorsExcel')?.addEventListener('click', async () => {
+                const { data: collectors } = await supabaseClient.from('data_collectors').select('district, status');
+                const collectorCount = new Map();
+                (collectors || []).forEach(c => { if (c.status === 'active' && c.district) collectorCount.set(c.district, (collectorCount.get(c.district)||0)+1); });
+                const data = supervisorsData.map(sup => ({ Name: sup.name, District: sup.district || '', Email: sup.email, ItemsInDistrict: inventoryData.filter(i=>i.district===sup.district).length, Status: sup.status, ActiveCollectors: collectorCount.get(sup.district) || 0 }));
+                exportToExcel(data, 'supervisor_performance', [{key:'Name',title:'Name'},{key:'District',title:'District'},{key:'Email',title:'Email'},{key:'ItemsInDistrict',title:'Items in District'},{key:'Status',title:'Status'},{key:'ActiveCollectors',title:'Active Collectors'}]);
+            });
+            
+            // Transfer filters
+            document.getElementById('filterTransferBtn')?.addEventListener('click', () => {
+                transferFilter.from = document.getElementById('transferFrom').value;
+                transferFilter.to = document.getElementById('transferTo').value;
+                renderTransfers();
+            });
+            document.getElementById('resetTransferBtn')?.addEventListener('click', () => {
+                transferFilter.from = null; transferFilter.to = null;
+                document.getElementById('transferFrom').value = '';
+                document.getElementById('transferTo').value = '';
+                renderTransfers();
+            });
+            document.getElementById('exportTransferCSV')?.addEventListener('click', () => {
+                const data = transferLogs.map(l => {
+                    const item = inventoryData.find(i => i.id === l.item_id);
+                    let toDist = 'Unknown';
+                    if (l.details) { const match = l.details.match(/to ([\w\s]+)/i); if (match) toDist = match[1]; }
+                    return { ItemID: l.item_id, ItemName: item?.name || 'Unknown', FromDistrict: 'Mbarara', ToDistrict: toDist, Status: l.action === 'transfer_initiated' ? 'Pending' : 'Approved', InitiatedBy: l.actor || 'System', Date: new Date(l.timestamp).toLocaleString() };
+                });
+                exportToCSV(data, 'transfer_history', [{key:'ItemID',title:'Item ID'},{key:'ItemName',title:'Item Name'},{key:'FromDistrict',title:'From District'},{key:'ToDistrict',title:'To District'},{key:'Status',title:'Status'},{key:'InitiatedBy',title:'Initiated By'},{key:'Date',title:'Date'}]);
+            });
+            document.getElementById('exportTransferExcel')?.addEventListener('click', () => {
+                const data = transferLogs.map(l => {
+                    const item = inventoryData.find(i => i.id === l.item_id);
+                    let toDist = 'Unknown';
+                    if (l.details) { const match = l.details.match(/to ([\w\s]+)/i); if (match) toDist = match[1]; }
+                    return { ItemID: l.item_id, ItemName: item?.name || 'Unknown', FromDistrict: 'Mbarara', ToDistrict: toDist, Status: l.action === 'transfer_initiated' ? 'Pending' : 'Approved', InitiatedBy: l.actor || 'System', Date: new Date(l.timestamp).toLocaleString() };
+                });
+                exportToExcel(data, 'transfer_history', [{key:'ItemID',title:'Item ID'},{key:'ItemName',title:'Item Name'},{key:'FromDistrict',title:'From District'},{key:'ToDistrict',title:'To District'},{key:'Status',title:'Status'},{key:'InitiatedBy',title:'Initiated By'},{key:'Date',title:'Date'}]);
+            });
+        }
+
+        // Initialize page
+        async function init() {
+            const loggedUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+            if (!loggedUser) { window.location.href = 'login.html'; return; }
+            if (loggedUser.role !== 'admin' && loggedUser.role !== 'super_admin') { window.location.href = 'supervisor.html'; return; }
+            currentUser = loggedUser;
+            document.getElementById('userName').textContent = currentUser.username;
+            document.getElementById('userAvatar').textContent = currentUser.username.charAt(0).toUpperCase();
+            document.getElementById('userRole').textContent = currentUser.role === 'super_admin' ? 'Super Admin' : 'Administrator';
+            
+            await fetchAllData();
+            renderInventory();
+            renderDistrict();
+            renderActivity();
+            await renderSupervisors();
+            renderTransfers();
+            setupEventListeners();
+        }
+        
+        init();
     </script>
     <script src="responsive.js"></script>
 </body>

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>RTV Inventory Hub | User Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="index.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+    <style>
+        :root { --sidebar-bg: linear-gradient(180deg, #1e1b4b 0%, #2e1065 100%) !important; }
+        .user-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+        .user-tab { padding: 0.6rem 1.2rem; background: transparent; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.2s; color: var(--secondary); }
+        .user-tab.active { background: var(--primary); color: white; }
+        .user-panel { display: none; }
+        .user-panel.active { display: block; }
+        .filters-bar { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-bottom: 1rem; background: white; padding: 0.8rem 1rem; border-radius: var(--border-radius); box-shadow: var(--shadow); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } .filters-bar { flex-direction: column; align-items: stretch; } }
+        .info-banner { background: #fef3c7; padding: 0.75rem; border-radius: 8px; margin-top: 1rem; font-size: 0.85rem; }
+        .mobile-menu-toggle { display: none; background: var(--light); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem; cursor: pointer; width: 40px; height: 40px; align-items: center; justify-content: center; }
+        @media (max-width: 992px) { .mobile-menu-toggle { display: inline-flex; } .sidebar { transform: translateX(-100%); transition: transform 0.3s; } .sidebar.open { transform: translateX(0); } .main-content { margin-left: 0; } }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .searchable-dropdown { position: relative; width: 100%; }
+        .searchable-dropdown input { width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px; }
+        .searchable-dropdown .dropdown-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--border); border-radius: 6px; max-height: 200px; overflow-y: auto; z-index: 1000; display: none; }
+        .searchable-dropdown .dropdown-list div { padding: 0.5rem; cursor: pointer; }
+        .searchable-dropdown .dropdown-list div:hover { background: var(--light); }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header"><img src="rtv logo.svg" class="sidebar-logo"><h2>RTV Inventory Hub</h2><p>Super Admin</p></div>
+            <nav class="sidebar-menu">
+                <a href="super-admin.html" class="menu-item"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+                <a href="super-admin.html?section=reports" class="menu-item"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
+                <a href="user-management.html" class="menu-item active"><i class="fas fa-users-cog"></i><span>User Management</span></a>
+                <a href="super-admin.html?section=inventory" class="menu-item"><i class="fas fa-boxes"></i><span>Inventory</span></a>
+                <a href="super-admin.html?section=audit" class="menu-item"><i class="fas fa-history"></i><span>Audit Logs</span></a>
+                <a href="super-admin.html?section=settings" class="menu-item"><i class="fas fa-cog"></i><span>Settings</span></a>
+                <a href="#" id="logout-link" class="menu-item"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header class="header">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
+                <div class="header-title"><h1><i class="fas fa-users-cog"></i> User Management</h1><p>Manage Admins, Supervisors, and Data Collectors</p></div>
+                <div class="header-right"><div class="user-profile"><div class="avatar" id="userAvatar">SA</div><div class="user-info"><div class="user-name" id="userName">Super Admin</div><div class="user-role">Super Administrator</div></div></div><button class="btn btn-outline" id="logoutBtn">Logout</button></div>
+            </header>
+
+            <div class="user-tabs">
+                <button class="user-tab active" data-type="admins">Administrators</button>
+                <button class="user-tab" data-type="supervisors">Supervisors</button>
+                <button class="user-tab" data-type="collectors">Data Collectors</button>
+            </div>
+
+            <!-- Admins Panel -->
+            <div id="adminsPanel" class="user-panel active">
+                <div class="filters-bar">
+                    <div style="flex:1"></div>
+                    <button class="btn btn-primary" id="addAdminBtn"><i class="fas fa-plus"></i> Add Admin</button>
+                </div>
+                <div class="card"><div class="card-header"><h3>Administrator Accounts (role='admin')</h3></div><div class="card-body"><div class="table-responsive"><table class="data-table"><thead><tr><th>Username</th><th>Name</th><th>Email</th><th>Created</th><th>Actions</th></tr></thead><tbody id="adminsTableBody"><tr><td colspan="5" class="empty-row">Loading...</td></tr></tbody></table></div></div></div>
+            </div>
+
+            <!-- Supervisors Panel -->
+            <div id="supervisorsPanel" class="user-panel">
+                <div class="filters-bar">
+                    <div style="flex:1"></div>
+                    <button class="btn btn-primary" id="addSupervisorBtn"><i class="fas fa-plus"></i> Add Supervisor</button>
+                </div>
+                <div class="card"><div class="card-header"><h3>Supervisor Accounts (role='supervisor')</h3></div><div class="card-body"><div class="table-responsive"><table class="data-table"><thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Created</th><th>Actions</th></tr></thead><tbody id="supervisorsTableBody"><tr><td colspan="5" class="empty-row">Loading...</td></tr></tbody></table></div></div></div>
+            </div>
+
+            <!-- Data Collectors Panel -->
+            <div id="collectorsPanel" class="user-panel">
+                <div class="filters-bar">
+                    <div class="filter-group"><label>District:</label>
+                        <div class="searchable-dropdown" style="min-width:200px">
+                            <input type="text" id="collDistrictSearch" placeholder="Search district...">
+                            <div id="collDistrictList" class="dropdown-list"></div>
+                            <input type="hidden" id="collDistrictFilter" value="">
+                        </div>
+                    </div>
+                    <div class="filter-group"><label>Status:</label><select id="collStatusFilter" class="filter-select"><option value="">All</option><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+                    <button class="btn btn-outline btn-sm" id="clearCollFilters">Clear</button>
+                    <div style="flex:1"></div>
+                    <button class="btn btn-primary" id="addCollectorBtn"><i class="fas fa-plus"></i> Add Data Collector</button>
+                    <button class="btn btn-outline" id="bulkCollectorBtn"><i class="fas fa-upload"></i> Bulk Upload</button>
+                </div>
+                <div class="card"><div class="card-header"><h3>Data Collectors (no login – field staff only)</h3></div><div class="card-body"><div class="table-responsive"><table class="data-table"><thead><tr><th>Name</th><th>EM CODE</th><th>Email</th><th>Phone</th><th>District</th><th>Status</th><th>Actions</th></tr></thead><tbody id="collectorsTableBody"><tr><td colspan="7" class="empty-row">Loading...</td></tr></tbody></table></div></div></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="adminModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 id="adminModalTitle">Add Admin</h3><span class="modal-close">&times;</span></div><div class="modal-body"><input type="hidden" id="adminId"><div class="form-group"><label>Username *</label><input type="text" id="adminUsername" class="form-control"></div><div class="form-group"><label>Name</label><input type="text" id="adminName" class="form-control"></div><div class="form-group"><label>Email</label><input type="email" id="adminEmail" class="form-control"></div><div class="form-group"><label>Password *</label><input type="password" id="adminPassword" class="form-control" placeholder="Min 6 chars"></div></div><div class="modal-footer"><button class="btn btn-outline modal-close">Cancel</button><button class="btn btn-primary" id="saveAdminBtn">Save</button></div></div></div>
+    
+    <div id="supervisorModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 id="supModalTitle">Add Supervisor</h3><span class="modal-close">&times;</span></div><div class="modal-body"><input type="hidden" id="supId"><div class="form-grid"><div class="form-group"><label>Name *</label><input type="text" id="supName" class="form-control"></div><div class="form-group"><label>Username *</label><input type="text" id="supUsername" class="form-control"></div><div class="form-group"><label>Email *</label><input type="email" id="supEmail" class="form-control"></div><div class="form-group"><label>Phone</label><input type="text" id="supPhone" class="form-control"></div><div class="form-group"><label>District</label><div class="searchable-dropdown"><input type="text" id="supDistrictSearchModal" placeholder="Search district..."><div id="supDistrictModalList" class="dropdown-list"></div><input type="hidden" id="supDistrict" value=""></div></div><div class="form-group"><label>Password *</label><input type="password" id="supPassword" class="form-control" placeholder="Min 6 chars"></div></div></div><div class="modal-footer"><button class="btn btn-outline modal-close">Cancel</button><button class="btn btn-primary" id="saveSupBtn">Save</button></div></div></div>
+    
+    <div id="collectorModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 id="collModalTitle">Add Data Collector</h3><span class="modal-close">&times;</span></div><div class="modal-body"><input type="hidden" id="collId"><div class="form-grid"><div class="form-group"><label>Name *</label><input type="text" id="collName" class="form-control"></div><div class="form-group"><label>EM CODE *</label><input type="text" id="collEmpId" class="form-control"></div><div class="form-group"><label>Email *</label><input type="email" id="collEmail" class="form-control"></div><div class="form-group"><label>Phone</label><input type="text" id="collPhone" class="form-control"></div><div class="form-group"><label>District *</label><div class="searchable-dropdown"><input type="text" id="collDistrictSearchModal" placeholder="Search district..."><div id="collDistrictModalList" class="dropdown-list"></div><input type="hidden" id="collDistrict" value=""></div></div><div class="form-group"><label>Status</label><select id="collStatus" class="form-control"><option>active</option><option>inactive</option></select></div></div><div class="info-banner"><i class="fas fa-info-circle"></i> Data collectors have no login credentials.</div></div><div class="modal-footer"><button class="btn btn-outline modal-close">Cancel</button><button class="btn btn-primary" id="saveCollBtn">Save</button></div></div></div>
+    
+    <div id="bulkModal" class="modal"><div class="modal-content"><div class="modal-header"><h3>Bulk Upload Collectors</h3><span class="modal-close">&times;</span></div><div class="modal-body"><p>Upload CSV with columns: name, empId, email, phone, district, status</p><input type="file" id="bulkFile" accept=".csv" class="form-control"><div id="bulkPreview" style="max-height:200px;overflow:auto;margin-top:1rem;"></div></div><div class="modal-footer"><button class="btn btn-outline" id="downloadTemplate">Template</button><button class="btn btn-primary" id="confirmBulk" disabled>Upload</button></div></div></div>
+    
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // ========== GLOBALS ==========
+        let admins = [], supervisors = [], collectors = [], districts = [];
+        let bulkData = [];
+        let loggedUser = null;
+
+        function escapeHtml(s) { if(!s) return ''; return s.replace(/[&<>]/g, function(m) { if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m; }); }
+        function showToast(msg, type) { type = type || 'success'; let t = document.getElementById('notification'); t.textContent = msg; t.className = 'notification ' + type; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); }
+
+        // ========== DATA LOADING ==========
+        async function loadAdmins() {
+            try {
+                const { data, error } = await supabaseClient.from('users').select('*').eq('role', 'admin');
+                if (error) throw error;
+                admins = data || [];
+                console.log('Admins loaded:', admins.length);
+            } catch(e) { console.error(e); showToast('Failed to load admins: ' + e.message, 'error'); }
+        }
+
+        async function loadSupervisors() {
+            try {
+                const { data, error } = await supabaseClient.from('users').select('*').eq('role', 'supervisor');
+                if (error) throw error;
+                supervisors = data || [];
+                console.log('Supervisors loaded from users table:', supervisors.length);
+                if (supervisors.length > 0) console.log('First supervisor:', supervisors[0]);
+            } catch(e) { console.error('Load supervisors error:', e); showToast('Failed to load supervisors: ' + e.message, 'error'); supervisors = []; }
+        }
+
+        async function loadCollectors() {
+            try {
+                const { data, error } = await supabaseClient.from('data_collectors').select('*');
+                if (error) throw error;
+                collectors = data || [];
+                console.log('Collectors loaded:', collectors.length);
+            } catch(e) { console.error(e); showToast('Failed to load data collectors: ' + e.message, 'error'); }
+        }
+
+        async function loadDistricts() {
+            try {
+                const { data, error } = await supabaseClient.from('districts').select('name');
+                if (error) throw error;
+                districts = data ? data.map(d => d.name) : [];
+                if(districts.length === 0) districts = ["Amuru","Gulu","Kagadi","Kyenjojo","Mbarara"];
+                console.log('Districts loaded:', districts);
+                initSearchableDropdowns();
+            } catch(e) { console.error(e); districts = ["Amuru","Gulu","Kagadi","Kyenjojo","Mbarara"]; initSearchableDropdowns(); }
+        }
+
+        function initSearchableDropdowns() {
+            initDropdown('collDistrictSearch', 'collDistrictList', 'collDistrictFilter');
+            initDropdown('collDistrictSearchModal', 'collDistrictModalList', 'collDistrict');
+            initDropdown('supDistrictSearchModal', 'supDistrictModalList', 'supDistrict');
+        }
+
+        function initDropdown(inputId, listId, hiddenId) {
+            let input = document.getElementById(inputId);
+            let list = document.getElementById(listId);
+            let hidden = document.getElementById(hiddenId);
+            if (!input || !list || !hidden) return;
+            
+            function render(filter = '') {
+                let filtered = districts.filter(d => d.toLowerCase().includes(filter.toLowerCase()));
+                let html = filtered.map(d => `<div data-value="${d}">${d}</div>`).join('');
+                if (filtered.length === 0) html = '<div style="color:#999;">No districts found</div>';
+                list.innerHTML = html;
+                
+                list.querySelectorAll('[data-value]').forEach(div => {
+                    div.addEventListener('click', () => {
+                        input.value = div.dataset.value;
+                        hidden.value = div.dataset.value;
+                        list.style.display = 'none';
+                        if (inputId === 'collDistrictSearch') renderCollectors();
+                    });
+                });
+            }
+            
+            input.addEventListener('input', (e) => { render(e.target.value); list.style.display = 'block'; });
+            input.addEventListener('focus', () => { render(input.value); list.style.display = 'block'; });
+            document.addEventListener('click', (e) => { if (!input.contains(e.target) && !list.contains(e.target)) list.style.display = 'none'; });
+            if (hidden.value) input.value = hidden.value;
+            render();
+        }
+
+        async function refreshAll() {
+            await loadAdmins();
+            await loadSupervisors();
+            await loadCollectors();
+            await loadDistricts();
+            renderAdmins();
+            renderSupervisors();
+            renderCollectors();
+        }
+
+        // ========== RENDER FUNCTIONS ==========
+        function renderAdmins() {
+            const tbody = document.getElementById('adminsTableBody');
+            if (!tbody) return;
+            if (admins.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No admin accounts found</td></tr>';
+                return;
+            }
+            tbody.innerHTML = admins.map(a => `
+                <tr data-id="${a.id}">
+                    <td><strong>${escapeHtml(a.username)}</strong>${a.id === (loggedUser?.id) ? ' <span class="badge badge-info">You</span>' : ''}</td>
+                    <td>${escapeHtml(a.name || '')}</td>
+                    <td>${escapeHtml(a.email || '')}</td>
+                    <td>${a.created_at ? new Date(a.created_at).toLocaleDateString() : 'N/A'}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-outline btn-sm editAdmin" data-id="${a.id}" ${a.id === (loggedUser?.id) ? 'disabled' : ''}>Edit</button>
+                        <button class="btn btn-danger btn-sm deleteAdmin" data-id="${a.id}" ${a.id === (loggedUser?.id) ? 'disabled' : ''}>Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            document.querySelectorAll('.editAdmin').forEach(btn => btn.addEventListener('click', () => openAdminModal(btn.dataset.id)));
+            document.querySelectorAll('.deleteAdmin').forEach(btn => btn.addEventListener('click', async () => {
+                if (confirm('Delete this admin?')) {
+                    await supabaseClient.from('users').delete().eq('id', btn.dataset.id);
+                    await refreshAll();
+                    showToast('Admin deleted');
+                }
+            }));
+        }
+
+        function renderSupervisors() {
+            const tbody = document.getElementById('supervisorsTableBody');
+            if (!tbody) return;
+            if (supervisors.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No supervisors found. Click "Add Supervisor" to create one.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = supervisors.map(s => `
+                <tr data-id="${s.id}">
+                    <td><strong>${escapeHtml(s.name || s.username)}</strong></td>
+                    <td><span class="badge badge-info">${escapeHtml(s.username)}</span></td>
+                    <td>${escapeHtml(s.email || '')}</td>
+                    <td>${s.created_at ? new Date(s.created_at).toLocaleDateString() : 'N/A'}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-outline btn-sm editSup" data-id="${s.id}">Edit</button>
+                        <button class="btn btn-danger btn-sm deleteSup" data-id="${s.id}">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            document.querySelectorAll('.editSup').forEach(btn => btn.addEventListener('click', () => openSupervisorModal(btn.dataset.id)));
+            document.querySelectorAll('.deleteSup').forEach(btn => btn.addEventListener('click', async () => {
+                if (confirm('Delete this supervisor? (login will be removed)')) {
+                    await supabaseClient.from('users').delete().eq('id', btn.dataset.id);
+                    // Also delete from supervisors table if exists
+                    await supabaseClient.from('supervisors').delete().eq('user_id', btn.dataset.id);
+                    await refreshAll();
+                    showToast('Supervisor deleted');
+                }
+            }));
+        }
+
+        function renderCollectors() {
+            const districtFilter = document.getElementById('collDistrictFilter')?.value || '';
+            const statusFilter = document.getElementById('collStatusFilter')?.value || '';
+            let filtered = collectors.filter(c => 
+                (!districtFilter || c.district === districtFilter) && 
+                (!statusFilter || c.status === statusFilter)
+            );
+            const tbody = document.getElementById('collectorsTableBody');
+            if (!tbody) return;
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-row">No data collectors found. Use "Add Data Collector" or "Bulk Upload" to add collectors.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = filtered.map(c => `
+                <tr data-id="${c.id}">
+                    <td><strong>${escapeHtml(c.name)}</strong></td>
+                    <td><code>${escapeHtml(c.emp_id)}</code></td>
+                    <td>${escapeHtml(c.email)}</td>
+                    <td>${escapeHtml(c.phone || '-')}</td>
+                    <td>${escapeHtml(c.district)}</td>
+                    <td><span class="badge ${c.status === 'active' ? 'badge-success' : 'badge-danger'}">${c.status}</span></td>
+                    <td class="action-buttons">
+                        <button class="btn btn-outline btn-sm editColl" data-id="${c.id}">Edit</button>
+                        <button class="btn btn-danger btn-sm deleteColl" data-id="${c.id}">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            document.querySelectorAll('.editColl').forEach(btn => btn.addEventListener('click', () => openCollectorModal(btn.dataset.id)));
+            document.querySelectorAll('.deleteColl').forEach(btn => btn.addEventListener('click', async () => {
+                if (confirm('Delete this collector?')) {
+                    await supabaseClient.from('data_collectors').delete().eq('id', btn.dataset.id);
+                    await refreshAll();
+                    showToast('Collector deleted');
+                }
+            }));
+        }
+
+        // ========== MODAL FUNCTIONS ==========
+        function openAdminModal(id = null) {
+            const modal = document.getElementById('adminModal');
+            document.getElementById('adminModalTitle').innerText = id ? 'Edit Admin' : 'Add Admin';
+            document.getElementById('adminId').value = id || '';
+            document.getElementById('adminUsername').value = '';
+            document.getElementById('adminName').value = '';
+            document.getElementById('adminEmail').value = '';
+            document.getElementById('adminPassword').value = '';
+            if (id) {
+                const a = admins.find(admin => admin.id == id);
+                if (a) {
+                    document.getElementById('adminUsername').value = a.username;
+                    document.getElementById('adminName').value = a.name || '';
+                    document.getElementById('adminEmail').value = a.email || '';
+                    document.getElementById('adminPassword').placeholder = 'Leave blank to keep current';
+                }
+            }
+            modal.style.display = 'flex';
+            const saveBtn = document.getElementById('saveAdminBtn');
+            const newBtn = saveBtn.cloneNode(true);
+            saveBtn.parentNode.replaceChild(newBtn, saveBtn);
+            newBtn.addEventListener('click', async () => {
+                const username = document.getElementById('adminUsername').value.trim().toLowerCase();
+                const name = document.getElementById('adminName').value.trim();
+                const email = document.getElementById('adminEmail').value.trim();
+                const pwd = document.getElementById('adminPassword').value;
+                if (!username) { showToast('Username required', 'error'); return; }
+                if (!id && (!pwd || pwd.length < 6)) { showToast('Password required (min 6 chars)', 'error'); return; }
+                if (id) {
+                    const updates = { name, email };
+                    if (pwd) updates.password = pwd;
+                    await supabaseClient.from('users').update(updates).eq('id', id);
+                    showToast('Admin updated');
+                } else {
+                    await supabaseClient.from('users').insert([{ username, password: pwd, role: 'admin', name, email }]);
+                    showToast('Admin added');
+                }
+                modal.style.display = 'none';
+                await refreshAll();
+            });
+        }
+
+        function openSupervisorModal(id = null) {
+            const modal = document.getElementById('supervisorModal');
+            document.getElementById('supModalTitle').innerText = id ? 'Edit Supervisor' : 'Add Supervisor';
+            document.getElementById('supId').value = id || '';
+            document.getElementById('supName').value = '';
+            document.getElementById('supUsername').value = '';
+            document.getElementById('supEmail').value = '';
+            document.getElementById('supPhone').value = '';
+            document.getElementById('supDistrictSearchModal').value = '';
+            document.getElementById('supDistrict').value = '';
+            document.getElementById('supPassword').value = '';
+            if (id) {
+                const s = supervisors.find(sup => sup.id == id);
+                if (s) {
+                    document.getElementById('supName').value = s.name || s.username;
+                    document.getElementById('supUsername').value = s.username;
+                    document.getElementById('supEmail').value = s.email || '';
+                    document.getElementById('supPassword').placeholder = 'Leave blank to keep current';
+                }
+            }
+            modal.style.display = 'flex';
+            const saveBtn = document.getElementById('saveSupBtn');
+            const newBtn = saveBtn.cloneNode(true);
+            saveBtn.parentNode.replaceChild(newBtn, saveBtn);
+            newBtn.addEventListener('click', async () => {
+                const name = document.getElementById('supName').value.trim();
+                const username = document.getElementById('supUsername').value.trim().toLowerCase();
+                const email = document.getElementById('supEmail').value.trim();
+                const phone = document.getElementById('supPhone').value.trim();
+                const district = document.getElementById('supDistrict').value;
+                const pwd = document.getElementById('supPassword').value;
+                if (!name || !username || !email) { showToast('Name, username and email required', 'error'); return; }
+                if (!id && (!pwd || pwd.length < 6)) { showToast('Password required (min 6 chars)', 'error'); return; }
+                
+                if (id) {
+                    await supabaseClient.from('users').update({ name, email }).eq('id', id);
+                    if (pwd) await supabaseClient.from('users').update({ password: pwd }).eq('id', id);
+                    // Update or insert into supervisors table for district info
+                    if (district) {
+                        const { data: existing } = await supabaseClient.from('supervisors').select('id').eq('user_id', id).maybeSingle();
+                        if (existing) {
+                            await supabaseClient.from('supervisors').update({ phone, district }).eq('user_id', id);
+                        } else {
+                            await supabaseClient.from('supervisors').insert([{ user_id: id, name, email, phone, district }]);
+                        }
+                    }
+                    showToast('Supervisor updated');
+                } else {
+                    const { data: newUser, error } = await supabaseClient.from('users').insert([{ username, password: pwd, role: 'supervisor', name, email }]).select().single();
+                    if (error) { showToast(error.message, 'error'); return; }
+                    if (district) {
+                        await supabaseClient.from('supervisors').insert([{ user_id: newUser.id, name, email, phone, district }]);
+                    }
+                    showToast('Supervisor added');
+                }
+                modal.style.display = 'none';
+                await refreshAll();
+            });
+        }
+
+        function openCollectorModal(id = null) {
+            const modal = document.getElementById('collectorModal');
+            document.getElementById('collModalTitle').innerText = id ? 'Edit Data Collector' : 'Add Data Collector';
+            document.getElementById('collId').value = id || '';
+            document.getElementById('collName').value = '';
+            document.getElementById('collEmpId').value = '';
+            document.getElementById('collEmail').value = '';
+            document.getElementById('collPhone').value = '';
+            document.getElementById('collDistrictSearchModal').value = '';
+            document.getElementById('collDistrict').value = '';
+            document.getElementById('collStatus').value = 'active';
+            if (id) {
+                const c = collectors.find(coll => coll.id == id);
+                if (c) {
+                    document.getElementById('collName').value = c.name;
+                    document.getElementById('collEmpId').value = c.emp_id;
+                    document.getElementById('collEmail').value = c.email;
+                    document.getElementById('collPhone').value = c.phone || '';
+                    document.getElementById('collDistrictSearchModal').value = c.district;
+                    document.getElementById('collDistrict').value = c.district;
+                    document.getElementById('collStatus').value = c.status;
+                }
+            }
+            modal.style.display = 'flex';
+            const saveBtn = document.getElementById('saveCollBtn');
+            const newBtn = saveBtn.cloneNode(true);
+            saveBtn.parentNode.replaceChild(newBtn, saveBtn);
+            newBtn.addEventListener('click', async () => {
+                const name = document.getElementById('collName').value.trim();
+                const empId = document.getElementById('collEmpId').value.trim().toUpperCase();
+                const email = document.getElementById('collEmail').value.trim();
+                const phone = document.getElementById('collPhone').value.trim();
+                const district = document.getElementById('collDistrict').value;
+                const status = document.getElementById('collStatus').value;
+                if (!name || !empId || !email || !district) { showToast('Fill required fields', 'error'); return; }
+                if (id) {
+                    await supabaseClient.from('data_collectors').update({ name, emp_id: empId, email, phone, district, status }).eq('id', id);
+                    showToast('Collector updated');
+                } else {
+                    const { error } = await supabaseClient.from('data_collectors').insert([{ name, emp_id: empId, email, phone, district, status }]);
+                    if (error) { showToast(error.message, 'error'); return; }
+                    showToast('Collector added');
+                }
+                modal.style.display = 'none';
+                await refreshAll();
+            });
+        }
+
+        function openBulkModal() {
+            const modal = document.getElementById('bulkModal');
+            document.getElementById('bulkFile').value = '';
+            document.getElementById('bulkPreview').innerHTML = '';
+            document.getElementById('confirmBulk').disabled = true;
+            modal.style.display = 'flex';
+            document.getElementById('bulkFile').onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                Papa.parse(file, { header: true, skipEmptyLines: true, complete: function(results) {
+                    if (results.errors.length) {
+                        document.getElementById('bulkPreview').innerHTML = '<p style="color:red">Error parsing CSV</p>';
+                    } else {
+                        bulkData = results.data;
+                        let html = `<p>${bulkData.length} rows. Preview first 5:</p><table class="data-table" style="font-size:0.7rem;"><thead><tr>${Object.keys(bulkData[0]).map(k => `<th>${k}</th>`).join('')}</tr></thead><tbody>`;
+                        bulkData.slice(0,5).forEach(row => {
+                            html += '<tr>' + Object.values(row).map(v => `<td>${escapeHtml(String(v || ''))}</td>`).join('') + '</tr>';
+                        });
+                        html += `</tbody></table>`;
+                        document.getElementById('bulkPreview').innerHTML = html;
+                        document.getElementById('confirmBulk').disabled = false;
+                    }
+                }});
+            };
+            document.getElementById('confirmBulk').onclick = async function() {
+                if (!bulkData.length) { showToast('No data', 'error'); return; }
+                let added = 0, skipped = 0;
+                for (const row of bulkData) {
+                    const name = row.name?.trim();
+                    const empId = (row.empId || row.empid || row.emcode || '').trim().toUpperCase();
+                    const email = row.email?.trim().toLowerCase();
+                    const phone = row.phone?.trim() || '';
+                    const district = row.district?.trim();
+                    const status = (row.status?.trim() || 'active').toLowerCase();
+                    if (!name || !empId || !email || !district) { skipped++; continue; }
+                    const exists = collectors.some(c => c.emp_id === empId);
+                    if (exists) { skipped++; continue; }
+                    const { error } = await supabaseClient.from('data_collectors').insert([{ name, emp_id: empId, email, phone, district, status }]);
+                    if (error) skipped++;
+                    else added++;
+                }
+                showToast(`${added} added, ${skipped} skipped`);
+                modal.style.display = 'none';
+                await refreshAll();
+            };
+            document.getElementById('downloadTemplate').onclick = function() {
+                const csv = 'name,empId,email,phone,district,status\nJohn Doe,DC-001,john@example.com,0700123456,Kyenjojo,active';
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'collectors_template.csv';
+                a.click();
+                URL.revokeObjectURL(a.href);
+                showToast('Template downloaded');
+            };
+        }
+
+        // ========== EVENT LISTENERS ==========
+        function setupEventListeners() {
+            const toggle = document.getElementById('mobileMenuToggle');
+            const sidebar = document.getElementById('sidebar');
+            if (toggle) toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+            document.addEventListener('click', (e) => {
+                if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !toggle?.contains(e.target)) sidebar.classList.remove('open');
+            });
+            document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.removeItem('loggedInUser'); window.location.href = 'login.html'; });
+            document.getElementById('logout-link').addEventListener('click', () => { sessionStorage.removeItem('loggedInUser'); window.location.href = 'login.html'; });
+            
+            document.querySelectorAll('.user-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const type = tab.dataset.type;
+                    document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.querySelectorAll('.user-panel').forEach(p => p.classList.remove('active'));
+                    document.getElementById(`${type}Panel`).classList.add('active');
+                });
+            });
+            
+            document.getElementById('addAdminBtn').addEventListener('click', () => openAdminModal());
+            document.getElementById('addSupervisorBtn').addEventListener('click', () => openSupervisorModal());
+            document.getElementById('addCollectorBtn').addEventListener('click', () => openCollectorModal());
+            document.getElementById('bulkCollectorBtn').addEventListener('click', openBulkModal);
+            
+            document.getElementById('collStatusFilter').addEventListener('change', renderCollectors);
+            document.getElementById('clearCollFilters').addEventListener('click', () => {
+                document.getElementById('collDistrictSearch').value = '';
+                document.getElementById('collDistrictFilter').value = '';
+                document.getElementById('collStatusFilter').value = '';
+                renderCollectors();
+            });
+            
+            document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', () => btn.closest('.modal').style.display = 'none'));
+            window.addEventListener('click', (e) => { if (e.target.classList.contains('modal')) e.target.style.display = 'none'; });
+        }
+
+        // ========== INIT ==========
+        (async function init() {
+            loggedUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+            if (!loggedUser || loggedUser.role !== 'super_admin') { window.location.href = 'login.html'; return; }
+            document.getElementById('userName').textContent = loggedUser.username;
+            document.getElementById('userAvatar').textContent = loggedUser.username.charAt(0).toUpperCase();
+            await refreshAll();
+            setupEventListeners();
+        })();
+    </script>
+    <script src="responsive.js"></script>
+</body>
+</html>
