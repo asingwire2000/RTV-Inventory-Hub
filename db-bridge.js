@@ -24,6 +24,7 @@ const dbBridge = {
 
     this.syncInProgress = true;
 
+    // If Supabase is unavailable, keep the older localStorage screens usable.
     if (typeof db === 'undefined' || !window.supabaseClient) {
       console.warn('Database bridge could not find Supabase helpers. Using local storage only.');
       this.seedFallbacks();
@@ -33,6 +34,7 @@ const dbBridge = {
     }
 
     try {
+      // Load the main app datasets together so each page starts with fresh cached data.
       const [
         inventoryResult,
         logsResult,
@@ -58,6 +60,7 @@ const dbBridge = {
       if (!logsResult?.error && logsResult?.data) {
         const logs = logsResult.data.map(this.fromDbLog);
         localStorage.setItem('movementLogs', JSON.stringify(logs));
+        // Remember synced log keys because movement logs are append-only records.
         localStorage.setItem(
           '__syncedMovementLogKeys',
           JSON.stringify(logs.map(log => `${log.itemId || log.item_id}|${log.action}|${log.timestamp}`))
@@ -258,6 +261,7 @@ const dbBridge = {
     }
     
     try {
+      // Skip incomplete rows before upserting to avoid database constraint errors.
       const validItems = items.filter(i => i && i.id).map(this.toDbInventory);
       if (validItems.length === 0) return;
       
@@ -307,6 +311,7 @@ const dbBridge = {
       const existing = JSON.parse(localStorage.getItem('__syncedMovementLogKeys') || '[]');
       const existingKeys = new Set(existing);
       
+      // Only send movement logs that were not already synced during hydration.
       const unsynced = logs.filter(log => {
         const key = `${log.itemId || log.item_id}|${log.action}|${log.timestamp}`;
         return !existingKeys.has(key);
@@ -346,6 +351,7 @@ const dbBridge = {
       let updated = false;
       for (const supervisor of supervisors) {
         if (supervisor.username && supervisor.password && !supervisor.user_id) {
+          // New supervisors need both a login user row and a supervisor profile row.
           const result = await db.addSupervisor(supervisor);
           if (!result.error && result.data) {
             supervisor.id = result.data.id || supervisor.id;
@@ -355,6 +361,7 @@ const dbBridge = {
             console.error('Failed to save supervisor:', result.error);
           }
         } else if (supervisor.id) {
+          // Existing supervisors can be upserted directly by profile ID.
           const { error } = await window.supabaseClient
             .from('supervisors')
             .upsert(this.toDbSupervisor(supervisor));

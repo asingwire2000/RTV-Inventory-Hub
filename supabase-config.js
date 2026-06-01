@@ -25,8 +25,12 @@ function formatSupabaseError(error, fallback = 'Database request failed') {
   return formatted || fallback;
 }
 
-// API Helper Functions
+// API helper functions used by the HTML pages. Each method returns a small
+// `{ data, error }` object so page code can show friendly messages consistently.
 const db = {
+  /**
+   * Quick health check used by pages that need to show database connection state.
+   */
   async testConnection() {
     if (!supabaseClient) {
       return { 
@@ -63,6 +67,7 @@ const db = {
         return { error: 'Username and password are required' };
       }
 
+      // Usernames are stored lowercase, so normalize before checking credentials.
       const normalizedUsername = username.trim().toLowerCase();
       const { data: user, error } = await supabaseClient
         .from('users')
@@ -81,6 +86,7 @@ const db = {
       }
       
       if (user.role === 'supervisor') {
+        // Supervisors need their assigned district in session for filtered views.
         const { data: supervisor, error: supError } = await supabaseClient
           .from('supervisors')
           .select('district, id')
@@ -291,6 +297,7 @@ const db = {
         return { error: 'Username and password are required' };
       }
       
+      // A supervisor has two records: one login account and one supervisor profile.
       const { data: user, error: userError } = await supabaseClient
         .from('users')
         .insert([{ 
@@ -307,6 +314,7 @@ const db = {
         return { error: formatSupabaseError(userError, 'Failed to create user') };
       }
       
+      // Link the profile to the user row so login can find district/profile details.
       const { data, error } = await supabaseClient
         .from('supervisors')
         .insert([{
@@ -349,6 +357,7 @@ const db = {
       if (!id) {
         return { error: 'Supervisor ID is required' };
       }
+      // Find the linked login account first so deleting a supervisor removes access too.
       const { data: supervisor } = await supabaseClient
         .from('supervisors')
         .select('user_id')
@@ -455,6 +464,7 @@ const db = {
         return { error: 'Data collector name is required' };
       }
       
+      // Translate the page form shape into the column names used by Supabase.
       const dbCollector = {
         emp_id: collector.emp_id || collector.empId,
         name: collector.name,
@@ -487,6 +497,7 @@ const db = {
         return { error: 'Data collector ID is required' };
       }
       
+      // Keep database field names consistent even if pages use camelCase names.
       const dbUpdates = {
         emp_id: updates.emp_id || updates.empId,
         name: updates.name,

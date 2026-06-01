@@ -6,6 +6,7 @@
 
 class ResponsiveManager {
     constructor() {
+        // Keep all page-wide responsive state here so every HTML page behaves the same way.
         this.currentBreakpoint = null;
         this.breakpoints = {
             large: 1024,
@@ -24,11 +25,147 @@ class ResponsiveManager {
      */
     init() {
         try {
+            this.ensureMobileNavigation();
             this.detectBreakpoint();
             window.addEventListener('resize', this.handleWindowResize.bind(this));
             this.validateResponsiveLayout();
         } catch (error) {
             console.error('[ResponsiveManager] Initialization error:', error);
+        }
+    }
+
+    /**
+     * Add the mobile menu button, backdrop, and sidebar handlers used by pages.
+     */
+    ensureMobileNavigation() {
+        try {
+            const sidebar = document.querySelector('.sidebar');
+            const header = document.querySelector('.header');
+            if (!sidebar || !header) return;
+
+            let toggle = document.querySelector('.menu-toggle, .mobile-menu-toggle');
+            if (!toggle) {
+                // Some pages did not have a mobile menu button, so create one at runtime.
+                toggle = document.createElement('button');
+                toggle.type = 'button';
+                toggle.className = 'menu-toggle mobile-menu-toggle';
+                toggle.innerHTML = '<i class="fas fa-bars"></i>';
+                toggle.title = 'Open navigation menu';
+                toggle.setAttribute('aria-label', 'Open navigation menu');
+                header.insertBefore(toggle, header.firstChild);
+            }
+
+            let backdrop = document.querySelector('.sidebar-backdrop');
+            if (!backdrop) {
+                backdrop = document.createElement('div');
+                backdrop.className = 'sidebar-backdrop';
+                document.body.appendChild(backdrop);
+            }
+
+            if (!document.getElementById('responsive-mobile-nav-styles')) {
+                // Inject only the mobile navigation rules that must exist on every page.
+                const style = document.createElement('style');
+                style.id = 'responsive-mobile-nav-styles';
+                style.textContent = `
+                    .menu-toggle, .mobile-menu-toggle {
+                        display: none;
+                        width: 44px;
+                        height: 44px;
+                        min-width: 44px;
+                        border: 1px solid var(--border, #e2e8f0);
+                        border-radius: 10px;
+                        background: var(--light, #f8fafc);
+                        color: var(--dark, #1e293b);
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        margin-right: 0.75rem;
+                        font-size: 1.15rem;
+                        z-index: 1101;
+                    }
+                    .sidebar-backdrop {
+                        display: none;
+                        position: fixed;
+                        inset: 0;
+                        background: rgba(15, 23, 42, 0.45);
+                        z-index: 999;
+                    }
+                    .sidebar-backdrop.active { display: block; }
+                    @media (max-width: 1024px) {
+                        .menu-toggle, .mobile-menu-toggle { display: inline-flex !important; }
+                        .sidebar {
+                            position: fixed !important;
+                            top: 0 !important;
+                            left: 0 !important;
+                            height: 100vh !important;
+                            transform: translateX(-105%) !important;
+                            transition: transform 0.25s ease !important;
+                            z-index: 1000 !important;
+                        }
+                        .sidebar.open, .sidebar.active { transform: translateX(0) !important; }
+                        .main-content {
+                            margin-left: 0 !important;
+                            max-width: 100% !important;
+                            width: 100% !important;
+                        }
+                        .header {
+                            align-items: flex-start;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            const openSidebar = () => {
+                // Lock page scroll while the off-canvas sidebar is open on small screens.
+                sidebar.classList.add('open', 'active');
+                backdrop.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            };
+            const closeSidebar = () => {
+                sidebar.classList.remove('open', 'active');
+                backdrop.classList.remove('active');
+                document.body.style.overflow = '';
+            };
+            const toggleSidebar = (event) => {
+                event?.stopPropagation();
+                if (sidebar.classList.contains('open') || sidebar.classList.contains('active')) closeSidebar();
+                else openSidebar();
+            };
+
+            toggle.addEventListener('click', toggleSidebar);
+            backdrop.addEventListener('click', closeSidebar);
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape') closeSidebar();
+            });
+            sidebar.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    // Close navigation after choosing a page so mobile users return to content.
+                    if (window.innerWidth < 1024) closeSidebar();
+                });
+            });
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) closeSidebar();
+            });
+            this.highlightActiveMenuItem();
+        } catch (error) {
+            console.error('[ResponsiveManager] Mobile navigation setup error:', error);
+        }
+    }
+
+    /**
+     * Keep sidebar navigation highlighting consistent across standalone pages.
+     */
+    highlightActiveMenuItem() {
+        try {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.menu-item').forEach(item => {
+                const href = item.getAttribute('href');
+                if (!href) return;
+                item.classList.toggle('active', href === currentPage);
+            });
+        } catch (error) {
+            console.error('[ResponsiveManager] Active menu highlight error:', error);
         }
     }
 
