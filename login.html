@@ -17,6 +17,8 @@
             --border-radius: 12px;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --transition: all 0.3s ease;
+            --super-admin: #7c3aed;
+            --super-admin-dark: #6d28d9;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -102,6 +104,17 @@
             font-size: 0.9rem;
         }
 
+        .info-message {
+            background-color: #dbeafe;
+            color: #1e40af;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1.25rem;
+            display: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
         .forgot-link {
             display: block;
             text-align: right;
@@ -126,6 +139,108 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        .role-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .role-admin { background: #dbeafe; color: #1e40af; }
+        .role-supervisor { background: #d1fae5; color: #065f46; }
+        .role-super-admin { background: #ede9fe; color: #5b21b6; }
+
+        @media (max-width: 768px) {
+            .login-container {
+                width: 95%;
+                max-width: 380px;
+                padding: 2rem;
+            }
+
+            .login-logo {
+                width: 80px;
+                height: 80px;
+            }
+
+            .login-container h1 {
+                font-size: 1.4rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+
+            .form-control {
+                padding: 0.75rem 0.9rem;
+                font-size: 0.95rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.2rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                width: 92%;
+                max-width: 95vw;
+                padding: 1.75rem 1rem;
+            }
+
+            .login-logo {
+                width: 70px;
+                height: 70px;
+                margin-bottom: 0.75rem;
+            }
+
+            .login-container h1 {
+                font-size: 1.2rem;
+                margin-bottom: 0.15rem;
+            }
+
+            .subtitle {
+                font-size: 0.85rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .form-group {
+                margin-bottom: 0.9rem;
+            }
+
+            .form-group label {
+                font-size: 0.85rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .form-control {
+                padding: 0.7rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                padding: 0.65rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .error-message,
+            .info-message {
+                padding: 0.6rem;
+                font-size: 0.85rem;
+                margin-bottom: 1rem;
+            }
+
+            .forgot-link {
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -135,6 +250,7 @@
         <p class="subtitle">Sign in to manage district inventory</p>
 
         <div id="error-message" class="error-message"></div>
+        <div id="info-message" class="info-message"></div>
 
         <form id="login-form">
             <div class="form-group">
@@ -155,6 +271,12 @@
                 <i class="fas fa-sign-in-alt"></i> Sign In
             </button>
         </form>
+
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+            <p style="font-size: 0.7rem; color: var(--secondary);">
+                <i class="fas fa-shield-alt"></i> Secure login for authorized personnel only
+            </p>
+        </div>
     </div>
 
     <script src="supabase-config.js"></script>
@@ -162,21 +284,39 @@
         document.addEventListener('DOMContentLoaded', () => {
             const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
             if (loggedInUser) {
-                window.location.href = loggedInUser.role === 'admin' ? 'index.html' : 'supervisor.html';
+                // Redirect based on role
+                if (loggedInUser.role === 'super_admin') {
+                    window.location.href = 'super-admin.html';
+                } else if (loggedInUser.role === 'admin') {
+                    window.location.href = 'index.html';
+                } else if (loggedInUser.role === 'supervisor') {
+                    window.location.href = 'supervisor.html';
+                } else {
+                    window.location.href = 'login.html';
+                }
             }
 
             const loginForm = document.getElementById('login-form');
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
             const errorMessage = document.getElementById('error-message');
+            const infoMessage = document.getElementById('info-message');
             const loginBtn = document.getElementById('login-btn');
 
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 errorMessage.style.display = 'none';
+                infoMessage.style.display = 'none';
                 
-                const username = usernameInput.value.trim().toLowerCase();
+                const username = usernameInput.value.trim();
                 const password = passwordInput.value;
+
+                if (!username || !password) {
+                    showError('Please enter both username and password.');
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+                    return;
+                }
 
                 // Show loading state
                 const originalBtnText = loginBtn.innerHTML;
@@ -184,45 +324,97 @@
                 loginBtn.innerHTML = '<span class="loading"></span> Signing in...';
 
                 try {
+                    // Test database connection
                     const { error: connectionError } = await db.testConnection();
                     if (connectionError) {
-                        showError(connectionError);
+                        showError('Cannot connect to database. Please check your internet connection.');
                         loginBtn.disabled = false;
                         loginBtn.innerHTML = originalBtnText;
                         return;
                     }
 
-                    // First check if it's an admin
-                    const { data: admin, error: adminError } = await db.getAdminCredentials();
-                    if (adminError) {
-                        showError(adminError);
-                        loginBtn.disabled = false;
-                        loginBtn.innerHTML = originalBtnText;
-                        return;
-                    }
-                    
-                    if (!adminError && admin && username === admin.username && password === admin.password) {
-                        sessionStorage.setItem('loggedInUser', JSON.stringify({ username: 'Admin', role: 'admin' }));
-                        window.location.href = 'index.html';
-                        return;
-                    }
-                    
-                    // If not admin, check supervisor
-                    const { data: user, error } = await db.login(username, password);
-                    
-                    if (!error && user && user.role === 'supervisor') {
-                        sessionStorage.setItem('loggedInUser', JSON.stringify({
-                            username: user.name,
-                            role: 'supervisor',
-                            district: user.district,
-                            id: user.supervisorId
+                    // First check if it's a super admin
+                    const { data: superAdmin, error: superAdminError } = await supabaseClient
+                        .from('users')
+                        .select('*')
+                        .eq('username', username)
+                        .eq('password', password)
+                        .eq('role', 'super_admin')
+                        .maybeSingle();
+
+                    if (!superAdminError && superAdmin) {
+                        sessionStorage.setItem('loggedInUser', JSON.stringify({ 
+                            username: superAdmin.username, 
+                            role: 'super_admin',
+                            id: superAdmin.id,
+                            name: superAdmin.name
                         }));
-                        window.location.href = 'supervisor.html';
-                    } else {
-                        showError(error || 'Invalid username or password. Please try again.');
-                        loginBtn.disabled = false;
-                        loginBtn.innerHTML = originalBtnText;
+                        showInfo('Redirecting to Super Admin Dashboard...');
+                        setTimeout(() => {
+                            window.location.href = 'super-admin.html';
+                        }, 1000);
+                        return;
                     }
+                    
+                    // Then check if it's an admin
+                    const { data: admin, error: adminError } = await supabaseClient
+                        .from('users')
+                        .select('*')
+                        .eq('username', username)
+                        .eq('password', password)
+                        .eq('role', 'admin')
+                        .maybeSingle();
+
+                    if (!adminError && admin) {
+                        sessionStorage.setItem('loggedInUser', JSON.stringify({ 
+                            username: admin.username, 
+                            role: 'admin',
+                            id: admin.id,
+                            name: admin.name
+                        }));
+                        showInfo('Redirecting to Admin Dashboard...');
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 1000);
+                        return;
+                    }
+                    
+                    // Then check if it's a supervisor
+                    const { data: supervisorUser, error: supervisorError } = await supabaseClient
+                        .from('users')
+                        .select('*')
+                        .eq('username', username)
+                        .eq('password', password)
+                        .eq('role', 'supervisor')
+                        .maybeSingle();
+
+                    if (!supervisorError && supervisorUser) {
+                        // Get supervisor details
+                        const { data: supervisor } = await supabaseClient
+                            .from('supervisors')
+                            .select('district, id')
+                            .eq('user_id', supervisorUser.id)
+                            .maybeSingle();
+                        
+                        sessionStorage.setItem('loggedInUser', JSON.stringify({
+                            username: supervisorUser.name || supervisorUser.username,
+                            role: 'supervisor',
+                            district: supervisor?.district || 'Unknown',
+                            id: supervisor?.id,
+                            user_id: supervisorUser.id
+                        }));
+                        showInfo('Redirecting to Supervisor Dashboard...');
+                        setTimeout(() => {
+                            window.location.href = 'supervisor.html';
+                        }, 1000);
+                        return;
+                    }
+                    
+                    // If no user found
+                    showError('Invalid username or password. Please try again.');
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = originalBtnText;
+                    
                 } catch (err) {
                     console.error('Login error:', err);
                     showError('An error occurred. Please try again.');
@@ -234,31 +426,43 @@
             function showError(message) {
                 errorMessage.textContent = message;
                 errorMessage.style.display = 'block';
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 5000);
+            }
+
+            function showInfo(message) {
+                infoMessage.textContent = message;
+                infoMessage.style.display = 'block';
             }
 
             document.getElementById('forgot-password-link').addEventListener('click', async (e) => {
                 e.preventDefault();
                 const username = usernameInput.value.trim();
                 if (username) {
-                    await db.addNotification({
-                        message: `Password reset requested for username: ${username}`,
-                        type: 'password_reset',
-                        read: false
-                    });
-                    alert('A password reset request has been sent to the administrator.');
+                    try {
+                        await db.addNotification({
+                            message: `Password reset requested for username: ${username}`,
+                            type: 'password_reset',
+                            read: false
+                        });
+                        alert('A password reset request has been sent to the Super Administrator.');
+                    } catch (err) {
+                        alert('Please contact the system administrator for password reset.');
+                    }
                 } else {
                     alert('Please enter your username first.');
                 }
             });
 
             document.getElementById('toggle-password').addEventListener('click', function() {
-                const passwordInput = document.getElementById('password');
+                const passwordField = document.getElementById('password');
                 const icon = this.querySelector('i');
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
                     icon.classList.replace('fa-eye', 'fa-eye-slash');
                 } else {
-                    passwordInput.type = 'password';
+                    passwordField.type = 'password';
                     icon.classList.replace('fa-eye-slash', 'fa-eye');
                 }
             });
@@ -270,6 +474,14 @@
             passwordInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') loginForm.dispatchEvent(new Event('submit'));
             });
+
+            // Add demo credentials hint (only in development)
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.log('Development mode - Demo credentials:');
+                console.log('  Super Admin: super_admin / super123');
+                console.log('  Admin: admin / admin123');
+                console.log('  Supervisor: Martin / password123');
+            }
         });
     </script>
 </body>

@@ -18,7 +18,6 @@
             --card-bg: #ffffff;
             --border: #e2e8f0;
             --sidebar-width: 260px;
-            --header-height: 70px;
             --border-radius: 12px;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --transition: all 0.3s ease;
@@ -42,7 +41,6 @@
             min-height: 100vh;
         }
 
-        /* Sidebar Styles */
         .sidebar {
             width: var(--sidebar-width);
             background: #053d1a;
@@ -53,16 +51,7 @@
             transition: var(--transition);
             z-index: 1000;
         }
-        .sidebar-logo,
-        .logo {
-            height: 80px;
-            width: 80px;
-            object-fit: contain;
-            background: white;
-            padding: 10px;
-            border-radius: 18px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-        }
+
         .sidebar-header {
             padding: 1.5rem 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -71,6 +60,16 @@
             align-items: center;
             gap: 0.75rem;
             text-align: center;
+        }
+
+        .sidebar-logo {
+            height: 80px;
+            width: 80px;
+            object-fit: contain;
+            background: white;
+            padding: 10px;
+            border-radius: 18px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
         }
 
         .sidebar-header h2 {
@@ -102,14 +101,22 @@
             text-align: center;
         }
 
-        /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
             padding: 1.5rem;
+            transition: var(--transition);
         }
 
-        /* Header */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark);
+        }
+
         .header {
             background: white;
             padding: 1rem 1.5rem;
@@ -119,22 +126,24 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .header-title h1 {
             font-size: 1.75rem;
             font-weight: 700;
             color: var(--dark);
-            margin-bottom: 0.25rem;
         }
 
         .header-title p {
             color: var(--secondary);
             font-size: 0.9rem;
+            margin-top: 0.25rem;
         }
-        
+
         .header-right {
-             display: flex;
+            display: flex;
             align-items: center;
             gap: 1.5rem;
         }
@@ -157,37 +166,126 @@
             font-weight: 600;
         }
 
-        /* Card Styles */
-        .card {
-            background: var(--card-bg);
+        .settings-container {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .settings-sidebar {
+            width: 280px;
+            background: white;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             overflow: hidden;
-            margin-bottom: 1.5rem;
+            flex-shrink: 0;
         }
 
-        .card-header {
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--border);
+        .settings-nav {
+            list-style: none;
         }
-        
-        .card-header h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
+
+        .settings-nav-item {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--secondary);
+        }
+
+        .settings-nav-item:hover {
+            background: var(--light);
             color: var(--dark);
         }
 
-        .card-body {
+        .settings-nav-item.active {
+            background: var(--light);
+            border-left-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .settings-nav-item i {
+            width: 20px;
+        }
+
+        .settings-content {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .settings-card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .settings-card-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .settings-card-body {
             padding: 1.5rem;
         }
 
-        /* Buttons */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            padding: 0.6rem 1.2rem;
+            padding: 0.65rem 1.25rem;
             border-radius: 8px;
             font-weight: 500;
             cursor: pointer;
@@ -196,96 +294,426 @@
             font-size: 0.9rem;
         }
 
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--secondary); }
-        .btn-outline:hover { background: var(--light); }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-danger:hover { background: #dc2626; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-success:hover { background: #0da271; }
-        .btn.btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        /* Table Styles */
-        .table-responsive { overflow-x: auto; }
-        .data-table { width: 100%; border-collapse: collapse; }
-        .data-table th, .data-table td { padding: 1rem 1.25rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
-        .data-table th { background-color: var(--light); font-weight: 600; color: var(--secondary); font-size: 0.9rem; }
-        .data-table tbody tr:hover { background-color: #f8fafc; }
-        .table-actions { display: flex; gap: 0.5rem; }
-
-        /* Status & District Badges */
-        .badge { display: inline-block; padding: 0.35em 0.65em; font-size: 0.75em; font-weight: 600; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.375rem; }
-        .badge-success { color: #065f46; background-color: #d1fae5; }
-        .badge-warning { color: #92400e; background-color: #fef3c7; }
-        .district-badge { background-color: #e0e7ff; color: #3730a3; text-transform: capitalize; }
-
-        /* Alert Messages */
-        .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; display: none; }
-        .alert-success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-        .alert-error { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-
-        /* Form Styles */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.25rem;
+        .btn-primary {
+            background: var(--primary);
+            color: white;
         }
-        .form-group { margin-bottom: 1.25rem; }
-        .form-group.full-width { grid-column: 1 / -1; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--dark); }
-        .form-control { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; transition: var(--transition); }
-        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        .form-control.error { border-color: var(--danger); }
-        .form-text { font-size: 0.8rem; color: var(--secondary); margin-top: 0.25rem; }
-        .password-toggle { position: relative; }
-        .password-toggle .form-control { padding-right: 2.5rem; }
-        .toggle-password { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--secondary); cursor: pointer; }
 
-        /* Modal Styles */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 2000; align-items: center; justify-content: center; }
-        .modal-content { background-color: white; border-radius: var(--border-radius); width: 90%; max-width: 600px; box-shadow: var(--shadow); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; }
-        .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .modal-header h3 { font-size: 1.2rem; font-weight: 600; color: var(--dark); }
-        .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--secondary); }
-        .modal-body { padding: 1.5rem; overflow-y: auto; flex: 1; min-height: 0; }
-        .modal-footer { padding: 1.25rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
 
-        /* Table Controls (Search/Filter) */
-        .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
-        .search-container { position: relative; flex-grow: 1; max-width: 400px; }
-        .search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
-        .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--secondary); }
-        
-        /* Settings Tabs */
-        .settings-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; flex-wrap: wrap;}
-        .settings-tab { padding: 0.75rem 1.5rem; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; color: var(--secondary); transition: var(--transition); }
-        .settings-tab:hover { color: var(--primary); }
-        .settings-tab.active { border-bottom-color: var(--primary); color: var(--primary); }
-        .settings-content { display: none; }
-        .settings-content.active { display: block; }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--secondary);
+        }
 
-        /* Danger Zone */
-        .danger-zone { border: 2px solid var(--danger); border-radius: var(--border-radius); margin-top: 2rem; }
-        .danger-zone .card-header { background-color: #fee2e2; }
-        .danger-zone .card-header h3 { color: #b91c1c; }
-        .danger-zone p { margin-bottom: 1rem; color: #b91c1c; }
+        .btn-outline:hover {
+            background: var(--light);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th, .data-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            background: var(--light);
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .data-table tr:hover {
+            background: var(--light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-purple { background: #ede9fe; color: #5b21b6; }
+        .badge-gold { background: #fef3c7; color: #b45309; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--secondary);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1rem 0;
+        }
+
+        .form-text {
+            font-size: 0.75rem;
+            color: var(--secondary);
+            margin-top: 0.25rem;
+            display: block;
+        }
+
+        .super-admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .info-banner {
+            background: #dbeafe;
+            border-left: 4px solid var(--primary);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark);
+            padding: 0.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--light);
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 1024px) {
+            .header-right {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: var(--sidebar-width);
+                height: 100vh;
+                z-index: 999;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .mobile-menu-toggle {
+                display: flex;
+            }
+
+            .header {
+                padding: 0.75rem 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .header-title h1 {
+                font-size: 1.4rem;
+            }
+
+            .header-title p {
+                display: none;
+            }
+
+            .header-right {
+                gap: 0.5rem;
+            }
+
+            .user-profile {
+                gap: 0.5rem;
+            }
+
+            .user-profile div:not(.avatar) {
+                display: none;
+            }
+
+            .avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+
+            .btn-outline {
+                display: none;
+            }
+
+            .settings-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .settings-sidebar {
+                width: 100%;
+                order: -1;
+            }
+
+            .settings-content {
+                min-width: 100%;
+            }
+
+            .settings-card {
+                margin-bottom: 1rem;
+            }
+
+            .settings-card-header {
+                padding: 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .settings-card-header h3 {
+                font-size: 1rem;
+            }
+
+            .settings-card-body {
+                padding: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+
+            .form-group label {
+                font-size: 0.9rem;
+            }
+
+            .form-control, .form-select {
+                padding: 0.65rem;
+                font-size: 1rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .data-table {
+                font-size: 0.85rem;
+            }
+
+            .data-table th, .data-table td {
+                padding: 0.5rem 0.75rem;
+            }
+
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .badge {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.65rem;
+            }
+
+            .alert {
+                padding: 0.65rem;
+                font-size: 0.9rem;
+            }
+
+            .form-text {
+                font-size: 0.7rem;
+            }
+
+            .super-admin-badge {
+                font-size: 0.65rem;
+                padding: 0.2rem 0.5rem;
+            }
+
+            .info-banner {
+                padding: 0.65rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 0.75rem;
+            }
+
+            .header {
+                padding: 0.5rem 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .header-title h1 {
+                font-size: 1.15rem;
+            }
+
+            .settings-nav-item {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .settings-card-header {
+                padding: 0.75rem;
+            }
+
+            .settings-card-body {
+                padding: 0.75rem;
+            }
+
+            .data-table th, .data-table td {
+                padding: 0.4rem 0.5rem;
+            }
+
+            .btn-sm {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.75rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                max-width: none;
+            }
+        }
     </style>
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
     <script>
-        // Security Check: This script runs first to protect the page.
         const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        if (!loggedInUser || loggedInUser.role !== 'admin') {
+        if (!loggedInUser) {
             window.location.href = 'login.html';
         }
+        
+        // Regular admin can access settings
+        if (loggedInUser.role !== 'admin' && loggedInUser.role !== 'super_admin') {
+            window.location.href = 'supervisor.html';
+        }
+        
+        const isSuperAdmin = loggedInUser.role === 'super_admin';
     </script>
+
     <div class="app-container">
         <aside class="sidebar">
             <div class="sidebar-header">
-                 <img src="rtv logo.svg" alt="RTV Inventory Hub Logo" class="sidebar-logo">
-                 <h2>RTV Inventory Hub</h2>
+                <img src="rtv logo.svg" alt="Logo" class="sidebar-logo">
+                <h2>RTV Inventory Hub</h2>
             </div>
             <nav class="sidebar-menu">
                 <a href="index.html" class="menu-item"><i class="fas fa-home"></i><span>Dashboard</span></a>
@@ -293,17 +721,21 @@
                 <a href="supervisor.html" class="menu-item"><i class="fas fa-user-shield"></i><span>Supervisor</span></a>
                 <a href="transfers.html" class="menu-item"><i class="fas fa-exchange-alt"></i><span>Transfers</span></a>
                 <a href="reports.html" class="menu-item"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
+                <a href="data-collectors.html" class="menu-item"><i class="fas fa-users"></i><span>Data Collectors</span></a>
                 <a href="settings.html" class="menu-item active"><i class="fas fa-cog"></i><span>Settings</span></a>
             </nav>
         </aside>
 
         <main class="main-content">
             <header class="header">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" title="Toggle Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <div class="header-title">
-                    <h1>Settings</h1>
-                    <p>Manage system settings and user accounts</p>
+                    <h1><i class="fas fa-cog"></i> Settings</h1>
+                    <p>Configure system settings and manage user accounts</p>
                 </div>
-                 <div class="header-right">
+                <div class="header-right">
                     <div class="user-profile">
                         <div class="avatar" id="user-avatar">A</div>
                         <div>
@@ -315,628 +747,863 @@
                 </div>
             </header>
 
-            <div class="settings-tabs">
-                <div class="settings-tab active" data-tab="users">User Management</div>
-                <div class="settings-tab" data-tab="admin">Admin Profile</div>
-                <div class="settings-tab" data-tab="system">System Configuration</div>
-            </div>
-            
-            <div class="settings-content active" id="usersTab">
-                <div class="card">
-                    <div class="card-header"><h3>Supervisor Accounts</h3></div>
-                    <div class="card-body">
-                        <div class="table-controls">
-                            <div class="search-container">
-                                <input type="text" class="search-input" placeholder="Search supervisors..." id="supervisorSearchInput">
-                                <i class="fas fa-search search-icon"></i>
-                            </div>
-                             <button type="button" class="btn btn-primary" id="addSupervisorBtn"><i class="fas fa-plus"></i> Add Supervisor</button>
-                        </div>
-                        <div id="supervisorAlert" class="alert"></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>Supervisor Info</th><th>Contact</th><th>District</th><th>Status</th><th>Actions</th></tr></thead>
-                                <tbody id="supervisorsTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
+            <div class="settings-container">
+                <div class="settings-sidebar">
+                    <ul class="settings-nav">
+                        <li class="settings-nav-item active" data-section="profile"><i class="fas fa-user-circle"></i> Profile Settings</li>
+                        <li class="settings-nav-item" data-section="security"><i class="fas fa-shield-alt"></i> Security</li>
+                        <li class="settings-nav-item" data-section="admin-users"><i class="fas fa-user-shield"></i> Admin Users</li>
+                        <li class="settings-nav-item" data-section="districts"><i class="fas fa-map-marker-alt"></i> District Management</li>
+                        <li class="settings-nav-item" data-section="supervisors"><i class="fas fa-user-tie"></i> Supervisor Management</li>
+                        <li class="settings-nav-item" data-section="backup"><i class="fas fa-database"></i> Backup & Restore</li>
+                        <li class="settings-nav-item" data-section="advanced"><i class="fas fa-exclamation-triangle"></i> Advanced</li>
+                    </ul>
                 </div>
 
-                <div class="card">
-                    <div class="card-header"><h3>Data Collector Accounts</h3></div>
-                    <div class="card-body">
-                         <div class="table-controls">
-                            <div class="search-container">
-                                <input type="text" class="search-input" placeholder="Search data collectors..." id="fieldOfficerSearchInput">
-                                <i class="fas fa-search search-icon"></i>
+                <div class="settings-content">
+                    <!-- Profile Settings Section -->
+                    <div id="profile-section" class="settings-section active">
+                        <div class="settings-card">
+                            <div class="settings-card-header"><h3><i class="fas fa-user-circle"></i> Administrator Profile</h3></div>
+                            <div class="settings-card-body">
+                                <div id="profileAlert" class="alert"></div>
+                                <div class="form-group">
+                                    <label>Username</label>
+                                    <input type="text" id="adminUsername" class="form-control" readonly value="admin">
+                                    <small class="form-text">Username cannot be changed</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Full Name</label>
+                                    <input type="text" id="adminName" class="form-control" placeholder="Administrator">
+                                </div>
+                                <div class="form-group">
+                                    <label>Email Address</label>
+                                    <input type="email" id="adminEmail" class="form-control" placeholder="admin@rtv.org">
+                                </div>
+                                <button class="btn btn-primary" id="updateProfileBtn"><i class="fas fa-save"></i> Update Profile</button>
                             </div>
-                             <button type="button" class="btn btn-primary" id="addFieldOfficerBtn"><i class="fas fa-plus"></i> Add Data Collector</button>
-                        </div>
-                        <div id="fieldOfficerAlert" class="alert"></div>
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead><tr><th>Data Collector Info</th><th>Contact</th><th>District</th><th>Status</th><th>Actions</th></tr></thead>
-                                <tbody id="fieldOfficersTableBody"></tbody>
-                            </table>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="settings-content" id="adminTab">
-                <div class="card">
-                    <div class="card-header"><h3>Change Admin Password</h3></div>
-                    <div class="card-body">
-                        <div id="adminAlert" class="alert"></div>
-                        <p class="form-text">Note: The default admin username is 'admin' and cannot be changed. The default password is 'admin123'. For security, it's recommended to change it.</p>
-                        <form id="adminPasswordForm">
-                            <div class="form-group password-toggle">
-                                <label for="currentPassword">Current Password</label>
-                                <input type="password" class="form-control" id="currentPassword" required>
-                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                    <!-- Security Section -->
+                    <div id="security-section" class="settings-section">
+                        <div class="settings-card">
+                            <div class="settings-card-header"><h3><i class="fas fa-lock"></i> Change Password</h3></div>
+                            <div class="settings-card-body">
+                                <div id="passwordAlert" class="alert"></div>
+                                <div class="form-group">
+                                    <label>Current Password</label>
+                                    <input type="password" id="currentPassword" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>New Password</label>
+                                    <input type="password" id="newPassword" class="form-control" required minlength="6">
+                                    <small class="form-text">Password must be at least 6 characters</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Confirm New Password</label>
+                                    <input type="password" id="confirmPassword" class="form-control" required>
+                                </div>
+                                <button class="btn btn-primary" id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</button>
                             </div>
-                            <div class="form-group password-toggle">
-                                <label for="newPassword">New Password</label>
-                                <input type="password" class="form-control" id="newPassword" required minlength="6">
-                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
-                                <div class="form-text">Password must be at least 6 characters.</div>
-                            </div>
-                            <div class="form-group password-toggle">
-                                <label for="confirmNewPassword">Confirm New Password</label>
-                                <input type="password" class="form-control" id="confirmNewPassword" required>
-                                <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
-                            </div>
-                            <button type="submit" class="btn btn-primary" id="adminPasswordSubmitBtn">
-                                Update Password
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div class="settings-content" id="systemTab">
-                <div class="card">
-                    <div class="card-header"><h3>Manage Districts</h3></div>
-                    <div class="card-body">
-                        <div id="districtAlert" class="alert"></div>
-                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                            <table class="data-table">
-                                <thead><tr><th>District Name</th><th>Users Assigned</th><th>Action</th></tr></thead>
-                                <tbody id="districtsTableBody"></tbody>
-                            </table>
                         </div>
-                        <form id="addDistrictForm" style="margin-top: 1.5rem; display: flex; gap: 1rem;">
-                            <input type="text" id="newDistrictName" class="form-control" placeholder="Enter new district name" required>
-                            <button type="submit" class="btn btn-primary">Add District</button>
-                        </form>
+
+                        <div class="settings-card">
+                            <div class="settings-card-header"><h3><i class="fas fa-history"></i> Session Management</h3></div>
+                            <div class="settings-card-body">
+                                <p>Manage active sessions and security settings.</p>
+                                <div class="divider"></div>
+                                <button class="btn btn-outline" id="clearSessionsBtn"><i class="fas fa-sign-out-alt"></i> Clear All Active Sessions</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="card danger-zone">
-                     <div class="card-header"><h3>Danger Zone</h3></div>
-                     <div class="card-body">
-                         <p>This action will permanently delete all inventory, users, and logs. This cannot be undone.</p>
-                         <button class="btn btn-danger" id="resetDataBtn">Reset Application Data</button>
-                     </div>
+
+                    <!-- Admin Users Management Section (Admins can manage fellow admins) -->
+                    <div id="admin-users-section" class="settings-section">
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <h3><i class="fas fa-user-shield"></i> Administrator Accounts</h3>
+                                <button class="btn btn-primary btn-sm" id="addAdminBtn"><i class="fas fa-plus"></i> Add Admin</button>
+                            </div>
+                            <div class="settings-card-body">
+                                <div id="adminUserAlert" class="alert"></div>
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr><th>Username</th><th>Full Name</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr>
+                                        </thead>
+                                        <tbody id="adminUsersList"></tbody>
+                                    </table>
+                                </div>
+                                <div class="info-banner" style="margin-top: 1rem;">
+                                    <i class="fas fa-info-circle"></i> Administrators can create, edit, and manage other admin accounts. They can also reset passwords for fellow admins.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- District Management Section -->
+                    <div id="districts-section" class="settings-section">
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <h3><i class="fas fa-map-marker-alt"></i> Manage Districts</h3>
+                                <button class="btn btn-primary btn-sm" id="addDistrictBtn"><i class="fas fa-plus"></i> Add District</button>
+                            </div>
+                            <div class="settings-card-body">
+                                <div id="districtAlert" class="alert"></div>
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead><tr><th>District Name</th><th>Status</th><th>Actions</th></tr></thead>
+                                        <tbody id="districtsList"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Supervisor Management Section -->
+                    <div id="supervisors-section" class="settings-section">
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <h3><i class="fas fa-user-tie"></i> Supervisor Accounts</h3>
+                                <button class="btn btn-primary btn-sm" id="addSupervisorBtn"><i class="fas fa-plus"></i> Add Supervisor</button>
+                            </div>
+                            <div class="settings-card-body">
+                                <div id="supervisorAlert" class="alert"></div>
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead><tr><th>Name</th><th>Email</th><th>District</th><th>Status</th><th>Actions</th></tr></thead>
+                                        <tbody id="supervisorsList"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backup & Restore Section (Full access for Super Admin, limited for Admin) -->
+                    <div id="backup-section" class="settings-section">
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <h3><i class="fas fa-download"></i> Export Data</h3>
+                                <?php if (isSuperAdmin): ?>
+                                <span class="super-admin-badge"><i class="fas fa-crown"></i> Super Admin</span>
+                                <?php else: ?>
+                                <span class="badge badge-info">Read Only</span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="settings-card-body">
+                                <div id="backupAlert" class="alert"></div>
+                                <p>Export your data for backup purposes.</p>
+                                <div class="form-row" style="margin-top: 1rem;">
+                                    <button class="btn btn-outline" id="exportInventoryBtn"><i class="fas fa-boxes"></i> Export Inventory</button>
+                                    <button class="btn btn-outline" id="exportAdminsBtn"><i class="fas fa-user-shield"></i> Export Admins</button>
+                                    <button class="btn btn-outline" id="exportSupervisorsBtn"><i class="fas fa-user-tie"></i> Export Supervisors</button>
+                                    <button class="btn btn-outline" id="exportAllBtn"><i class="fas fa-database"></i> Export All Data</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <?php if (isSuperAdmin): ?>
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <h3><i class="fas fa-upload"></i> Import Data</h3>
+                                <span class="super-admin-badge"><i class="fas fa-crown"></i> Super Admin Only</span>
+                            </div>
+                            <div class="settings-card-body">
+                                <p>Import data from CSV or JSON files.</p>
+                                <div class="form-group">
+                                    <label>Select File</label>
+                                    <input type="file" id="importFile" class="form-control" accept=".csv,.json">
+                                </div>
+                                <button class="btn btn-primary" id="importBtn"><i class="fas fa-upload"></i> Import Data</button>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Advanced Section - Different for Super Admin vs Admin -->
+                    <div id="advanced-section" class="settings-section">
+                        <?php if (isSuperAdmin): ?>
+                        <!-- Super Admin Advanced Section -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <h3><i class="fas fa-trash-alt"></i> Clear Activity Logs</h3>
+                                <span class="super-admin-badge"><i class="fas fa-crown"></i> Super Admin Only</span>
+                            </div>
+                            <div class="settings-card-body">
+                                <div id="clearLogsAlert" class="alert"></div>
+                                <p>This will permanently delete all activity logs from the system.</p>
+                                <div class="form-group">
+                                    <label>Type "CLEAR LOGS" to confirm</label>
+                                    <input type="text" id="clearLogsConfirm" class="form-control" placeholder="Type CLEAR LOGS to confirm">
+                                </div>
+                                <button class="btn btn-warning" id="clearLogsBtn" disabled><i class="fas fa-eraser"></i> Clear Activity Logs</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-card danger-zone">
+                            <div class="settings-card-header">
+                                <h3><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+                                <span class="super-admin-badge"><i class="fas fa-crown"></i> Super Admin Only</span>
+                            </div>
+                            <div class="settings-card-body">
+                                <div id="dangerAlert" class="alert"></div>
+                                <p><strong>Warning:</strong> These actions are irreversible and will permanently delete data.</p>
+                                <div class="form-group">
+                                    <label>Type "DELETE ALL DATA" to confirm</label>
+                                    <input type="text" id="resetConfirm" class="form-control" placeholder="Type DELETE ALL DATA to confirm">
+                                </div>
+                                <button class="btn btn-danger" id="resetAllDataBtn" disabled>
+                                    <i class="fas fa-trash-alt"></i> Permanently Delete All Data
+                                </button>
+                            </div>
+                        </div>
+                        <?php else: ?>
+                        <!-- Regular Admin Advanced Section - Limited -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <h3><i class="fas fa-lock"></i> Limited Access</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-shield-alt"></i> 
+                                    <strong>Administrator Access Level</strong>
+                                </div>
+                                <p>As an Administrator, you have the following permissions:</p>
+                                <ul style="margin-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                                    <li>✓ Create, edit, and manage other admin accounts</li>
+                                    <li>✓ Reset passwords for fellow administrators</li>
+                                    <li>✓ Manage supervisor accounts</li>
+                                    <li>✓ Manage data collectors</li>
+                                    <li>✓ Manage districts</li>
+                                    <li>✓ Export data for backup</li>
+                                </ul>
+                                <p>For security and audit purposes, regular administrators <strong>cannot</strong>:</p>
+                                <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--danger);">
+                                    <li>✗ Clear activity logs</li>
+                                    <li>✗ Import data</li>
+                                    <li>✗ Delete system data</li>
+                                    <li>✗ Reset the entire system</li>
+                                </ul>
+                                <div class="divider"></div>
+                                <p>To view activity logs, please go to the <a href="reports.html" style="color: var(--primary);">Reports page</a>.</p>
+                                <p>For system-level operations, contact your <strong>Super Administrator</strong>.</p>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <div class="modal" id="supervisorModal">
+    <!-- Add/Edit Admin Modal -->
+    <div id="adminModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="supervisorModalTitle">Add Supervisor</h3>
+                <h3 id="adminModalTitle">Add Administrator</h3>
                 <button class="modal-close">&times;</button>
             </div>
+            <div class="modal-body">
+                <form id="adminForm">
+                    <input type="hidden" id="adminId">
+                    <div class="form-group">
+                        <label>Username *</label>
+                        <input type="text" id="adminUsername" class="form-control" required>
+                        <small class="form-text">Username must be unique and will be used for login</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input type="text" id="adminFullName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="adminEmailAddr" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="adminPassword" class="form-control">
+                        <small class="form-text">Minimum 6 characters. Leave blank to keep current password for existing users</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="adminConfirmPassword" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="adminStatus" class="form-select">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline modal-close">Cancel</button>
+                <button class="btn btn-primary" id="saveAdminBtn">Save Administrator</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Admin Password Modal -->
+    <div id="resetPasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Reset Admin Password</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Reset password for <strong id="resetAdminName"></strong></p>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="resetNewPassword" class="form-control" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="resetConfirmPassword" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline modal-close">Cancel</button>
+                <button class="btn btn-primary" id="confirmResetPasswordBtn">Reset Password</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add District Modal -->
+    <div id="districtModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Add New District</h3><button class="modal-close">&times;</button></div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>District Name</label>
+                    <input type="text" id="newDistrictName" class="form-control" placeholder="Enter district name">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline modal-close">Cancel</button>
+                <button class="btn btn-primary" id="saveDistrictBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Supervisor Modal -->
+    <div id="supervisorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3 id="supervisorModalTitle">Add Supervisor</h3><button class="modal-close">&times;</button></div>
             <div class="modal-body">
                 <form id="supervisorForm">
                     <input type="hidden" id="supervisorId">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="supervisorName">Full Name *</label>
-                            <input type="text" class="form-control" id="supervisorName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="supervisorEmpId">FS ID *</label>
-                            <input type="text" class="form-control" id="supervisorEmpId" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="supervisorEmail">Email *</label>
-                            <input type="email" class="form-control" id="supervisorEmail" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="supervisorPhone">Phone Number</label>
-                            <input type="tel" class="form-control" id="supervisorPhone">
-                        </div>
-                        <div class="form-group full-width">
-                            <hr style="border: none; border-top: 1px solid var(--border); margin: 1rem 0;">
-                            <h4>Login Credentials</h4>
-                        </div>
-                        <div class="form-group">
-                            <label for="supervisorUsername">Username *</label>
-                            <input type="text" class="form-control" id="supervisorUsername" required>
-                        </div>
-                        <div class="form-group password-toggle">
-                            <label for="supervisorPassword">Password *</label>
-                            <input type="password" class="form-control" id="supervisorPassword">
-                            <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
-                            <div class="form-text">Required for new users. Leave blank to keep current password.</div>
-                        </div>
-                        <div class="form-group">
-                            <label for="supervisorDistrict">District *</label>
-                            <select class="form-control supervisorDistrict" required></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="supervisorStatus">Status *</label>
-                            <select class="form-control supervisorStatus" required>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                    </div>
+                    <div class="form-group"><label>Full Name *</label><input type="text" id="supName" class="form-control" required></div>
+                    <div class="form-group"><label>Email *</label><input type="email" id="supEmail" class="form-control" required></div>
+                    <div class="form-group"><label>Phone</label><input type="text" id="supPhone" class="form-control"></div>
+                    <div class="form-group"><label>District *</label><select id="supDistrict" class="form-select" required></select></div>
+                    <div class="form-group"><label>Username *</label><input type="text" id="supUsername" class="form-control" required></div>
+                    <div class="form-group"><label>Password</label><input type="password" id="supPassword" class="form-control"><small>Leave blank to keep current</small></div>
+                    <div class="form-group"><label>Status</label><select id="supStatus" class="form-select"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline modal-close">Cancel</button>
-                <button type="submit" form="supervisorForm" class="btn btn-primary">Save Supervisor</button>
-            </div>
+            <div class="modal-footer"><button class="btn btn-outline modal-close">Cancel</button><button class="btn btn-primary" id="saveSupervisorBtn">Save Supervisor</button></div>
         </div>
     </div>
 
-    <div class="modal" id="fieldOfficerModal">
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="fieldOfficerModalTitle">Add Data Collector</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="fieldOfficerForm">
-                    <input type="hidden" id="fieldOfficerId">
-                     <div class="form-grid">
-                        <div class="form-group">
-                            <label for="fieldOfficerName">Full Name *</label>
-                            <input type="text" class="form-control" id="fieldOfficerName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="fieldOfficerEmpId">Data Collector ID *</label>
-                            <input type="text" class="form-control" id="fieldOfficerEmpId" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="fieldOfficerEmail">Email *</label>
-                            <input type="email" class="form-control" id="fieldOfficerEmail" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="fieldOfficerPhone">Phone Number</label>
-                            <input type="tel" class="form-control" id="fieldOfficerPhone">
-                        </div>
-                        <div class="form-group">
-                            <label for="fieldOfficerDistrict">District *</label>
-                            <select class="form-control fieldOfficerDistrict" required></select>
-                        </div>
-                       <div class="form-group">
-                           <label for="fieldOfficerStatus">Status *</label>
-                           <select class="form-control fieldOfficerStatus" required>
-                               <option value="active">Active</option>
-                               <option value="inactive">Inactive</option>
-                           </select>
-                       </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline modal-close">Cancel</button>
-                <button type="submit" form="fieldOfficerForm" class="btn btn-primary">Save Data Collector</button>
-            </div>
+            <div class="modal-header"><h3>Confirm Delete</h3><button class="modal-close">&times;</button></div>
+            <div class="modal-body"><p>Are you sure you want to delete <strong id="deleteItemName"></strong>? This action cannot be undone.</p></div>
+            <div class="modal-footer"><button class="btn btn-outline modal-close">Cancel</button><button class="btn btn-danger" id="confirmDeleteBtn">Delete</button></div>
         </div>
     </div>
-    
-    <div class="modal" id="deleteModal">
-        <div class="modal-content" style="max-width: 450px;">
-            <div class="modal-header"><h3>Confirm Deletion</h3><button class="modal-close">&times;</button></div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete <strong id="deleteObjectName">this item</strong>? This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer">
-                 <button type="button" class="btn btn-outline modal-close">Cancel</button>
-                 <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
-            </div>
-        </div>
-    </div>
+
+    <div id="toast" class="notification" style="display: none;"></div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Retrieve logged-in user details from sessionStorage
-            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-            
-            // Set up the header with the user's name and avatar
-            document.getElementById('user-name').textContent = loggedInUser.username;
+        let currentDeleteCallback = null;
+        let districtsList = [];
+        let supervisorsList = [];
+        let adminUsersList = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Set user info
             document.getElementById('user-avatar').textContent = loggedInUser.username.charAt(0).toUpperCase();
+            document.getElementById('user-name').textContent = loggedInUser.username;
+            if (isSuperAdmin) {
+                document.getElementById('user-role').textContent = 'Super Administrator';
+                document.getElementById('user-role').style.background = '#7c3aed';
+                document.getElementById('user-role').style.color = 'white';
+                document.getElementById('user-role').style.padding = '2px 8px';
+                document.getElementById('user-role').style.borderRadius = '12px';
+            } else {
+                document.getElementById('user-role').textContent = 'Administrator';
+            }
+
+            await loadAllData();
+            setupEventListeners();
+            setupNavigation();
             
-            // --- LOCAL STORAGE KEYS ---
-            const SUPERVISORS_KEY = 'supervisors';
-            const FIELDOFFICERS_KEY = 'fieldOfficers';
-            const DISTRICTS_KEY = 'districts';
-            const ADMIN_CREDS_KEY = 'adminCredentials';
-
-            // --- DATA HELPERS ---
-            const getData = key => JSON.parse(localStorage.getItem(key)) || [];
-            const saveData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
-
-            // --- APP INITIALIZATION ---
-            function initializeApp() {
-                // Seed database with default data if it doesn't exist
-                const initData = (key, defaultData) => !localStorage.getItem(key) && localStorage.setItem(key, JSON.stringify(defaultData()));
+            // Setup Super Admin specific confirmations
+            if (isSuperAdmin) {
+                const resetConfirm = document.getElementById('resetConfirm');
+                const resetBtn = document.getElementById('resetAllDataBtn');
+                if (resetConfirm) {
+                    resetConfirm.addEventListener('input', (e) => {
+                        resetBtn.disabled = e.target.value !== 'DELETE ALL DATA';
+                    });
+                }
                 
-                // --- MODIFICATION: Updated the list of districts as per the user's request ---
-                initData(DISTRICTS_KEY, () => [
-                    "Amuru", "Gulu", "Isingiro", "Kabale", "Kagadi", "Kaliro", "Kamwengye", 
-                    "Kanungu", "Kibaale", "Kiryandongo", "Kisoro", "Kyegegwa", "Kyenjojo", 
-                    "Luuka", "Mbarara", "Mitooma", "Nwoya", "Rubanda", "Rubirizi", 
-                    "Rukiga", "Rukungiri"
-                ].sort());
-
-                initData(SUPERVISORS_KEY, () => [{ id: Date.now(), name: 'Default Supervisor', empId: 'SUP-001', email: 'sup.kagadi@rtv.org', phone: '0700123456', username: 'sup_kagadi', password: 'password123', district: 'Kagadi', status: 'active' }]);
-                initData(FIELDOFFICERS_KEY, () => [{ id: Date.now() + 1, name: 'Default Data Collector', empId: 'FO-001', email: 'fo.kyenjojo@rtv.org', phone: '0700654321', district: 'Kyenjojo', status: 'active' }]);
-                initData(ADMIN_CREDS_KEY, () => ({ username: 'admin', password: 'admin123' }));
-
-                // Initial render of all UI components
-                populateDistrictDropdowns();
-                renderSupervisorsTable();
-                renderFieldOfficersTable();
-                renderDistrictsTable();
-                setupEventListeners();
+                const clearLogsConfirm = document.getElementById('clearLogsConfirm');
+                const clearLogsBtn = document.getElementById('clearLogsBtn');
+                if (clearLogsConfirm) {
+                    clearLogsConfirm.addEventListener('input', (e) => {
+                        clearLogsBtn.disabled = e.target.value !== 'CLEAR LOGS';
+                    });
+                }
             }
+        });
 
-            // --- RENDER FUNCTIONS ---
-            function renderSupervisorsTable() {
-                const supervisors = getData(SUPERVISORS_KEY);
-                const tableBody = document.getElementById('supervisorsTableBody');
-                const searchTerm = document.getElementById('supervisorSearchInput').value.toLowerCase();
-                
-                const filtered = supervisors.filter(item => 
-                    item.name.toLowerCase().includes(searchTerm) || 
-                    item.district.toLowerCase().includes(searchTerm) || 
-                    item.username.toLowerCase().includes(searchTerm) ||
-                    item.email.toLowerCase().includes(searchTerm) ||
-                    (item.phone && item.phone.toLowerCase().includes(searchTerm)) ||
-                    (item.empId && item.empId.toLowerCase().includes(searchTerm))
-                );
-                
-                tableBody.innerHTML = filtered.map(item => `
-                    <tr data-id="${item.id}">
-                        <td>
-                            <div><strong>${item.name}</strong></div>
-                            <small style="color: var(--secondary);">ID: ${item.empId} | User: ${item.username}</small>
-                        </td>
-                        <td>
-                            <div>${item.email}</div>
-                            <small style="color: var(--secondary);">${item.phone || 'N/A'}</small>
-                        </td>
-                        <td><span class="badge district-badge">${item.district}</span></td>
-                        <td><span class="badge ${item.status === 'active' ? 'badge-success' : 'badge-warning'}">${item.status}</span></td>
-                        <td class="table-actions">
-                            <button type="button" class="btn btn-sm btn-outline edit-supervisor-btn">Edit</button>
-                            <button type="button" class="btn btn-sm btn-danger delete-supervisor-btn">Delete</button>
-                        </td>
-                    </tr>
-                `).join('') || `<tr><td colspan="5" style="text-align: center;">No supervisors found.</td></tr>`;
-            }
+        async function loadAllData() {
+            await loadDistricts();
+            await loadSupervisors();
+            await loadAdminUsers();
+        }
 
-            function renderFieldOfficersTable() {
-                const officers = getData(FIELDOFFICERS_KEY);
-                const tableBody = document.getElementById('fieldOfficersTableBody');
-                const searchTerm = document.getElementById('fieldOfficerSearchInput').value.toLowerCase();
+        async function loadDistricts() {
+            const result = await db.getDistricts();
+            if (!result.error) { districtsList = result.data; renderDistricts(); }
+        }
 
-                 const filtered = officers.filter(item => 
-                    item.name.toLowerCase().includes(searchTerm) || 
-                    item.district.toLowerCase().includes(searchTerm) || 
-                    item.email.toLowerCase().includes(searchTerm) ||
-                    (item.phone && item.phone.toLowerCase().includes(searchTerm)) ||
-                    (item.empId && item.empId.toLowerCase().includes(searchTerm))
-                );
+        async function loadSupervisors() {
+            const result = await db.getSupervisors();
+            if (!result.error) { supervisorsList = result.data; renderSupervisors(); }
+        }
 
-                tableBody.innerHTML = filtered.map(item => `
-                    <tr data-id="${item.id}">
-                        <td>
-                            <div><strong>${item.name}</strong></div>
-                            <small style="color: var(--secondary);">ID: ${item.empId}</small>
-                        </td>
-                         <td>
-                            <div>${item.email}</div>
-                            <small style="color: var(--secondary);">${item.phone || 'N/A'}</small>
-                        </td>
-                        <td><span class="badge district-badge">${item.district}</span></td>
-                        <td><span class="badge ${item.status === 'active' ? 'badge-success' : 'badge-warning'}">${item.status}</span></td>
-                        <td class="table-actions">
-                            <button type="button" class="btn btn-sm btn-outline edit-fieldofficer-btn" data-action="edit">Edit</button>
-                            <button type="button" class="btn btn-sm btn-danger delete-fieldofficer-btn" data-action="delete">Delete</button>
-                        </td>
-                    </tr>
-                `).join('') || `<tr><td colspan="5" style="text-align: center;">No data collectors found.</td></tr>`;
-            }
+        async function loadAdminUsers() {
+            const result = await supabaseClient.from('users').select('*').eq('role', 'admin').order('created_at', { ascending: false });
+            if (!result.error) { adminUsersList = result.data; renderAdminUsers(); }
+        }
 
-            function renderDistrictsTable() {
-                const districts = getData(DISTRICTS_KEY).sort();
-                const supervisors = getData(SUPERVISORS_KEY);
-                const officers = getData(FIELDOFFICERS_KEY);
-                const tableBody = document.getElementById('districtsTableBody');
-                
-                tableBody.innerHTML = districts.map(d => {
-                    const userCount = [...supervisors, ...officers].filter(u => u.district === d).length;
-                    return `
-                        <tr data-name="${d}">
-                            <td>${d}</td>
-                            <td>${userCount} user(s)</td>
-                            <td class="table-actions">
-                                <button class="btn btn-sm btn-danger delete-district-btn" ${userCount > 0 ? 'disabled title="Cannot delete district with assigned users"' : ''}>Delete</button>
-                            </td>
-                        </tr>`;
-                }).join('') || `<tr><td colspan="3" style="text-align: center;">No districts found.</td></tr>`;
-            }
+        function renderDistricts() {
+            const tbody = document.getElementById('districtsList');
+            tbody.innerHTML = districtsList.map(d => `<tr><td><strong>${escapeHtml(d)}</strong></td><td><span class="badge badge-success">Active</span></td><td><button class="btn btn-outline btn-sm delete-district" data-district="${escapeHtml(d)}"><i class="fas fa-trash"></i> Delete</button></td>`).join('');
+        }
+
+        function renderSupervisors() {
+            const tbody = document.getElementById('supervisorsList');
+            tbody.innerHTML = supervisorsList.map(s => `
+                <tr data-id="${s.id}">
+                    <td><strong>${escapeHtml(s.name)}</strong><br><small>${escapeHtml(s.username)}</small></td>
+                    <td>${escapeHtml(s.email)}<br><small>${escapeHtml(s.phone) || 'No phone'}</small></td>
+                    <td><span class="badge badge-info">${escapeHtml(s.district)}</span></td>
+                    <td><span class="badge ${s.status === 'active' ? 'badge-success' : 'badge-warning'}">${s.status}</span></td>
+                    <td class="table-actions">
+                        <button class="btn btn-outline btn-sm edit-supervisor" data-id="${s.id}"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn btn-danger btn-sm delete-supervisor" data-id="${s.id}"><i class="fas fa-trash"></i> Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderAdminUsers() {
+            const tbody = document.getElementById('adminUsersList');
+            const currentAdminId = loggedInUser.id;
+            tbody.innerHTML = adminUsersList.map(admin => `
+                <tr data-id="${admin.id}">
+                    <td><strong>${escapeHtml(admin.username)}</strong>${admin.id === currentAdminId ? ' <span class="badge badge-info">(You)</span>' : ''}</td>
+                    <td>${escapeHtml(admin.name) || 'N/A'}</td>
+                    <td>${escapeHtml(admin.email) || 'N/A'}</td>
+                    <td><span class="badge badge-purple">Admin</span></td>
+                    <td><span class="badge ${admin.status === 'active' ? 'badge-success' : 'badge-warning'}">${admin.status || 'active'}</span></td>
+                    <td class="table-actions">
+                        <button class="btn btn-outline btn-sm edit-admin" data-id="${admin.id}" ${admin.id === currentAdminId ? 'disabled' : ''}><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn btn-outline btn-sm reset-admin-password" data-id="${admin.id}" data-name="${escapeHtml(admin.username)}"><i class="fas fa-key"></i> Reset Password</button>
+                        <button class="btn btn-danger btn-sm delete-admin" data-id="${admin.id}" ${admin.id === currentAdminId ? 'disabled' : ''}><i class="fas fa-trash"></i> Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function populateDistrictSelects() {
+            const supDistrict = document.getElementById('supDistrict');
+            supDistrict.innerHTML = '<option value="">Select District</option>' + districtsList.map(d => `<option value="${d}">${d}</option>`).join('');
+        }
+
+        function setupNavigation() {
+            document.querySelectorAll('.settings-nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.settings-nav-item').forEach(nav => nav.classList.remove('active'));
+                    document.querySelectorAll('.settings-section').forEach(section => section.classList.remove('active'));
+                    item.classList.add('active');
+                    document.getElementById(`${item.dataset.section}-section`).classList.add('active');
+                });
+            });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('logout-btn').addEventListener('click', () => { sessionStorage.removeItem('loggedInUser'); window.location.href = 'login.html'; });
             
-            // --- UI & EVENT LISTENERS ---
-            function populateDistrictDropdowns() {
-                const districts = getData(DISTRICTS_KEY).sort();
-                const optionsHTML = '<option value="">Select District</option>' + districts.map(d => `<option value="${d}">${d}</option>`).join('');
-                document.querySelectorAll('.supervisorDistrict, .fieldOfficerDistrict').forEach(select => select.innerHTML = optionsHTML);
+            // Mobile menu toggle
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('active');
+                });
+                // Close menu when clicking on a menu item
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        sidebar.classList.remove('active');
+                    });
+                });
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!sidebar.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                        sidebar.classList.remove('active');
+                    }
+                });
             }
 
-            function setupEventListeners() {
-                document.getElementById('logout-btn').addEventListener('click', () => { sessionStorage.removeItem('loggedInUser'); window.location.href = 'login.html'; });
-                document.querySelectorAll('.settings-tab').forEach(tab => tab.addEventListener('click', function() {
-                    document.querySelectorAll('.settings-tab, .settings-content').forEach(el => el.classList.remove('active'));
-                    this.classList.add('active');
-                    document.getElementById(this.dataset.tab + 'Tab').classList.add('active');
-                }));
-                document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', e => e.target.closest('.modal').style.display = 'none'));
-                document.getElementById('addSupervisorBtn').addEventListener('click', () => openUserModal('supervisor'));
-                document.getElementById('supervisorForm').addEventListener('submit', (e) => handleSaveUser(e, 'supervisor'));
-                document.getElementById('supervisorsTableBody').addEventListener('click', (e) => handleTableAction(e, 'supervisor'));
-                document.getElementById('supervisorSearchInput').addEventListener('input', renderSupervisorsTable);
-                document.getElementById('addFieldOfficerBtn').addEventListener('click', () => openUserModal('fieldOfficer'));
-                document.getElementById('fieldOfficerForm').addEventListener('submit', (e) => handleSaveUser(e, 'fieldOfficer'));
-                document.getElementById('fieldOfficersTableBody').addEventListener('click', (e) => handleTableAction(e, 'fieldOfficer'));
-                document.getElementById('fieldOfficerSearchInput').addEventListener('input', renderFieldOfficersTable);
-                document.getElementById('adminPasswordForm').addEventListener('submit', handleAdminPasswordChange);
-                document.querySelectorAll('.toggle-password').forEach(btn => btn.addEventListener('click', togglePasswordVisibility));
-                document.getElementById('addDistrictForm').addEventListener('submit', handleAddDistrict);
-                document.getElementById('districtsTableBody').addEventListener('click', handleDeleteDistrictClick);
-                document.getElementById('resetDataBtn').addEventListener('click', () => {
-                    if (confirm('DANGER: This will delete ALL data including inventory, users, and logs. Are you absolutely sure?')) {
+            document.getElementById('updateProfileBtn').addEventListener('click', updateProfile);
+            document.getElementById('changePasswordBtn').addEventListener('click', changePassword);
+            document.getElementById('clearSessionsBtn').addEventListener('click', clearSessions);
+            document.getElementById('addAdminBtn').addEventListener('click', () => openAdminModal());
+            document.getElementById('saveAdminBtn').addEventListener('click', saveAdminUser);
+            document.getElementById('addDistrictBtn').addEventListener('click', () => openDistrictModal());
+            document.getElementById('saveDistrictBtn').addEventListener('click', addDistrict);
+            document.getElementById('addSupervisorBtn').addEventListener('click', () => openSupervisorModal());
+            document.getElementById('saveSupervisorBtn').addEventListener('click', saveSupervisor);
+            document.getElementById('exportInventoryBtn').addEventListener('click', () => exportData('inventory'));
+            document.getElementById('exportAdminsBtn').addEventListener('click', () => exportData('admins'));
+            document.getElementById('exportSupervisorsBtn').addEventListener('click', () => exportData('supervisors'));
+            document.getElementById('exportAllBtn').addEventListener('click', () => exportData('all'));
+            
+            if (isSuperAdmin) {
+                document.getElementById('importBtn')?.addEventListener('click', importData);
+                document.getElementById('clearLogsBtn')?.addEventListener('click', clearLogs);
+                document.getElementById('resetAllDataBtn')?.addEventListener('click', resetAllData);
+            }
+
+            document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', () => btn.closest('.modal').style.display = 'none'));
+            window.addEventListener('click', (e) => { if (e.target.classList.contains('modal')) e.target.style.display = 'none'; });
+            
+            document.getElementById('districtsList').addEventListener('click', handleDistrictActions);
+            document.getElementById('supervisorsList').addEventListener('click', handleSupervisorActions);
+            document.getElementById('adminUsersList').addEventListener('click', handleAdminActions);
+        }
+
+        function showAlert(elementId, type, message) {
+            const alert = document.getElementById(elementId);
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i> ${message}`;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 5000);
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `notification ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        async function updateProfile() {
+            const name = document.getElementById('adminName').value;
+            const email = document.getElementById('adminEmail').value;
+            if (!name && !email) { showAlert('profileAlert', 'info', 'No changes to update'); return; }
+            const updates = {};
+            if (name) updates.name = name;
+            if (email) updates.email = email;
+            const { error } = await supabaseClient.from('users').update(updates).eq('id', loggedInUser.id);
+            if (error) showAlert('profileAlert', 'error', 'Failed to update profile');
+            else showAlert('profileAlert', 'success', 'Profile updated successfully');
+        }
+
+        async function changePassword() {
+            const current = document.getElementById('currentPassword').value;
+            const newPwd = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            if (!current || !newPwd || !confirm) { showAlert('passwordAlert', 'error', 'Please fill all fields'); return; }
+            if (newPwd !== confirm) { showAlert('passwordAlert', 'error', 'New passwords do not match'); return; }
+            if (newPwd.length < 6) { showAlert('passwordAlert', 'error', 'Password must be at least 6 characters'); return; }
+            const { data: adminUser } = await supabaseClient.from('users').select('password').eq('id', loggedInUser.id).single();
+            if (adminUser?.password !== current) { showAlert('passwordAlert', 'error', 'Current password is incorrect'); return; }
+            const { error } = await supabaseClient.from('users').update({ password: newPwd }).eq('id', loggedInUser.id);
+            if (error) showAlert('passwordAlert', 'error', 'Failed to update password');
+            else { showAlert('passwordAlert', 'success', 'Password updated successfully'); document.getElementById('currentPassword').value = ''; document.getElementById('newPassword').value = ''; document.getElementById('confirmPassword').value = ''; }
+        }
+
+        function clearSessions() {
+            showToast('All sessions cleared. Please login again.', 'info');
+            setTimeout(() => { sessionStorage.clear(); window.location.href = 'login.html'; }, 2000);
+        }
+
+        function openAdminModal(id = null) {
+            document.getElementById('adminForm').reset();
+            document.getElementById('adminId').value = '';
+            document.getElementById('adminModalTitle').textContent = 'Add Administrator';
+            document.getElementById('adminPassword').required = true;
+            document.getElementById('adminConfirmPassword').required = true;
+            
+            if (id) {
+                const admin = adminUsersList.find(a => a.id === id);
+                if (admin) {
+                    document.getElementById('adminId').value = admin.id;
+                    document.getElementById('adminUsername').value = admin.username;
+                    document.getElementById('adminFullName').value = admin.name || '';
+                    document.getElementById('adminEmailAddr').value = admin.email || '';
+                    document.getElementById('adminStatus').value = admin.status || 'active';
+                    document.getElementById('adminModalTitle').textContent = 'Edit Administrator';
+                    document.getElementById('adminPassword').required = false;
+                    document.getElementById('adminConfirmPassword').required = false;
+                }
+            }
+            document.getElementById('adminModal').style.display = 'flex';
+        }
+
+        async function saveAdminUser() {
+            const id = document.getElementById('adminId').value;
+            const username = document.getElementById('adminUsername').value.trim().toLowerCase();
+            const name = document.getElementById('adminFullName').value.trim();
+            const email = document.getElementById('adminEmailAddr').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            const confirmPassword = document.getElementById('adminConfirmPassword').value;
+            const status = document.getElementById('adminStatus').value;
+            
+            if (!username || !name || !email) { showAlert('adminUserAlert', 'error', 'Please fill all required fields'); return; }
+            if (!id && !password) { showAlert('adminUserAlert', 'error', 'Password is required for new admin users'); return; }
+            if (password && password !== confirmPassword) { showAlert('adminUserAlert', 'error', 'Passwords do not match'); return; }
+            if (password && password.length < 6) { showAlert('adminUserAlert', 'error', 'Password must be at least 6 characters'); return; }
+
+            if (id) {
+                const updates = { name, email, status };
+                if (password) updates.password = password;
+                const { error } = await supabaseClient.from('users').update(updates).eq('id', id);
+                if (error) showAlert('adminUserAlert', 'error', 'Failed to update admin: ' + error.message);
+                else showAlert('adminUserAlert', 'success', 'Admin user updated successfully');
+            } else {
+                const { error } = await supabaseClient.from('users').insert([{ username, password, role: 'admin', name, email, status }]);
+                if (error) showAlert('adminUserAlert', 'error', 'Failed to add admin: ' + error.message);
+                else showAlert('adminUserAlert', 'success', 'Admin user added successfully');
+            }
+            await loadAdminUsers();
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function openResetPasswordModal(id, name) {
+            document.getElementById('resetAdminName').textContent = name;
+            document.getElementById('resetNewPassword').value = '';
+            document.getElementById('resetConfirmPassword').value = '';
+            document.getElementById('resetPasswordModal').style.display = 'flex';
+            
+            const confirmBtn = document.getElementById('confirmResetPasswordBtn');
+            const newBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+            newBtn.addEventListener('click', async () => {
+                const newPassword = document.getElementById('resetNewPassword').value;
+                const confirmPassword = document.getElementById('resetConfirmPassword').value;
+                
+                if (!newPassword) { showAlert('adminUserAlert', 'error', 'Please enter a new password'); return; }
+                if (newPassword !== confirmPassword) { showAlert('adminUserAlert', 'error', 'Passwords do not match'); return; }
+                if (newPassword.length < 6) { showAlert('adminUserAlert', 'error', 'Password must be at least 6 characters'); return; }
+                
+                const { error } = await supabaseClient.from('users').update({ password: newPassword }).eq('id', id);
+                if (error) showAlert('adminUserAlert', 'error', 'Failed to reset password: ' + error.message);
+                else {
+                    showAlert('adminUserAlert', 'success', 'Password reset successfully');
+                    document.getElementById('resetPasswordModal').style.display = 'none';
+                }
+            });
+        }
+
+        function openDistrictModal() { document.getElementById('newDistrictName').value = ''; document.getElementById('districtModal').style.display = 'flex'; }
+        
+        async function addDistrict() {
+            const name = document.getElementById('newDistrictName').value.trim();
+            if (!name) { showAlert('districtAlert', 'error', 'Please enter a district name'); return; }
+            const result = await db.addDistrict(name);
+            if (result.error) showAlert('districtAlert', 'error', result.error.message || 'Failed to add district');
+            else { await loadDistricts(); populateDistrictSelects(); document.getElementById('districtModal').style.display = 'none'; showAlert('districtAlert', 'success', 'District added successfully'); }
+        }
+
+        function openSupervisorModal(id = null) {
+            document.getElementById('supervisorForm').reset();
+            document.getElementById('supervisorId').value = '';
+            document.getElementById('supervisorModalTitle').textContent = 'Add Supervisor';
+            document.getElementById('supPassword').required = true;
+            
+            if (id) {
+                const sup = supervisorsList.find(s => s.id === id);
+                if (sup) {
+                    document.getElementById('supervisorId').value = sup.id;
+                    document.getElementById('supName').value = sup.name;
+                    document.getElementById('supEmail').value = sup.email;
+                    document.getElementById('supPhone').value = sup.phone || '';
+                    document.getElementById('supDistrict').value = sup.district;
+                    document.getElementById('supUsername').value = sup.username;
+                    document.getElementById('supStatus').value = sup.status;
+                    document.getElementById('supervisorModalTitle').textContent = 'Edit Supervisor';
+                    document.getElementById('supPassword').required = false;
+                }
+            }
+            populateDistrictSelects();
+            document.getElementById('supervisorModal').style.display = 'flex';
+        }
+
+        async function saveSupervisor() {
+            const id = document.getElementById('supervisorId').value;
+            const name = document.getElementById('supName').value.trim();
+            const email = document.getElementById('supEmail').value.trim();
+            const phone = document.getElementById('supPhone').value.trim();
+            const district = document.getElementById('supDistrict').value;
+            const username = document.getElementById('supUsername').value.trim().toLowerCase();
+            const password = document.getElementById('supPassword').value;
+            const status = document.getElementById('supStatus').value;
+            
+            if (!name || !email || !district || !username) { showAlert('supervisorAlert', 'error', 'Please fill all required fields'); return; }
+            if (!id && !password) { showAlert('supervisorAlert', 'error', 'Password is required for new supervisors'); return; }
+            
+            if (id) {
+                await db.updateSupervisor(id, { name, email, phone, district, status });
+                if (password) { const sup = supervisorsList.find(s => s.id === id); if (sup?.user_id) await db.updateUserPassword(sup.user_id, password); }
+            } else {
+                await db.addSupervisor({ name, email, phone, district, username, password, status });
+            }
+            await loadSupervisors();
+            document.getElementById('supervisorModal').style.display = 'none';
+            showAlert('supervisorAlert', 'success', `Supervisor ${id ? 'updated' : 'added'} successfully`);
+        }
+
+        function handleDistrictActions(e) {
+            const btn = e.target.closest('.delete-district');
+            if (btn) { const district = btn.dataset.district; showDeleteModal(`district "${district}"`, async () => { await db.deleteDistrict(district); await loadDistricts(); showToast('District deleted successfully'); }); }
+        }
+
+        function handleSupervisorActions(e) {
+            const editBtn = e.target.closest('.edit-supervisor');
+            const deleteBtn = e.target.closest('.delete-supervisor');
+            if (editBtn) openSupervisorModal(editBtn.dataset.id);
+            if (deleteBtn) { const id = deleteBtn.dataset.id; const supervisor = supervisorsList.find(s => s.id === id); showDeleteModal(`${supervisor?.name}`, async () => { await db.deleteSupervisor(id); await loadSupervisors(); showToast('Supervisor deleted successfully'); }); }
+        }
+
+        function handleAdminActions(e) {
+            const editBtn = e.target.closest('.edit-admin');
+            const resetBtn = e.target.closest('.reset-admin-password');
+            const deleteBtn = e.target.closest('.delete-admin');
+            
+            if (editBtn) openAdminModal(editBtn.dataset.id);
+            if (resetBtn) openResetPasswordModal(resetBtn.dataset.id, resetBtn.dataset.name);
+            if (deleteBtn) { 
+                const id = deleteBtn.dataset.id; 
+                const admin = adminUsersList.find(a => a.id === id); 
+                showDeleteModal(`${admin?.username} (Admin)`, async () => { 
+                    await supabaseClient.from('users').delete().eq('id', id); 
+                    await loadAdminUsers(); 
+                    showToast('Admin user deleted successfully'); 
+                }); 
+            }
+        }
+
+        function showDeleteModal(name, callback) {
+            document.getElementById('deleteItemName').textContent = name;
+            currentDeleteCallback = callback;
+            const modal = document.getElementById('deleteModal');
+            modal.style.display = 'flex';
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            const newBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+            newBtn.addEventListener('click', async () => { if (currentDeleteCallback) await currentDeleteCallback(); modal.style.display = 'none'; });
+        }
+
+        async function exportData(type) {
+            let data = [], filename = '';
+            if (type === 'inventory') { const result = await db.getInventory(); data = result.data; filename = 'inventory_export.json'; }
+            else if (type === 'admins') { data = adminUsersList; filename = 'admin_users_export.json'; }
+            else if (type === 'supervisors') { const result = await db.getSupervisors(); data = result.data; filename = 'supervisors_export.json'; }
+            else if (type === 'all') {
+                const inventory = await db.getInventory();
+                const supervisors = await db.getSupervisors();
+                const districts = await db.getDistricts();
+                data = { inventory: inventory.data, supervisors: supervisors.data, admins: adminUsersList, districts: districts.data, exportDate: new Date().toISOString() };
+                filename = 'full_backup.json';
+            }
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Export completed successfully');
+        }
+
+        async function importData() {
+            const file = document.getElementById('importFile').files[0];
+            if (!file) { showAlert('backupAlert', 'error', 'Please select a file to import'); return; }
+            showAlert('backupAlert', 'info', 'Import feature coming soon...');
+        }
+
+        async function clearLogs() {
+            const { error } = await supabaseClient.from('movement_logs').delete().neq('id', '');
+            if (error) showToast('Failed to clear logs', 'error');
+            else showToast('Activity logs cleared successfully', 'success');
+        }
+
+        async function resetAllData() {
+            if (confirm('⚠️ SUPER ADMIN: This will delete ALL data including inventory, users, transfers, and logs. This action is IRREVERSIBLE. Are you absolutely sure?')) {
+                if (confirm('FINAL WARNING: All data will be permanently deleted. Click OK to proceed.')) {
+                    try {
+                        await supabaseClient.from('inventory_items').delete().neq('id', '');
+                        await supabaseClient.from('movement_logs').delete().neq('id', '');
+                        const supervisors = await db.getSupervisors();
+                        if (supervisors.data) {
+                            for (const sup of supervisors.data) await db.deleteSupervisor(sup.id);
+                        }
+                        const collectors = await db.getDataCollectors();
+                        if (collectors.data) {
+                            for (const col of collectors.data) await db.deleteDataCollector(col.id);
+                        }
+                        await supabaseClient.from('users').delete().eq('role', 'admin');
                         localStorage.clear();
                         sessionStorage.clear();
-                        window.location.href = 'login.html';
-                    }
-                });
-            }
-            
-            // --- MODAL & FORM HANDLERS ---
-            function openUserModal(userType, id = null) {
-                const modalId = `${userType}Modal`;
-                const formId = `${userType}Form`;
-                const form = document.getElementById(formId);
-                form.reset();
-                
-                const isSupervisor = userType === 'supervisor';
-                const modalTitle = document.getElementById(`${userType}ModalTitle`);
-                const passwordInput = isSupervisor ? form.querySelector(`#${userType}Password`) : null;
-
-                if (id) {
-                    const dataKey = isSupervisor ? SUPERVISORS_KEY : FIELDOFFICERS_KEY;
-                    const user = getData(dataKey).find(u => u.id === Number(id));
-
-                    if (!user) {
-                        console.error(`User with ID ${id} not found for type ${userType}.`);
-                        showAlert(`${userType}Alert`, 'error', `Could not find user data to edit. Please refresh and try again.`);
-                        return;
-                    }
-
-                    modalTitle.textContent = `Edit ${isSupervisor ? 'Supervisor' : 'Data Collector'}`;
-                    form.querySelector(`#${userType}Id`).value = user.id;
-                    form.querySelector(`#${userType}Name`).value = user.name;
-                    form.querySelector(`#${userType}EmpId`).value = user.empId;
-                    form.querySelector(`#${userType}Email`).value = user.email;
-                    form.querySelector(`#${userType}Phone`).value = user.phone;
-                    if (isSupervisor) {
-                        form.querySelector(`#${userType}Username`).value = user.username;
-                        passwordInput.value = '';
-                        passwordInput.placeholder = 'Leave blank to keep current password';
-                        passwordInput.required = false;
-                    }
-
-                    form.querySelector(`.${userType}District`).value = user.district;
-                    form.querySelector(`.${userType}Status`).value = user.status;
-                } else {
-                    modalTitle.textContent = `Add ${isSupervisor ? 'Supervisor' : 'Data Collector'}`;
-                    form.querySelector(`#${userType}Id`).value = '';
-                    if (isSupervisor) {
-                        passwordInput.placeholder = 'Enter password';
-                        passwordInput.required = true;
+                        showToast('System reset completed. Redirecting to login...', 'success');
+                        setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+                    } catch (err) {
+                        showToast('Error during system reset: ' + err.message, 'error');
                     }
                 }
-                document.getElementById(modalId).style.display = 'flex';
             }
+        }
 
-            function handleSaveUser(e, userType) {
-                e.preventDefault();
-                const form = e.target;
-                const isSupervisor = userType === 'supervisor';
-                const dataKey = isSupervisor ? SUPERVISORS_KEY : FIELDOFFICERS_KEY;
-                const alertId = isSupervisor ? 'supervisorAlert' : 'fieldOfficerAlert';
-
-                const idValue = form.querySelector(`#${userType}Id`).value;
-                const id = idValue ? Number(idValue) : null;
-                const name = form.querySelector(`#${userType}Name`).value.trim();
-                const empId = form.querySelector(`#${userType}EmpId`).value.trim();
-                const email = form.querySelector(`#${userType}Email`).value.trim().toLowerCase();
-                const phone = form.querySelector(`#${userType}Phone`).value.trim();
-                const district = form.querySelector(`.${userType}District`).value;
-                const status = form.querySelector(`.${userType}Status`).value;
-                const username = isSupervisor ? form.querySelector(`#${userType}Username`).value.trim().toLowerCase() : null;
-                const password = isSupervisor ? form.querySelector(`#${userType}Password`).value : '';
-                
-                if (!name || !district || !empId || !email || (isSupervisor && !username)) {
-                    return showAlert(alertId, 'error', 'Please fill all required fields.');
-                }
-                
-                let allUsers = [...getData(SUPERVISORS_KEY), ...getData(FIELDOFFICERS_KEY)];
-                if (isSupervisor && allUsers.some(u => u.username === username && u.id !== id)) {
-                     return showAlert(alertId, 'error', `Username '${username}' is already taken.`);
-                }
-                
-                const idLabel = isSupervisor ? 'FS ID' : 'Data Collector ID';
-                if (allUsers.some(u => u.empId === empId && u.id !== id)) {
-                     return showAlert(alertId, 'error', `${idLabel} '${empId}' is already in use.`);
-                }
-                
-                let data = getData(dataKey);
-                const userObject = isSupervisor
-                    ? { name, empId, email, phone, username, district, status }
-                    : { name, empId, email, phone, district, status };
-                
-                if (id) { // Editing existing user
-                    const index = data.findIndex(u => u.id === id);
-                    if (index > -1) {
-                        data[index] = { ...data[index], ...userObject };
-                        if (isSupervisor && password) { // Update password only if a new one is provided
-                            data[index].password = password;
-                        }
-                    }
-                } else { // Adding new user
-                    if (isSupervisor && !password) {
-                         return showAlert(alertId, 'error', 'Password is required for new users.');
-                    }
-                    data.unshift({ id: Date.now(), ...userObject, ...(isSupervisor ? { password } : {}) });
-                }
-                
-                saveData(dataKey, data);
-                isSupervisor ? renderSupervisorsTable() : renderFieldOfficersTable();
-                renderDistrictsTable();
-                document.getElementById(`${userType}Modal`).style.display = 'none';
-                showAlert(alertId, 'success', `${isSupervisor ? 'Supervisor' : 'Data Collector'} saved successfully.`);
-            }
-            
-            function handleTableAction(e, userType) {
-                const btn = e.target.closest('button[data-action]');
-                if (!btn) return;
-                const id = Number(btn.closest('tr').dataset.id);
-                const action = btn.dataset.action;
-                
-                if (action === 'edit') {
-                    openUserModal(userType, id);
-                } else if (action === 'delete') {
-                    const isSupervisor = userType === 'supervisor';
-                    const dataKey = isSupervisor ? SUPERVISORS_KEY : FIELDOFFICERS_KEY;
-                    const user = getData(dataKey).find(u => u.id === id);
-                    const deleteAlertId = isSupervisor ? 'supervisorAlert' : 'fieldOfficerAlert';
-                    const deleteCallback = () => {
-                        saveData(dataKey, getData(dataKey).filter(item => item.id !== id));
-                        renderSupervisorsTable();
-                        renderFieldOfficersTable();
-                        renderDistrictsTable();
-                        showAlert(deleteAlertId, 'success', `${isSupervisor ? 'Supervisor' : 'Data Collector'} deleted successfully.`);
-                    };
-                    openDeleteModal(`${user.name} (${isSupervisor ? 'Supervisor' : 'Data Collector'})`, deleteCallback);
-                }
-            }
-
-            function openDeleteModal(name, confirmCallback) {
-                const modal = document.getElementById('deleteModal');
-                document.getElementById('deleteObjectName').textContent = name;
-                
-                const oldBtn = document.getElementById('confirmDeleteBtn');
-                const newBtn = oldBtn.cloneNode(true);
-                oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-
-                newBtn.addEventListener('click', () => {
-                    confirmCallback();
-                    modal.style.display = 'none';
-                });
-                modal.style.display = 'flex';
-            }
-
-            function handleAddDistrict(e) {
-                e.preventDefault();
-                const input = document.getElementById('newDistrictName');
-                const newDistrict = input.value.trim();
-                if (!newDistrict) return;
-
-                let districts = getData(DISTRICTS_KEY);
-                if (districts.some(d => d.toLowerCase() === newDistrict.toLowerCase())) {
-                    return showAlert('districtAlert', 'error', 'District already exists.');
-                }
-                
-                districts.push(newDistrict);
-                saveData(DISTRICTS_KEY, districts.sort());
-                renderDistrictsTable();
-                populateDistrictDropdowns();
-                showAlert('districtAlert', 'success', 'District added successfully.');
-                input.value = '';
-            }
-
-            function handleDeleteDistrictClick(e) {
-                const btn = e.target.closest('.delete-district-btn');
-                if (!btn || btn.disabled) return;
-                const districtName = btn.closest('tr').dataset.name;
-                
-                const deleteCallback = () => {
-                    saveData(DISTRICTS_KEY, getData(DISTRICTS_KEY).filter(d => d !== districtName));
-                    renderDistrictsTable();
-                    populateDistrictDropdowns();
-                    showAlert('districtAlert', 'success', 'District deleted successfully.');
-                };
-                openDeleteModal(`the district "${districtName}"`, deleteCallback);
-            }
-
-            function handleAdminPasswordChange(e) {
-                e.preventDefault();
-                const currentPassword = document.getElementById('currentPassword').value;
-                const newPassword = document.getElementById('newPassword').value;
-                const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-
-                const adminCreds = JSON.parse(localStorage.getItem(ADMIN_CREDS_KEY));
-
-                if (currentPassword !== adminCreds.password) {
-                    return showAlert('adminAlert', 'error', 'Current password does not match.');
-                }
-                if (newPassword.length < 6) {
-                    return showAlert('adminAlert', 'error', 'New password must be at least 6 characters.');
-                }
-                if (newPassword !== confirmNewPassword) {
-                    return showAlert('adminAlert', 'error', 'New passwords do not match.');
-                }
-                
-                adminCreds.password = newPassword;
-                saveData(ADMIN_CREDS_KEY, adminCreds);
-                showAlert('adminAlert', 'success', 'Admin password updated successfully.');
-                e.target.reset();
-            }
-            
-            function togglePasswordVisibility(e) {
-                const button = e.currentTarget;
-                const input = button.closest('.password-toggle').querySelector('input');
-                const icon = button.querySelector('i');
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                } else {
-                    input.type = 'password';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                }
-            }
-            
-            function showAlert(alertId, type, message) {
-                const alertBox = document.getElementById(alertId);
-                alertBox.className = `alert alert-${type}`;
-                alertBox.textContent = message;
-                alertBox.style.display = 'block';
-                setTimeout(() => { alertBox.style.display = 'none'; }, 5000);
-            }
-            
-            initializeApp();
-        });
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
     </script>
+    <style>
+        .settings-section { display: none; }
+        .settings-section.active { display: block; }
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 9999;
+        }
+        .notification.success { background: #10b981; color: white; }
+        .notification.error { background: #ef4444; color: white; }
+        .notification.info { background: #3b82f6; color: white; }
+        .notification.warning { background: #f59e0b; color: white; }
+        .table-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
+    </style>
 </body>
 </html>

@@ -185,8 +185,16 @@
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
+            gap: 1rem;
             margin-bottom: 1.5rem;
+        }
+
+        .summary-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .type-grid {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
         }
 
         .card {
@@ -214,17 +222,150 @@
         .card-header h2 { font-size: 1.1rem; font-weight: 600; color: var(--dark); }
         .card-body { padding: 1.5rem; }
 
-        .stat-card .card-body { display: flex; flex-direction: column; }
-        .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--dark); }
-        .stat-label { color: var(--secondary); font-size: 1rem; font-weight: 500;}
+        .stat-card .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 128px;
+            text-align: center;
+        }
+        .stat-value { font-size: 3rem; line-height: 1; font-weight: 800; color: var(--dark); }
+        .stat-label { color: var(--secondary); font-size: 1rem; font-weight: 600; margin-top: 0.7rem;}
 
         .type-card { text-align: center; }
-        .type-card .stat-icon { font-size: 1.5rem; color: var(--primary); margin-bottom: 0.5rem; }
+        .type-card .card-body {
+            min-height: 184px;
+            padding: 1.75rem 1rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .type-card .stat-icon { font-size: 1.5rem; color: var(--primary); margin-bottom: 0.7rem; }
         .type-card .stat-label { font-size: 1rem; font-weight: 600; color: var(--dark); }
-        .type-card .stat-value { font-size: 1.75rem; }
+        .type-card .stat-value { font-size: 1.9rem; margin-top: 1rem; }
         .type-card .stat-breakdown { display: flex; justify-content: center; gap: 1rem; margin-top: 0.5rem; font-size: 0.85rem;}
         .type-card .stat-breakdown .available { color: var(--success); }
         .type-card .stat-breakdown .in-use { color: var(--info); }
+
+        .card-download-btn {
+            position: absolute;
+            top: 0.85rem;
+            right: 0.85rem;
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            color: var(--secondary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .card-download-btn:hover {
+            background: var(--light);
+            color: var(--primary);
+        }
+
+        @media (max-width: 760px) {
+            .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .type-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+            .app-container { flex-direction: column; }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                z-index: 999;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active { transform: translateX(0); }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                flex: 1;
+            }
+
+            .mobile-menu-toggle {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--light);
+                border: none;
+                color: var(--dark);
+                cursor: pointer;
+                width: 40px;
+                height: 40px;
+                border-radius: 8px;
+                font-size: 1.3rem;
+                margin-right: 0.75rem;
+            }
+
+            .header {
+                padding: 0.75rem 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .header-title h1 { font-size: 1.3rem; }
+            .header-title p { display: none; }
+
+            .card { padding: 1rem; }
+            .card-header h2 { font-size: 1.1rem; }
+
+            .summary-grid,
+            .type-grid { gap: 0.75rem; }
+
+            .stat-card { padding: 1rem; }
+            .stat-value { font-size: 1.8rem; }
+            .stat-label { font-size: 0.9rem; }
+
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            table { font-size: 0.85rem; }
+            th, td { padding: 0.75rem 0.5rem; }
+        }
+
+        @media (max-width: 520px) {
+            .summary-grid,
+            .type-grid { grid-template-columns: 1fr; }
+
+            .mobile-menu-toggle { display: inline-flex; }
+
+            .header { flex-wrap: wrap; padding: 0.5rem; }
+            .header-title h1 { font-size: 1.1rem; margin: 0; }
+
+            .main-content { padding: 0.5rem; }
+
+            .card { padding: 0.75rem; margin-bottom: 0.75rem; }
+
+            .stat-value { font-size: 1.5rem; }
+            .stat-label { font-size: 0.8rem; }
+
+            table { font-size: 0.75rem; }
+            th, td { padding: 0.5rem 0.35rem; }
+
+            .btn { padding: 0.5rem 0.75rem; font-size: 0.8rem; }
+            .btn-sm { padding: 0.35rem 0.6rem; font-size: 0.7rem; }
+
+            .modal-content { width: 95%; max-width: 90vw; }
+            .modal-header { padding: 1rem; }
+            .modal-body { padding: 1rem; }
+        }
         
         .btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
@@ -341,12 +482,16 @@
                 <a href="supervisor.html" class="menu-item"><i class="fas fa-user-shield"></i><span>Supervisor</span></a>
                 <a href="transfers.html" class="menu-item"><i class="fas fa-exchange-alt"></i><span>Transfers</span></a>
                 <a href="reports.html" class="menu-item"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
+                <a href="data-collectors.html" class="menu-item"><i class="fas fa-users"></i><span>Data Collectors</span></a>
                 <a href="settings.html" class="menu-item"><i class="fas fa-cog"></i><span>Settings</span></a>
             </nav>
         </aside>
 
         <main class="main-content">
             <header class="header">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" style="display:none;">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <div class="header-title">
                     <h1>INVENTORY DASHBOARD <button class="refresh-btn" id="refreshBtn" title="Refresh Data"><i class="fas fa-sync-alt"></i></button></h1>
                     <p>Field equipment tracking & management overview</p>
@@ -378,7 +523,7 @@
                 </div>
             </header>
 
-            <div class="dashboard-grid">
+            <div class="dashboard-grid summary-grid">
                 <div class="card stat-card"><div class="card-body">
                     <div class="stat-value" id="totalInventoryValue">0</div>
                     <div class="stat-label">Total Inventory Items</div>
@@ -397,8 +542,9 @@
                 </div></div>
             </div>
             
-            <div class="dashboard-grid">
+            <div class="dashboard-grid type-grid">
                 <div class="card type-card"><div class="card-body">
+                    <button class="card-download-btn" title="Download Tablets List" data-download-type="type" data-type="tablet" aria-label="Download Tablets List"><i class="fas fa-download"></i></button>
                     <div class="stat-icon"><i class="fas fa-tablet-alt"></i></div>
                     <div class="stat-label">Tablets</div>
                     <div class="stat-value" id="tabletsTotal">0</div>
@@ -408,6 +554,7 @@
                     </div>
                 </div></div>
                 <div class="card type-card"><div class="card-body">
+                    <button class="card-download-btn" title="Download Phones List" data-download-type="type" data-type="phone" aria-label="Download Phones List"><i class="fas fa-download"></i></button>
                     <div class="stat-icon"><i class="fas fa-mobile-alt"></i></div>
                     <div class="stat-label">Phones</div>
                     <div class="stat-value" id="phonesTotal">0</div>
@@ -417,6 +564,7 @@
                     </div>
                 </div></div>
                 <div class="card type-card"><div class="card-body">
+                    <button class="card-download-btn" title="Download Chargers List" data-download-type="type" data-type="charger" aria-label="Download Chargers List"><i class="fas fa-download"></i></button>
                     <div class="stat-icon"><i class="fas fa-charging-station"></i></div>
                     <div class="stat-label">Chargers</div>
                     <div class="stat-value" id="chargersTotal">0</div>
@@ -426,6 +574,7 @@
                     </div>
                 </div></div>
                 <div class="card type-card"><div class="card-body">
+                    <button class="card-download-btn" title="Download Bags List" data-download-type="type" data-type="bag" aria-label="Download Bags List"><i class="fas fa-download"></i></button>
                     <div class="stat-icon"><i class="fas fa-briefcase"></i></div>
                     <div class="stat-label">Bags</div>
                     <div class="stat-value" id="bagsTotal">0</div>
@@ -435,6 +584,7 @@
                     </div>
                 </div></div>
                 <div class="card type-card"><div class="card-body">
+                    <button class="card-download-btn" title="Download Power Banks List" data-download-type="type" data-type="power-bank" aria-label="Download Power Banks List"><i class="fas fa-download"></i></button>
                     <div class="stat-icon"><i class="fas fa-car-battery"></i></div>
                     <div class="stat-label">Power Banks</div>
                     <div class="stat-value" id="powerbanksTotal">0</div>
@@ -492,6 +642,7 @@
     <script src="supabase-config.js"></script>
     <script>
         let currentUser = null;
+        let dashboardInventory = [];
 
         document.addEventListener('DOMContentLoaded', async function() {
             // Security Check
@@ -540,13 +691,15 @@
                 // Get notifications
                 const { data: notifications, error: notifError } = await db.getNotifications();
                 if (notifError) throw notifError;
+
+                dashboardInventory = inventory || [];
                 
                 // Update UI
-                updateStats(inventory);
-                updateTypeStats(inventory);
-                updateApprovalQueue(inventory, logs);
-                updateDistrictInventory(inventory, supervisors, districts);
-                updateRecentActivity(logs, inventory);
+                updateStats(dashboardInventory);
+                updateTypeStats(dashboardInventory);
+                updateApprovalQueue(dashboardInventory, logs);
+                updateDistrictInventory(dashboardInventory, supervisors, districts);
+                updateRecentActivity(logs, dashboardInventory);
                 updateNotifications(notifications);
                 
             } catch (error) {
@@ -587,6 +740,37 @@
                 if (availableEl) availableEl.textContent = available;
                 if (inUseEl) inUseEl.textContent = inUse;
             });
+        }
+
+        function downloadCSV(data, filename = 'export.csv') {
+            if (!data || data.length === 0) {
+                showError('No data available to download.');
+                return;
+            }
+
+            const headers = Array.from(data.reduce((set, row) => {
+                Object.keys(row || {}).forEach(key => set.add(key));
+                return set;
+            }, new Set()));
+
+            const csvRows = [
+                headers.join(','),
+                ...data.map(row => headers.map(header => {
+                    const value = row?.[header] ?? '';
+                    return `"${String(value).replace(/"/g, '""')}"`;
+                }).join(','))
+            ];
+
+            const blob = new Blob([csvRows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
         function updateApprovalQueue(inventory, logs) {
@@ -830,6 +1014,33 @@
         }
 
         function setupEventListeners() {
+            // Mobile menu toggle
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            // Close sidebar when clicking on a menu item
+            if (sidebar) {
+                sidebar.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        sidebar.classList.remove('active');
+                    });
+                });
+            }
+
+            // Close sidebar when clicking outside of it
+            document.addEventListener('click', (e) => {
+                if (sidebar && sidebar.classList.contains('active') && 
+                    !sidebar.contains(e.target) && 
+                    !mobileMenuToggle?.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
+
             // Logout
             document.getElementById('logout-btn').addEventListener('click', () => {
                 sessionStorage.removeItem('loggedInUser');
@@ -895,6 +1106,18 @@
                 }
                 
                 notificationDropdown.style.display = 'none';
+            });
+
+            document.querySelector('.main-content').addEventListener('click', (e) => {
+                const downloadBtn = e.target.closest('.card-download-btn');
+                if (!downloadBtn) return;
+
+                const downloadType = downloadBtn.dataset.downloadType;
+                if (downloadType === 'type') {
+                    const itemType = downloadBtn.dataset.type;
+                    const typeData = dashboardInventory.filter(item => item.type === itemType);
+                    downloadCSV(typeData, `inventory_${itemType}.csv`);
+                }
             });
         }
 
