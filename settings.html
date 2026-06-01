@@ -242,6 +242,8 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            flex-wrap: wrap;
+            word-break: break-word;
         }
 
         .settings-card-body {
@@ -276,7 +278,7 @@
 
         .form-row {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
         }
 
@@ -361,6 +363,13 @@
             background: var(--light);
         }
 
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
         .badge {
             display: inline-block;
             padding: 0.25rem 0.5rem;
@@ -429,6 +438,7 @@
             display: flex;
             justify-content: flex-end;
             gap: 0.75rem;
+            flex-wrap: wrap;
         }
 
         .alert {
@@ -494,6 +504,24 @@
         @media (max-width: 1024px) {
             .header-right {
                 gap: 1rem;
+            }
+
+            .settings-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .settings-card-header h3 {
+                margin-bottom: 0.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
             }
         }
 
@@ -622,6 +650,23 @@
             .table-responsive {
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
+                border-radius: 8px;
+                margin-bottom: 0.5rem;
+            }
+
+            .table-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 0.3rem;
+                align-items: stretch;
+            }
+
+            .table-actions .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 0.4rem 0.5rem;
+                font-size: 0.7rem;
+                min-height: 32px;
             }
 
             .badge {
@@ -647,6 +692,47 @@
                 padding: 0.65rem;
                 font-size: 0.9rem;
             }
+
+            .settings-nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0;
+                overflow-x: auto;
+            }
+
+            .settings-nav-item {
+                flex: 1;
+                min-width: 140px;
+                padding: 0.75rem 0.5rem;
+                font-size: 0.85rem;
+                text-align: center;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                white-space: normal;
+                line-height: 1.2;
+            }
+
+            .settings-nav-item i {
+                display: block;
+                margin-bottom: 0.25rem;
+            }
+
+            .settings-nav-item.active {
+                border-left: none;
+                border-bottom-color: var(--primary);
+                background: var(--light);
+            }
+
+            .modal-footer {
+                padding: 1rem;
+                flex-direction: column-reverse;
+                gap: 0.5rem;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+                padding: 0.65rem 1rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -657,37 +743,181 @@
             .header {
                 padding: 0.5rem 0.75rem;
                 margin-bottom: 0.75rem;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .header-title {
+                width: 100%;
+                margin-bottom: 0.75rem;
             }
 
             .header-title h1 {
-                font-size: 1.15rem;
+                font-size: 1.1rem;
+                margin: 0;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+                gap: 0.5rem;
+            }
+
+            .settings-nav {
+                gap: 0;
+                display: flex;
+                flex-wrap: wrap;
             }
 
             .settings-nav-item {
-                padding: 0.75rem 1rem;
+                flex: 0 1 calc(50% - 2px);
+                min-width: auto;
+                padding: 0.6rem 0.25rem;
+                font-size: 0.75rem;
+                text-align: center;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+            }
+
+            .settings-nav-item i {
                 font-size: 0.9rem;
+                margin-bottom: 0.1rem;
+            }
+
+            .settings-nav-item.active {
+                border-left: none;
+                border-bottom-color: var(--primary);
             }
 
             .settings-card-header {
                 padding: 0.75rem;
+                gap: 0.5rem;
+            }
+
+            .settings-card-header h3 {
+                font-size: 0.95rem;
+                flex: 0 1 100%;
+            }
+
+            .settings-card-header .btn-sm {
+                align-self: center;
+                width: auto;
             }
 
             .settings-card-body {
                 padding: 0.75rem;
             }
 
+            .form-group {
+                margin-bottom: 0.75rem;
+            }
+
+            .form-group label {
+                font-size: 0.85rem;
+            }
+
+            .form-control, .form-select {
+                padding: 0.6rem;
+                font-size: 0.95rem;
+            }
+
+            .data-table {
+                font-size: 0.75rem;
+            }
+
             .data-table th, .data-table td {
                 padding: 0.4rem 0.5rem;
             }
 
-            .btn-sm {
-                padding: 0.3rem 0.6rem;
+            .table-actions {
+                gap: 0.2rem;
+            }
+
+            .table-actions .btn {
+                padding: 0.35rem 0.4rem;
+                font-size: 0.65rem;
+                min-height: 28px;
+            }
+
+            .btn {
+                padding: 0.5rem 0.65rem;
                 font-size: 0.75rem;
+                min-height: 32px;
+            }
+
+            .btn-sm {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.7rem;
+                min-height: 28px;
             }
 
             .modal-content {
                 width: 95%;
-                max-width: none;
+                max-width: 100%;
+                max-height: 90vh;
+            }
+
+            .modal-header {
+                padding: 0.75rem;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+            }
+
+            .modal-header h3 {
+                font-size: 0.95rem;
+                min-width: 150px;
+                flex: 0 1 100%;
+            }
+
+            .modal-close {
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .modal-body {
+                padding: 0.75rem;
+                max-height: calc(90vh - 100px);
+                overflow-y: auto;
+            }
+
+            .modal-footer {
+                padding: 0.75rem;
+                gap: 0.4rem;
+                flex-direction: column-reverse;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+                padding: 0.5rem 0.75rem;
+                font-size: 0.75rem;
+            }
+
+            .badge {
+                padding: 0.15rem 0.35rem;
+                font-size: 0.6rem;
+            }
+
+            .alert {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .form-text {
+                font-size: 0.65rem;
+            }
+
+            .super-admin-badge {
+                font-size: 0.6rem;
+                padding: 0.15rem 0.4rem;
+            }
+
+            .info-banner {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+                margin-top: 0.75rem;
             }
         }
     </style>
@@ -1605,5 +1835,6 @@
         .btn-warning { background: #f59e0b; color: white; }
         .btn-warning:hover { background: #d97706; }
     </style>
+    <script src="responsive.js"></script>
 </body>
 </html>
